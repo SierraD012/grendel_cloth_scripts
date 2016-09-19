@@ -23,7 +23,7 @@ def clearTranslate(list):
 
 #Selects/Returns Full Rig
 def selectRig():
- 
+
     ten_body_controls = [
     "ten_rig_main_l_armEnd_FK_CTL",
     "ten_rig_main_l_armIK_CTL",
@@ -148,28 +148,55 @@ def selectRig():
     mc.select(fullRig, replace=True)
     return fullRig
 
-def APose():
-    #Handle Right Shoulder
-    mc.setAttr('ten_rig_main_r_shoulder_CTL.translateY', -0.04)
-    #Handle Right Arm
-    if mc.getAttr('ten_rig_main_r_arm_switch_CTL.IKFK_Switch') == 1: #FK
-        mc.rotate(0, 0, -45, 'ten_rig_main_r_armRoot_FK_CTL')
-    elif mc.getAttr('ten_rig_main_r_arm_switch_CTL.IKFK_Switch') == 0: #IK
-        mc.setAttr('ten_rig_main_r_armIK_CTL.translateX', 0.2)
-        mc.setAttr('ten_rig_main_r_armIK_CTL.translateY', 0.5)
-        mc.setAttr('ten_rig_main_r_armIK_CTL.rotateZ', 45)
-        
-    #Handle Left Shoulder
-    mc.setAttr('ten_rig_main_l_shoulder_CTL.translateY', -0.04)
-    #Handle Left Arm
-    if mc.getAttr('ten_rig_main_l_arm_switch_CTL.IKFK_Switch') == 1: #FK
-        mc.rotate(0, 0, -45, 'ten_rig_main_l_armRoot_FK_CTL')
-    elif mc.getAttr('ten_rig_main_l_arm_switch_CTL.IKFK_Switch') == 0: #IK
-        mc.setAttr('ten_rig_main_l_armIK_CTL.translateX', -0.2)
-        mc.setAttr('ten_rig_main_l_armIK_CTL.translateY', -0.5)
-        mc.setAttr('ten_rig_main_l_armIK_CTL.rotateZ', 45)
+def keyArmFK():
+    mc.setAttr('ten_rig_main_l_arm_switch_CTL.IKFK_Switch', 1)
 
-def setKey(fullRig):
+    if (mc.getAttr('ten_rig_main_l_arm_switch_CTL.IKFK_Switch', keyable=True) or mc.getAttr('ten_rig_main_l_arm_switch_CTL.IKFK_Switch', channelBox=True)):
+        mc.setKeyframe('ten_rig_main_l_arm_switch_CTL.IKFK_Switch');
+        
+    mc.setAttr('ten_rig_main_r_arm_switch_CTL.IKFK_Switch', 1)
+
+    if (mc.getAttr('ten_rig_main_r_arm_switch_CTL.IKFK_Switch', keyable=True) or mc.getAttr('ten_rig_main_r_arm_switch_CTL.IKFK_Switch', channelBox=True)):
+        mc.setKeyframe('ten_rig_main_r_arm_switch_CTL.IKFK_Switch');
+
+def oldKeyArmIKFK(preRoll):
+    #Right Arm
+    #Check initial IKFK State
+    mc.currentTime(0)
+    if mc.getAttr('ten_rig_main_r_arm_switch_CTL.IKFK_Switch') == 0:
+        #Set Arm as FK
+        mc.setAttr('ten_rig_main_l_arm_switch_CTL.IKFK_Switch', 1)
+        
+        if (mc.getAttr('ten_rig_main_l_arm_switch_CTL.IKFK_Switch', keyable=True) or mc.getAttr('ten_rig_main_l_arm_switch_CTL.IKFK_Switch', channelBox=True)):
+            mc.setKeyframe('ten_rig_main_l_arm_switch_CTL.IKFK_Switch');
+        
+        
+        
+        #Set IKFK at zero
+        mc.setKeyframe('ten_rig_main_r_arm_switch_CTL.IKFK_Switch')
+        #Set IKFK at preRoll
+        mc.currentTime(preRoll)
+        mc.setAttr('ten_rig_main_r_arm_switch_CTL.IKFK_Switch', 1)
+        mc.setKeyframe('ten_rig_main_r_arm_switch_CTL.IKFK_Switch')
+    
+    #Left Arm
+    #Check initial IKFK State
+    mc.currentTime(0)
+    if mc.getAttr('ten_rig_main_l_arm_switch_CTL.IKFK_Switch') == 0:
+        #Set IKFK at zero
+        mc.setKeyframe('ten_rig_main_l_arm_switch_CTL.IKFK_Switch')
+        #Set IKFK at preRoll
+        mc.currentTime(preRoll)
+        mc.setAttr('ten_rig_main_l_arm_switch_CTL.IKFK_Switch', 1)
+        mc.setKeyframe('ten_rig_main_l_arm_switch_CTL.IKFK_Switch')
+
+def APose():
+    #Handle Right Arm
+    mc.rotate(0, 0, -40, 'ten_rig_main_r_armRoot_FK_CTL')
+    #Handle Left Arm
+    mc.rotate(0, 0, -40, 'ten_rig_main_l_armRoot_FK_CTL')
+
+def setRigKey(fullRig):
     #Key Translation
     mc.setKeyframe(fullRig, at='translateX')
     mc.setKeyframe(fullRig, at='translateY')
@@ -198,29 +225,53 @@ mc.currentTime(-20)
 #Collect Full Rig
 fullRig = selectRig()
 
+#Keyframe Arm IKFK
+keyArmFK()
+
 #Set TPose (Clear Transformations)
-clearRotate(fullRig + ["ten_rig_main_m_global_CTL"])
+clearRotate(fullRig)
 clearTranslate(fullRig)
+
+#Clear Move CTL Rotation
+mc.setAttr('ten_rig_main_m_global_CTL.rotateX', 0)
+mc.setAttr('ten_rig_main_m_global_CTL.rotateY', 0)
+mc.setAttr('ten_rig_main_m_global_CTL.rotateZ', 0)
 
 #Set APose (Adjust Arms)
 APose()
 
-#Set Keyframes
-setKey(fullRig)
+#Key fullRig
+setRigKey(fullRig)
+
+#Key Move CTL
+mc.setKeyframe('ten_rig_main_m_global_CTL', at='rotateX')
+mc.setKeyframe('ten_rig_main_m_global_CTL', at='rotateY')
+mc.setKeyframe('ten_rig_main_m_global_CTL', at='rotateZ')
 
 #Import/Move Cloth OBJ
 mc.file('/groups/dusk/production/assets/ten_robe_sim/model/main/ten_robe_sim_model_main.mb', i=True)
 alignToRigLoc('ten_Robe_Sim')
 alignToRigLoc('ten_Pants_Sim')
 alignToRigLoc('ten_Collider')
+alignToRigLoc('ten_Mittens')
+alignToRigLoc('ten_Sash_Sim')
 
 #Wrap Ten Collider to Rig
 mc.select('ten_Collider', replace=True)
 mc.select('ten_rig_main_Ten_Skin_RENDER', add=True)
 mc.CreateWrap()
 
-#Set Up Collider
+#Wrap Mittens to Collider
+mc.select('ten_Mittens', replace=True)
+mc.select('ten_Collider', add=True)
+mc.CreateWrap()
+
+#Set Up Ten Collider
 mc.select('ten_Collider', replace=True)
+mel.eval('makeCollideNCloth;')
+
+#Set Up Mittens Collider
+mc.select('ten_Mittens', replace=True)
 mel.eval('makeCollideNCloth;')
 
 #Set Up Cloth
@@ -248,5 +299,19 @@ mc.select('ten_Robe_Sim.vtx[699:701]', 'ten_Robe_Sim.vtx[1652]', 'ten_Robe_Sim.v
 mc.select('ten_Collider', toggle=True)
 mel.eval('createNConstraint pointToSurface 0;')
 
+#Cache Out the Cloth Sim
+shapeRelatives = mc.listRelatives('ten_Robe_Sim', shapes=True)
+print shapeRelatives
+mc.cacheFile(fileName='fileName', format='OneFilePerFrame', startTime=-20, endTime=186, points=shapeRelatives[1], directory='/users/animation/mitchbre/Documents/Cloth_Script_Files/Test_Cache')
+
+#YOU GOTS TO IMPORT THE CACHE, BRUH
+#We did it by selecting the mesh, and going to Geometry Cache > Import Cache
+mc.currentTime(-20)
+mc.cacheFile(attachFile=True, inAttr='ten_Robe_Sim') #THIS ISN'T WORKING. MAKE IT BETTER.
+
+#Group Colliders
+mc.group(['ten_Collider', 'ten_Mittens'], name='colliders')
+
 #Resources:
     #stackoverflow.com/questions/27104218/maya-different-behaviours-in-standalone-and-embedded-mode
+    #unblogdecolin.blogspot.com/2012/06/pyton-pymel-cachefile.html
