@@ -1,4 +1,5 @@
 import maya.mel as mel #Allows for evaluation of MEL
+import pymel.core as pc #Allows for evaluation of MEL
 import maya.cmds as mc
 
 #Clears Rotation on a List of Objects
@@ -300,17 +301,34 @@ mc.select('ten_Collider', toggle=True)
 mel.eval('createNConstraint pointToSurface 0;')
 
 #Cache Out the Cloth Sim
+filepath = '/users/animation/mitchbre/Documents/Cloth_Script_Files/Test_Cache'
 shapeRelatives = mc.listRelatives('ten_Robe_Sim', shapes=True)
 print shapeRelatives
-mc.cacheFile(fileName='fileName', format='OneFilePerFrame', startTime=-20, endTime=186, points=shapeRelatives[1], directory='/users/animation/mitchbre/Documents/Cloth_Script_Files/Test_Cache')
+mc.cacheFile(fileName='tenRobe_cache', format='OneFilePerFrame', startTime=-20, endTime=186, points=shapeRelatives[1], directory=filepath)
 
-#YOU GOTS TO IMPORT THE CACHE, BRUH
-#We did it by selecting the mesh, and going to Geometry Cache > Import Cache
+#Connect the Cloth Cache
 mc.currentTime(-20)
-mc.cacheFile(attachFile=True, inAttr='ten_Robe_Sim') #THIS ISN'T WORKING. MAKE IT BETTER.
+pc.mel.doImportCacheFile(filepath + '/tenRobe_cache.xml', '', ['ten_Robe_Sim'], list())
+
 
 #Group Colliders
-mc.group(['ten_Collider', 'ten_Mittens'], name='colliders')
+mc.group(['ten_Collider', 'ten_ColliderBase', 'ten_Mittens', 'nRigid1', 'nRigid2'], name='colliders')
+
+#Group Robe
+mc.group(['ten_Robe_Sim','ten_Sash_Sim'], name='robe_Objects' ) #Objects
+mc.group(['nCloth1','dynamicConstraint1'], name='robe_Sim' ) #Group Robe Sim
+mc.group(['robe_Objects', 'robe_Sim'], name='robe') #Group All Robe Groups
+
+#Group Pants
+mc.group(['ten_Pants_Sim'], name='pants_Objects') #Objects
+mc.group(['pants_Objects'], name='pants') #Group All Pants Groups
+
+#Group All
+mc.group(['colliders', 'robe', 'pants', 'nucleus1'], name='ClothSim')
+
+#Hide Unnescessary Objects
+mc.hide(['colliders', 'robe_Sim'])
+mc.hide(['pants', 'ten_Sash_Sim']) #TEMPORARY
 
 #Resources:
     #stackoverflow.com/questions/27104218/maya-different-behaviours-in-standalone-and-embedded-mode
