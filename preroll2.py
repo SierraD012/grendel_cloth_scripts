@@ -53,7 +53,7 @@ def selectRig():
     #"ten_rig_main_m_global_CTL", TEN'S POSITION - DO NOT PREROLL
     "ten_rig_main_m_head_CTL",
     "ten_rig_main_m_jaw_CTL",
-    "ten_rig_main_m_mouth_position_CTL",
+    #"ten_rig_main_m_mouth_position_CTL",
     "ten_rig_main_m_neck_CTL",
     "ten_rig_main_m_spine_FKchest_CTL",
     "ten_rig_main_m_spine_FKstomach_CTL",
@@ -75,7 +75,7 @@ def selectRig():
     "ten_rig_main_r_leg_root_FK_CTL",
     "ten_rig_main_r_lower_eyelid_CTL",
     "ten_rig_main_r_middle_CTL",
-    "ten_rig_main_r_mouth_corner_CTL",
+    #"ten_rig_main_r_mouth_corner_CTL",
     "ten_rig_main_r_pinky_CTL",
     "ten_rig_main_r_ring_CTL",
     "ten_rig_main_r_shoulder_CTL",
