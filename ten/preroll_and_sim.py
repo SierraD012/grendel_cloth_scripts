@@ -25,72 +25,24 @@ def clearTranslate(list):
 #Selects/Returns Full Rig
 def selectRig():
 
-    new_ten = [
-    "ten_rig_main_l_armEnd_FK_CTL",
-    "ten_rig_main_l_armIK_CTL",
-    "ten_rig_main_l_armMid_FK_CTL",
-    "ten_rig_main_l_armPV_CTL",
-    "ten_rig_main_l_armRoot_FK_CTL",
-    "ten_rig_main_l_arm_switch_CTL",
-    "ten_rig_main_l_eye_CTL",
-    "ten_rig_main_l_foot_CTL",
-    "ten_rig_main_l_hand_CTL",
-    "ten_rig_main_l_index_CTL",
-    "ten_rig_main_l_legIK_CTL",
-    "ten_rig_main_l_legPV_CTL",
-    "ten_rig_main_l_leg_end_FK_CTL",
-    "ten_rig_main_l_leg_mid_FK_CTL",
-    "ten_rig_main_l_leg_root_FK_CTL",
-    "ten_rig_main_l_lower_eyelid_CTL",
-    "ten_rig_main_l_lower_eyelid_tweaker_CTL",
-    "ten_rig_main_l_middle_CTL",
-    "ten_rig_main_l_pinky_CTL",
-    "ten_rig_main_l_ring_CTL",
-    "ten_rig_main_l_shoulder_CTL",
-    "ten_rig_main_l_thumb_CTL",
-    "ten_rig_main_l_upper_eyelid_CTL",
-    "ten_rig_main_l_upper_eyelid_tweaker_CTL",
-    "ten_rig_main_m_COG_CTL",
-    "ten_rig_main_m_IKSpinyThing_CTL",
-    "ten_rig_main_m_eyes_CTL",
-    #"ten_rig_main_m_global_CTL",
-    "ten_rig_main_m_head_CTL_NUL",
-    "ten_rig_main_m_jaw_CTL",
-    "ten_rig_main_m_neck_CTL",
-    "ten_rig_main_m_spine_FKchest_CTL",
-    "ten_rig_main_m_spine_FKstomach_CTL",
-    "ten_rig_main_m_spine_hips_CTL",
-    "ten_rig_main_r_armEnd_FK_CTL",
-    "ten_rig_main_r_armIK_CTL",
-    "ten_rig_main_r_armMid_FK_CTL",
-    "ten_rig_main_r_armPV_CTL",
-    "ten_rig_main_r_armRoot_FK_CTL",
-    "ten_rig_main_r_arm_switch_CTL",
-    "ten_rig_main_r_eye_CTL",
-    "ten_rig_main_r_foot_CTL",
-    "ten_rig_main_r_hand_CTL",
-    "ten_rig_main_r_index_CTL",
-    "ten_rig_main_r_legIK_CTL",
-    "ten_rig_main_r_legPV_CTL",
-    "ten_rig_main_r_leg_end_FK_CTL",
-    "ten_rig_main_r_leg_mid_FK_CTL",
-    "ten_rig_main_r_leg_root_FK_CTL",
-    "ten_rig_main_r_lower_eyelid_CTL",
-    "ten_rig_main_r_lower_eyelid_tweaker_CTL",
-    "ten_rig_main_r_middle_CTL",
-    "ten_rig_main_r_pinky_CTL",
-    "ten_rig_main_r_ring_CTL",
-    "ten_rig_main_r_shoulder_CTL",
-    "ten_rig_main_r_thumb_CTL",
-    "ten_rig_main_r_upper_eyelid_CTL",
-    "ten_rig_main_r_upper_eyelid_tweaker_CTL1"]
-
-    #Assemble Full Rig
-    fullRig = new_ten
+    controls = mc.ls("ten_*_CTL")
+    controls.extend( mc.ls("ten_rig_main_head_cc_01") )
+            
+    exclude_objects_with = [
+        "global",
+        "rotatex", "rotatey", "rotatez", 
+        "rotateX", "rotateY", "rotateZ", 
+        "scalex", "scaley", "scalez", 
+        "scaleX", "scaleY", "scaleZ", 
+        "translatex", "translatey", "translatez", 
+        "translateX", "translateY", "translateZ"]
     
-    #Create Selection from 'fullRig'
-    mc.select(fullRig, replace=True)
-    return fullRig
+    for exclusion_term in exclude_objects_with:
+        controls = [name for name in controls if exclusion_term not in name]
+        
+    mc.select(controls, replace=True)
+
+    return controls
 
 def keyArmFK():
     mc.setAttr('ten_rig_main_l_arm_switch_CTL.IKFK_Switch', 1)
