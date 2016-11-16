@@ -190,8 +190,8 @@ def keyArmFK():
     if (mc.getAttr('ten_rig_main_r_arm_switch_CTL.IKFK_Switch', keyable=True) or mc.getAttr('ten_rig_main_r_arm_switch_CTL.IKFK_Switch', channelBox=True)):
         mc.setKeyframe('ten_rig_main_r_arm_switch_CTL.IKFK_Switch');
 
-def scaleFingers():
-    fingers = [
+def fingerNames():
+    return [
     'ten_rig_main_l_hand_CTL',
     'ten_rig_main_l_thumb_CTL',
     'ten_rig_main_l_index_CTL',
@@ -205,10 +205,15 @@ def scaleFingers():
     'ten_rig_main_r_ring_CTL',
     'ten_rig_main_r_pinky_CTL']
     
-    for i in fingers:
+def scaleFingers():
+    for i in fingerNames():
         mc.setAttr(i + '.scaleX', 1)
-	mc.setKeyframe(i, at='scaleX')
+        mc.setKeyframe(i, at='scaleX')
 
+def keyFingers():
+    for i in fingerNames():
+	    mc.setKeyframe(i, at='scaleX')
+    
 
 def APose():
     #Handle Right Arm
@@ -225,6 +230,8 @@ def setRigKey(fullRig):
     mc.setKeyframe(fullRig, at='rotateX')
     mc.setKeyframe(fullRig, at='rotateY')
     mc.setKeyframe(fullRig, at='rotateZ')
+    
+    keyFingers()
 
 #Keyframe Initial Frame
 mc.currentTime(STARTANIM)
