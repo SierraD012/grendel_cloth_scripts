@@ -9,32 +9,8 @@ import maya.cmds as mc
 from byuam.project import Project
 from byuam.environment import Department, Environment
 
-'''
-THIS CODE IS TO BE RUN FROM THE ANIMATION FILE. Once the pre-roll script is run and a finished alembic has been exported: RUN THIS SCRIPT.
-
-It will:
-
-1. Open the corresponding cfx file (unless one doesn't exist - then it makes its own)
-2. Import/place Ten's cloth simulation meshes and objects
-3. Set up all colliders and nCloth objects
-
-What this script doesn't do (yet):
-
-1. Organize the outliner (I've been doing it by hand - gotta get better about that)
-2. Import the final "Hero" cloth meshes
-3. Wrape the "Hero" cloth meshes to the Simulation meshes
-
-Another Note: The Sash has no sim - it's too expensive/fragile. I've just been wrapping the Hero Sash Model to the Hero Robe Model.
-At some point we'll need to go back in and create a collider for the sash in some scenes, but for now it looks fine.
-
-MAKE SURE "EXCLUSIVE BIND" IS NOT SELECTED WHEN WRAPPING - ESPECIALLY THE SASH. Smh.
-
-Final Note: Some CFX scenes already have cloth simulations in them.
-IN THESE CASES IT'S IMPORTANT TO CREATE YOUR OWN NUCLEUS SEPERATE FROM ANY OTHER ROBES/TAPESTRIES.
-I've been naming Ten's nucelus "nucleus_ten"
-
-Feel free to look at some of the other semi-finished scenes. I believe B17 or B19 are good examples.
-'''
+STARTANIM = -5
+STARTPRE = -25
 
 #########################
 ## ESTABLISH CFX SCENE ##
@@ -47,7 +23,7 @@ def generateScene():
     environment = Environment()
 
     # Create a global position locator for Ten's Starting Location
-    mc.currentTime(0)
+    mc.currentTime(STARTANIM)
     globalPos = mc.spaceLocator(p=[0,0,0])
     globPos = mc.rename(globalPos, "tenGlobalPos")
     mc.select("ten_rig_main_m_global_CTL")
@@ -103,13 +79,19 @@ def generateScene():
     collide = "TEN_ANIM"
     mc.rename("ten_rig_main_Ten_Skin_RENDER", collide)
 
-    # Reference Ten's Robe
+    # Reference Ten's Sim Robe
     body = project.get_body("ten_robe_sim")
     element = body.get_element(Department.MODEL)
     robe_file = element.get_app_filepath()
     mc.file(robe_file, reference=True)
     
-    # set robe transforms to variables above
+    # Reference Ten's Hero Robe
+    body = project.get_body("ten_robe")
+    element = body.get_element(Department.MODEL)
+    robe_hero_file = element.get_app_filepath()
+    mc.file(robe_hero_file, reference=True)
+    
+    # Set Sim Robe transforms to variables above
     mc.setAttr("ten_robe_sim_model_main_ten_cloth.translateX", tx)
     mc.setAttr("ten_robe_sim_model_main_ten_cloth.translateY", ty)
     mc.setAttr("ten_robe_sim_model_main_ten_cloth.translateZ", tz)
@@ -117,8 +99,15 @@ def generateScene():
     mc.setAttr("ten_robe_sim_model_main_ten_cloth.rotateY", ry)
     mc.setAttr("ten_robe_sim_model_main_ten_cloth.rotateZ", rz)
     
+    # Set Hero Robe transforms to variables above
+    mc.setAttr("ten_robe_model_main_TEN_ROBE_HERO.translateX", tx)
+    mc.setAttr("ten_robe_model_main_TEN_ROBE_HERO.translateY", ty)
+    mc.setAttr("ten_robe_model_main_TEN_ROBE_HERO.translateZ", tz)
+    mc.setAttr("ten_robe_model_main_TEN_ROBE_HERO.rotateX", rx)
+    mc.setAttr("ten_robe_model_main_TEN_ROBE_HERO.rotateY", ry)
+    mc.setAttr("ten_robe_model_main_TEN_ROBE_HERO.rotateZ", rz)
+    
 generateScene()
-
 
 #######################
 ## Set Up Simulation ##
@@ -129,23 +118,25 @@ generateScene()
 
 mc.select('ten_robe_sim_model_main_ten_collide_body', replace=True)
 mc.viewFit() #Snap View to Body Collider
-mc.hide('TEN_ANIM')
-mc.playbackOptions(animationStartTime=-20)
-mc.playbackOptions(minTime=-20)
-mc.currentTime(-20)
+mc.playbackOptions(animationStartTime=STARTPRE)
+mc.playbackOptions(minTime=STARTPRE)
+mc.currentTime(STARTPRE)
 
 #Wrap Colliders to Alembic
 mc.select('ten_robe_sim_model_main_ten_collide_body', replace=True) #Wrap Body
 mc.select('TEN_ANIM', add=True)
 mc.CreateWrap()
+#mc.setAttr('wrap1.exclusiveBind', 0)
 
 mc.select('ten_robe_sim_model_main_ten_collide_mitten_l', replace=True) #Wrap Left Mitten
 mc.select('TEN_ANIM', add=True)
 mc.CreateWrap()
+#mc.setAttr('wrap2.exclusiveBind', 0)
 
 mc.select('ten_robe_sim_model_main_ten_collide_mitten_r', replace=True) #Wrap Right Mitten
 mc.select('TEN_ANIM', add=True)
 mc.CreateWrap()
+#mc.setAttr('wrap3.exclusiveBind', 0)
 
 #Establish Colliders
 mc.select('ten_robe_sim_model_main_ten_collide_body', replace=True) #Collider Body
@@ -230,5 +221,72 @@ mel.eval('createNConstraint pointToSurface 0;')
 #Set Nucleus Parameters (INCOMPLETE - New Nucleus specific to Ten?)
 mc.setAttr('nucleus1.subSteps', 15)
 mc.setAttr('nucleus1.maxCollisionIterations', 20)
-mc.setAttr('nucleus1.startFrame', -20)
+mc.setAttr('nucleus1.startFrame', STARTPRE)
 mc.setAttr('nucleus1.spaceScale', 0.45)
+
+#########################
+## PREPARE HERO MESHES ##
+#########################
+
+#Create Sleeveless Robe for Sash Sim
+mc.duplicate('ten_robe_model_main_ten_Hero_Robe')
+mc.rename('ten_robe_model_main_ten_Hero_Robe1', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless')
+
+mc.select('ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1861:1862]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1866:1869]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1872:1873]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1878:1881]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1884:1885]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1888]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1891]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1893:1894]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1898:1899]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2009:2010]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2021:2022]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2396:2397]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2402:2403]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2412]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2415]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2428:2429]', replace=True)
+mc.select('ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[968]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[971:972]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[975:976]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[979:980]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[983:984]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[987:988]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[991:992]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[995:996]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[999:1000]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1003:1004]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1007:1008]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1011:1012]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1015:1016]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1019:1020]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1023:1024]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1027:1028]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1031]', add=True)
+mc.delete()
+
+mc.select('ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[0:895]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[4452:4579]', replace=True)
+mc.select('ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[968:1639]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[3872:3935]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[4000:4127]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[4324:4451]', add=True)
+mc.delete()
+
+# Wrap Hero Meshes to Sim Meshes
+mc.select('ten_robe_model_main_ten_Hero_Robe', replace=True) #Wrap Robe
+mc.select('ten_robe_sim_model_main_ten_sim_robe', add=True)
+mc.CreateWrap()
+#mc.setAttr('wrap4.exclusiveBind', 0)
+
+mc.select('ten_robe_model_main_ten_Hero_Pants', replace=True) #Wrap Pants
+mc.select('ten_robe_sim_model_main_ten_sim_pants', add=True)
+mc.CreateWrap()
+#mc.setAttr('wrap5.exclusiveBind', 0)
+
+mc.select('ten_robe_model_main_ten_Hero_Robe_Sleeveless', replace=True) #Wrap Sleeveless Robe (Exclusive Bind)
+mc.select('ten_robe_model_main_ten_Hero_Robe', add=True)
+mc.CreateWrap()
+#mc.setAttr('wrap6.exclusiveBind', 1)
+
+mc.select('ten_robe_model_main_ten_Hero_Sash', replace=True) #Wrap Sash
+mc.select('ten_robe_model_main_ten_Hero_Robe_Sleeveless', add=True)
+mc.CreateWrap()
+#mc.setAttr('wrap7.exclusiveBind', 0)
+
+#Rename/Group Simulation Objects
+mc.rename('nucleus1', 'nucleus_ten') #Nucleus
+
+mc.rename('nRigid1', 'nRigid_ten_body') #nRigid
+mc.rename('nRigid2', 'nRigid_ten_mitten_l')
+mc.rename('nRigid3', 'nRigid_ten_mitten_r')
+mc.group('nRigid_ten_body', 'nRigid_ten_mitten_l', 'nRigid_ten_mitten_r', name='ten_nRigid')
+
+mc.rename('nCloth1', 'nCloth_ten_robe') #nCloth
+mc.rename('nCloth2', 'nCloth_ten_pants')
+mc.group('nCloth_ten_robe', 'nCloth_ten_pants', name='ten_nCloth')
+
+mc.rename('dynamicConstraint1', 'dynamicConstraint_ten_robe_lapel') #dynamicConstraint
+mc.rename('dynamicConstraint2', 'dynamicConstraint_ten_robe_back')
+mc.rename('dynamicConstraint3', 'dynamicConstraint_ten_robe_front')
+mc.rename('dynamicConstraint4', 'dynamicConstraint_ten_pants')
+mc.group('dynamicConstraint_ten_robe_lapel', 'dynamicConstraint_ten_robe_back', 'dynamicConstraint_ten_robe_front', 'dynamicConstraint_ten_pants', name='ten_dynamicConstraint')
+
+mc.group('nucleus_ten', 'ten_nRigid', 'ten_nCloth', 'ten_dynamicConstraint', name='ten_simulation')
+
+#Group Alembic Objects
+mc.group('TEN_ANIM', 'TEN_ANIMBase', 'TEN_ANIMBase1', 'TEN_ANIMBase2', name='ten_alembic')
+
+#Group Ten Cloth
+mc.group('ten_robe_sim_model_main_ten_cloth', 'ten_robe_model_main_TEN_ROBE_HERO', 'ten_simulation', 'ten_alembic', name='ten_cloth')
+
+#Hide Unnescessary Objects
+mc.hide('ten_simulation')
+mc.hide('ten_robe_sim_model_main_ten_cloth')
