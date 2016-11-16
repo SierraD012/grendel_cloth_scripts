@@ -1,21 +1,15 @@
 #Authors: Daniel Fuller, Brennan Mitchell
 import os
 
-'''
-This script should be run in a FINISHED (or at least splined) animation file.
-
-The Final line of code opens the alembic exporter, so I've commented it out. MAKE SURE THE PRE-ROLL IS SMOOTH/CLEAN. No self-collisions, no stepping.
-
-Once that's all set up you can run the Alembic Exporter personally from the toolbar or with the last line of code.
-'''
-
-
 import maya
 import maya.mel as mel #Allows for evaluation of MEL
 import maya.cmds as mc
 
 from byuam.project import Project
 from byuam.environment import Department, Environment
+
+STARTANIM = -5
+STARTPRE = -25
 
 
 ############################
@@ -233,12 +227,12 @@ def setRigKey(fullRig):
     mc.setKeyframe(fullRig, at='rotateZ')
 
 #Keyframe Initial Frame
-mc.currentTime(0)
+mc.currentTime(STARTANIM)
 fullRig = selectRig()
 setRigKey(fullRig)
 
 #Set T-Pose (Clear Transformations)
-mc.currentTime(-20)
+mc.currentTime(STARTPRE)
 
 selectRig()
 keyArmFK()
@@ -271,6 +265,6 @@ mc.setKeyframe('ten_rig_main_r_shoulder_CTL', at='rotateZ')
 
 
 #Export Alembic (Requires User Input - Select Ten's Rig)
-mc.playbackOptions(animationStartTime=-20)
+mc.playbackOptions(animationStartTime=STARTPRE)
 import alembic_exporter
-#alembic_exporter.go() #This is the alembic exporter. Use at own risk.
+alembic_exporter.go()
