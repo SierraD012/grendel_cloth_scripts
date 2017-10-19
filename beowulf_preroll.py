@@ -52,133 +52,219 @@ def clearTranslate(list):
 
 #Selects/Returns Full Rig
 def selectRig():
-    ten_head = [
-    'ten_rig_main_head_cc_01',
-    'ten_rig_main_head_top_squash_cc_01',
-    'ten_rig_main_head_mid_squash_cc_01',
-    'ten_rig_main_head_bottom_squash_cc_01']
+
+# getting all the cc_01 rig control objects into groups and selecting all 
+# I just tested each section individually and then all together too
+# they all seem to select everything just fine
+
+    beowulf_main = [
+	'Beowulf_main_cc_01',
+	'Beowulf_secondary_global_cc_01',
+	'Beowulf_primary_global_cc_01'
+	]
+
+     beowulf_head = [
+	'Beowulf_head_cc_01',
+	'Beowulf_jaw_cc_01',
+	'Beowulf_head_settings_cc_01' #not sure about the settings ones
+	]
+
+     beowulf_eyes = [
+	'Beowulf_LFT_eye_rotate_cc_01', 	#Left
+	'Beowulf_LFT_LOW_eyelid_cc_01',	
+	'Beowulf_LFT_UPP_eyelid_cc_01',
+	'Beowulf_LFT_OUT_eyebrow_cc_01',
+	'Beowulf_LFT_MID_eyebrow_cc_01',
+	'Beowulf_LFT_INN_eyebrow_cc_01',
+	'Beowulf_LFT_MAIN_eyebrow_cc_01',
+	'Beowulf_RGT_eye_rotate_cc_01',		#Right
+	'Beowulf_RGT_LOW_eyelid_cc_01',	
+	'Beowulf_RGT_UPP_eyelid_cc_01',
+	'Beowulf_RGT_OUT_eyebrow_cc_01',
+	'Beowulf_RGT_MID_eyebrow_cc_01',
+	'Beowulf_RGT_INN_eyebrow_cc_01',
+	'Beowulf_RGT_MAIN_eyebrow_cc_01',
+	'Beowulf_LFT_eye_aim_cc_01',
+	'Beowulf_RGT_eye_aim_cc_01',
+	'Beowulf_both_eyes_aim_cc_01'
+	]
     
-    ten_eyebrows = [
-    'ten_rig_main_eyebrow_r_full_cc_01', #Right
-    'ten_rig_main_eyebrow_r_OUT_cc_01',
-    'ten_rig_main_eyebrow_r_MID_cc_01',
-    'ten_rig_main_eyebrow_r_INN_cc_01',
-    'ten_rig_main_eyebrow_l_full_cc_01', #Left
-    'ten_rig_main_eyebrow_l_OUT_cc_01',
-    'ten_rig_main_eyebrow_l_MID_cc_01',
-    'ten_rig_main_eyebrow_l_INN_cc_01']
+    beowulf_mouth = [
+    	'Beowulf_tongue_tip_cc_01',
+    	'Beowulf_tongue_middle_cc_01',
+    	'Beowulf_tongue_root_cc_01',
+    	'Beowulf_LOW_teeth_cc_01',
+    	'Beowulf_UPP_teeth_cc_01'
+     ]
     
-    ten_eyes = [
-    'ten_rig_main_eye_r_full_cc_01', #Right
-    'ten_rig_main_r_upper_eyelid_CTL',
-    'ten_rig_main_r_upper_eyelid_tweaker_CTL', #Legacy: suffix '1'
-    'ten_rig_main_r_lower_eyelid_CTL',
-    'ten_rig_main_r_lower_eyelid_tweaker_CTL',
-    'ten_rig_main_eye_r_cc_01',
-    'ten_rig_main_pupil_r_cc_01',
-    'ten_rig_main_eye_l_full_cc_01', #Left
-    'ten_rig_main_l_upper_eyelid_CTL',
-    'ten_rig_main_l_upper_eyelid_tweaker_CTL',
-    'ten_rig_main_l_lower_eyelid_CTL',
-    'ten_rig_main_l_lower_eyelid_tweaker_CTL',
-    'ten_rig_main_eye_l_cc_01',
-    'ten_rig_main_pupil_l_cc_01',
-    'ten_rig_main_m_eyes_CTL', #Lookat
-    'ten_rig_main_r_eye_CTL',
-    'ten_rig_main_l_eye_CTL']
+    beowulf_neck = [
+	'Beowulf_UPP_neck_cc_01',
+	'Beowulf_MID_neck_cc_01',
+	'Beowulf_LOW_neck_cc_01',
+	'Beowulf_neck_base_cc_01',
+	'Beowulf_neck_settings_cc_01'
+	]
     
-    ten_squint = [
-    'ten_rig_main_squint_r_full_cc_01', #Right
-    'ten_rig_main_squint_r_OUT_cc_01',
-    'ten_rig_main_squint_r_MID_cc_01',
-    'ten_rig_main_squint_r_INN_cc_01',
-    'ten_rig_main_squint_l_full_cc_01', #Left
-    'ten_rig_main_squint_l_OUT_cc_01',
-    'ten_rig_main_squint_l_MID_cc_01',
-    'ten_rig_main_squint_l_INN_cc_01']
-    
-    ten_ears = [
-    'ten_rig_main_ear_r_cc_01', #Right
-    'ten_rig_main_earlobe_r_cc_01',
-    'ten_rig_main_ear_l_cc_01', #Left
-    'ten_rig_main_earlobe_l_cc_01']
-    
-    ten_nose = [
-    'ten_rig_main_nose_full_cc_01',
-    'ten_rig_main_nostril_sneer_r_cc_01',
-    'ten_rig_main_nostril_sneer_l_cc_01',
-    'ten_rig_main_nose_tip_cc_01']
-    
-    ten_mouth = [
-    'ten_rig_main_mouth_full_cc_01',
-    'ten_rig_main_lips_r_corner_cc_01',
-    'ten_rig_main_lips_l_corner_cc_01']
-    
-    ten_lips = [
-    'ten_rig_main_upper_lip_full_cc_01', #Top
-    'ten_rig_main_upper_lip_RGT_cc_01',
-    'ten_rig_main_upper_lip_MID_cc_01',
-    'ten_rig_main_upper_lip_LFT_cc_01',
-    'ten_rig_main_lower_lip_full_cc_01', #Bottom
-    'ten_rig_main_lower_lip_RGT_cc_01',
-    'ten_rig_main_lower_lip_MID_cc_01',
-    'ten_rig_main_lower_lip_LFT_cc_01']
-    
-    ten_cheeks_chin = [
-    'ten_rig_main_cheek_r_cc_01',
-    'ten_rig_main_cheek_l_cc_01',
-    'ten_rig_main_jaw_cc_01']
-    
-    ten_neck_abdomen = [
-    'ten_rig_main_m_neck_CTL',
-    'ten_rig_main_m_spine_FKchest_CTL',
-    'ten_rig_main_m_IKSpinyThing_CTL',
-    'ten_rig_main_m_spine_FKstomach_CTL']
-    
-    ten_arms = [
-    'ten_rig_main_r_shoulder_CTL', #Right
-    'ten_rig_main_r_armRoot_FK_CTL',
-    'ten_rig_main_r_armMid_FK_CTL',
-    'ten_rig_main_r_armEnd_FK_CTL',
-    'ten_rig_main_r_arm_switch_CTL',
-    'ten_rig_main_l_shoulder_CTL', #Left
-    'ten_rig_main_l_armRoot_FK_CTL',
-    'ten_rig_main_l_armMid_FK_CTL',
-    'ten_rig_main_l_armEnd_FK_CTL',
-    'ten_rig_main_l_arm_switch_CTL']
-    
-    ten_hands = [
-    'ten_rig_main_r_hand_CTL', #Right
-    'ten_rig_main_r_thumb_CTL',
-    'ten_rig_main_r_index_CTL',
-    'ten_rig_main_r_middle_CTL',
-    'ten_rig_main_r_ring_CTL',
-    'ten_rig_main_r_pinky_CTL',
-    'ten_rig_main_l_hand_CTL', #Left
-    'ten_rig_main_l_thumb_CTL',
-    'ten_rig_main_l_index_CTL',
-    'ten_rig_main_l_middle_CTL',
-    'ten_rig_main_l_ring_CTL',
-    'ten_rig_main_l_pinky_CTL']
-    
-    ten_hips = [
-    'ten_rig_main_m_spine_hips_CTL',
-    'ten_rig_main_m_COG_CTL']
-    
-    ten_legs_feet = [
-    'ten_rig_main_r_legIK_CTL', #Right
-    'ten_rig_main_r_foot_CTL',
-    'ten_rig_main_r_legPV_CTL',
-    'ten_rig_main_l_legIK_CTL', #Left
-    'ten_rig_main_l_foot_CTL',
-    'ten_rig_main_l_legPV_CTL']
-    
-    fullRig = ten_head + ten_eyebrows + ten_eyes + ten_squint + ten_ears + ten_nose + ten_mouth + ten_lips + ten_cheeks_chin + ten_neck_abdomen + ten_arms + ten_hands + ten_hips + ten_legs_feet
+    beowulf_torso = [
+	'Beowulf_spine_settings_cc_01',
+	'Beowulf_chest_cc_01',
+	'Beowulf_UPP_belly_cc_01',
+	'Beowulf_MID_belly_cc_01',
+	'Beowulf_LOW_belly_cc_01',
+	'Beowulf_COG_cc_01'
+	]
+
+    beowulf_arms = [
+	'Beowulf_LFT_arm_settings_cc_01',	#Left
+	'Beowulf_LFT_IK_arm_cc_01',
+	'Beowulf_LFT_arm_pole_vector_cc_01',
+	'Beowulf_LFT_clavicle_cc_01',
+	'Beowulf_LFT_FK_wrist_cc_01',
+	'Beowulf_LFT_FK_lower_arm_cc_01',
+	'Beowulf_LFT_FK_upper_arm_cc_01',
+	'Beowulf_LFT_upper_arm_bendy_cc_01',
+	'Beowulf_LFT_upper_arm_bendy_low_tangent_cc_01',
+	'Beowulf_LFT_upper_arm_bendy_upp_tangent_cc_01',
+	'Beowulf_LFT_elbow_bendy_cc_01',
+	'Beowulf_LFT_elbow_bendy_low_tangent_cc_01',
+	'Beowulf_LFT_elbow_bendy_upp_tangent_cc_01',
+	'Beowulf_LFT_lower_arm_bendy_cc_01',
+	'Beowulf_LFT_lower_arm_bendy_low_tangent_cc_01',
+	'Beowulf_LFT_lower_arm_bendy_upp_tangent_cc_01',
+	'Beowulf_LFT_wrist_bendy_cc_01',
+	'Beowulf_LFT_wrist_bendy_upp_tangent_cc_01',
+	'Beowulf_LFT_shoulder_bendy_cc_01',
+	'Beowulf_LFT_shoulder_bendy_low_tangent_cc_01',
+
+	'Beowulf_RGT_arm_settings_cc_01',	#Right
+	'Beowulf_RGT_IK_arm_cc_01',
+	'Beowulf_RGT_arm_pole_vector_cc_01',
+	'Beowulf_RGT_clavicle_cc_01',
+	'Beowulf_RGT_FK_wrist_cc_01',
+	'Beowulf_RGT_FK_lower_arm_cc_01',
+	'Beowulf_RGT_FK_upper_arm_cc_01',
+	'Beowulf_RGT_upper_arm_bendy_cc_01',
+	'Beowulf_RGT_upper_arm_bendy_low_tangent_cc_01',
+	'Beowulf_RGT_upper_arm_bendy_upp_tangent_cc_01',
+	'Beowulf_RGT_elbow_bendy_cc_01',
+	'Beowulf_RGT_elbow_bendy_low_tangent_cc_01',
+	'Beowulf_RGT_elbow_bendy_upp_tangent_cc_01',
+	'Beowulf_RGT_lower_arm_bendy_cc_01',
+	'Beowulf_RGT_lower_arm_bendy_low_tangent_cc_01',
+	'Beowulf_RGT_lower_arm_bendy_upp_tangent_cc_01',
+	'Beowulf_RGT_wrist_bendy_cc_01',
+	'Beowulf_RGT_wrist_bendy_upp_tangent_cc_01',
+	'Beowulf_RGT_shoulder_bendy_cc_01',
+	'Beowulf_RGT_shoulder_bendy_low_tangent_cc_01'
+	]    
+
+    beowulf_hands = [
+	'Beowulf_LFT_hand_cupping_splaying_cc_01',	#Left
+	'Beowulf_LFT_thumb_primary_cc_01',
+	'Beowulf_LFT_thumb_MED_secondary_cc_01',
+	'Beowulf_LFT_thumb_DIS_secondary_cc_01',
+	'Beowulf_LFT_index_finger_primary_cc_01',
+	'Beowulf_LFT_index_finger_DIS_secondary_cc_01',
+	'Beowulf_LFT_index_finger_MED_secondary_cc_01',
+	'Beowulf_LFT_index_metacarpal_secondary_cc_01',
+	'Beowulf_LFT_middle_finger_DIS_secondary_cc_01',
+	'Beowulf_LFT_middle_finger_MED_secondary_cc_01',
+	'Beowulf_LFT_middle_finger_primary_cc_01',
+	'Beowulf_LFT_middle_metacarpal_secondary_cc_01',
+	'Beowulf_LFT_ring_finger_DIS_secondary_cc_01',
+	'Beowulf_LFT_ring_finger_MED_secondary_cc_01',
+	'Beowulf_LFT_ring_finger_primary_cc_01',
+	'Beowulf_LFT_ring_metacarpal_secondary_cc_01',
+	'Beowulf_LFT_pinky_finger_DIS_secondary_cc_01',
+	'Beowulf_LFT_pinky_finger_MED_secondary_cc_01',
+	'Beowulf_LFT_pinky_finger_primary_cc_01',
+	'Beowulf_LFT_pinky_metacarpal_secondary_cc_01',
+
+	'Beowulf_RGT_hand_cupping_splaying_cc_01',	#Right
+	'Beowulf_RGT_thumb_primary_cc_01',
+	'Beowulf_RGT_thumb_MED_secondary_cc_01',
+	'Beowulf_RGT_thumb_DIS_secondary_cc_01',
+	'Beowulf_RGT_index_finger_primary_cc_01',
+	'Beowulf_RGT_index_finger_DIS_secondary_cc_01',
+	'Beowulf_RGT_index_finger_MED_secondary_cc_01',
+	'Beowulf_RGT_index_metacarpal_secondary_cc_01',
+	'Beowulf_RGT_middle_finger_DIS_secondary_cc_01',
+	'Beowulf_RGT_middle_finger_MED_secondary_cc_01',
+	'Beowulf_RGT_middle_finger_primary_cc_01',
+	'Beowulf_RGT_middle_metacarpal_secondary_cc_01',
+	'Beowulf_RGT_ring_finger_DIS_secondary_cc_01',
+	'Beowulf_RGT_ring_finger_MED_secondary_cc_01',
+	'Beowulf_RGT_ring_finger_primary_cc_01',
+	'Beowulf_RGT_ring_metacarpal_secondary_cc_01',
+	'Beowulf_RGT_pinky_finger_DIS_secondary_cc_01',
+	'Beowulf_RGT_pinky_finger_MED_secondary_cc_01',
+	'Beowulf_RGT_pinky_finger_primary_cc_01',
+	'Beowulf_RGT_pinky_metacarpal_secondary_cc_01'
+	]
+	
+    beowulf_hips = [
+	'Beowulf_hips_cc_01',
+	'Beowulf_LFT_hip_bendy_low_tangent_cc_01',
+	'Beowulf_LFT_hip_bendy_cc_01'
+	]
+
+    beowulf_legs_feet = [
+	'Beowulf_LFT_leg_settings_cc_01',	#Left
+	'Beowulf_LFT_FK_ankle_cc_01',
+	'Beowulf_LFT_FK_lower_leg_cc_01',
+	'Beowulf_LFT_FK_upper_leg_cc_01',
+	'Beowulf_LFT_leg_pole_vector_cc_01',
+	'Beowulf_LFT_IK_leg_cc_01',
+	'Beowulf_LFT_upper_leg_bendy_cc_01',
+	'Beowulf_LFT_upper_leg_bendy_low_tangent_cc_01',
+	'Beowulf_LFT_upper_leg_bendy_upp_tangent_cc_01',
+	'Beowulf_LFT_knee_bendy_cc_01',
+	'Beowulf_LFT_knee_bendy_upp_tangent_cc_01',
+	'Beowulf_LFT_knee_bendy_low_tangent_cc_01',
+	'Beowulf_LFT_lower_leg_bendy_cc_01',
+	'Beowulf_LFT_lower_leg_bendy_low_tangent_cc_01',
+	'Beowulf_LFT_lower_leg_bendy_upp_tangent_cc_01',
+	'Beowulf_LFT_ankle_bendy_cc_01',
+	'Beowulf_LFT_ankle_bendy_upp_tangent_cc_01',
+	'Beowulf_LFT_foot_splaying_cc_01',
+	'Beowulf_LFT_foot_ball_cc_01',
+	'Beowulf_LFT_big_toe_DIS_secondary_cc_01',
+	'Beowulf_LFT_big_toe_MED_secondary_cc_01',
+	'Beowulf_LFT_big_toe_primary_cc_01',
+	'Beowulf_LFT_foot_ball_cc_01',
+
+	'Beowulf_RGT_leg_settings_cc_01',	#Right
+	'Beowulf_RGT_FK_ankle_cc_01',
+	'Beowulf_RGT_FK_lower_leg_cc_01',
+	'Beowulf_RGT_FK_upper_leg_cc_01',
+	'Beowulf_RGT_leg_pole_vector_cc_01',
+	'Beowulf_RGT_IK_leg_cc_01',
+	'Beowulf_RGT_upper_leg_bendy_cc_01',
+	'Beowulf_RGT_upper_leg_bendy_low_tangent_cc_01',
+	'Beowulf_RGT_upper_leg_bendy_upp_tangent_cc_01',
+	'Beowulf_RGT_knee_bendy_cc_01',
+	'Beowulf_RGT_knee_bendy_upp_tangent_cc_01',
+	'Beowulf_RGT_knee_bendy_low_tangent_cc_01',
+	'Beowulf_RGT_lower_leg_bendy_cc_01',
+	'Beowulf_RGT_lower_leg_bendy_low_tangent_cc_01',
+	'Beowulf_RGT_lower_leg_bendy_upp_tangent_cc_01',
+	'Beowulf_RGT_ankle_bendy_cc_01',
+	'Beowulf_RGT_ankle_bendy_upp_tangent_cc_01',
+	'Beowulf_RGT_foot_splaying_cc_01',
+	'Beowulf_RGT_foot_ball_cc_01',
+	'Beowulf_RGT_big_toe_DIS_secondary_cc_01',
+	'Beowulf_RGT_big_toe_MED_secondary_cc_01',
+	'Beowulf_RGT_big_toe_primary_cc_01',
+	'Beowulf_RGT_foot_ball_cc_01'
+	]
+
+    fullRig = beowulf_main + beowulf_head + beowulf_mouth + beowulf_neck + beowulf_torso + beowulf_arms + beowulf_hands + beowulf_hips + beowulf_legs_feet
     
     #Create Selection from 'fullRig'
     mc.select(fullRig, replace=True)
     return fullRig
 
+##TODO: change these to Beowulf's
 def keyArmFK():
     mc.setAttr('ten_rig_main_l_arm_switch_CTL.IKFK_Switch', 1)
 
@@ -192,18 +278,31 @@ def keyArmFK():
 
 def fingerNames():
     return [
-    'ten_rig_main_l_hand_CTL',
-    'ten_rig_main_l_thumb_CTL',
-    'ten_rig_main_l_index_CTL',
-    'ten_rig_main_l_middle_CTL',
-    'ten_rig_main_l_ring_CTL',
-    'ten_rig_main_l_pinky_CTL',
-    'ten_rig_main_r_hand_CTL',
-    'ten_rig_main_r_thumb_CTL',
-    'ten_rig_main_r_index_CTL',
-    'ten_rig_main_r_middle_CTL',
-    'ten_rig_main_r_ring_CTL',
-    'ten_rig_main_r_pinky_CTL']
+    #'ten_rig_main_l_hand_CTL',
+    #'ten_rig_main_l_thumb_CTL',
+    #'ten_rig_main_l_index_CTL',
+    #'ten_rig_main_l_middle_CTL',
+    #'ten_rig_main_l_ring_CTL',
+    #'ten_rig_main_l_pinky_CTL',
+    #'ten_rig_main_r_hand_CTL',
+    #'ten_rig_main_r_thumb_CTL',
+    #'ten_rig_main_r_index_CTL',
+    #'ten_rig_main_r_middle_CTL',
+    #'ten_rig_main_r_ring_CTL',
+    #'ten_rig_main_r_pinky_CTL'
+    'Beowulf_LFT_hand_cupping_splaying_cc_01',		#I'm not sure if these are the right controls for this
+    'Beowulf_LFT_thumb_primary_cc_01',
+    'Beowulf_LFT_index_metacarpal_secondary_cc_01',
+    'Beowulf_LFT_middle_metacarpal_secondary_cc_01',
+    'Beowulf_LFT_ring_metacarpal_secondary_cc_01',
+    'Beowulf_LFT_pinky_metacarpal_secondary_cc_01',
+    'Beowulf_RGT_hand_cupping_splaying_cc_01',
+    'Beowulf_RGT_thumb_primary_cc_01',
+    'Beowulf_RGT_index_metacarpal_secondary_cc_01',
+    'Beowulf_RGT_middle_metacarpal_secondary_cc_01',
+    'Beowulf_RGT_ring_metacarpal_secondary_cc_01',
+    'Beowulf_RGT_pinky_metacarpal_secondary_cc_01'
+]
     
 def scaleFingers():
     for i in fingerNames():
@@ -217,9 +316,11 @@ def keyFingers():
 
 def APose():
     #Handle Right Arm
-    mc.rotate(0, 0, -45, 'ten_rig_main_r_armRoot_FK_CTL')
+    #   mc.rotate(0, 0, -45, 'ten_rig_main_r_armRoot_FK_CTL')
+    mc.rotate(0, 0, -45, 'Beowulf_LFT_FK_upper_arm_cc_01') #check that this is the correct controls to use
     #Handle Left Arm
-    mc.rotate(0, 0, -45, 'ten_rig_main_l_armRoot_FK_CTL')
+    #   mc.rotate(0, 0, -45, 'ten_rig_main_l_armRoot_FK_CTL')
+    mc.rotate(0, 0, -45, 'Beowulf_RGT_FK_upper_arm_cc_01') 
 
 def setRigKey(fullRig):
     #Key Translation
@@ -253,7 +354,7 @@ scaleFingers() #Scale Fingers (Only Scalable Control)
 APose()
 setRigKey(fullRig)
 
-
+#TODO: set these to Beowulf's
 mc.setKeyframe('ten_rig_main_m_COG_CTL', at='translateX') #Hip Controller Not Working?
 mc.setKeyframe('ten_rig_main_m_COG_CTL', at='translateY')
 mc.setKeyframe('ten_rig_main_m_COG_CTL', at='translateZ')
