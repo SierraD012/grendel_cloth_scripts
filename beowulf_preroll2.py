@@ -1,4 +1,7 @@
-#Authors: Daniel Fuller, Brennan Mitchell, ### contact this guy: Trevor Barrus
+#Authors: Daniel Fuller, Brennan Mitchell,
+### contact this guy: Trevor Barrus
+# run this one BEFORE the sim script
+
 import os
 
 import maya
@@ -15,7 +18,7 @@ STARTPRE = -25
 ############################
 ## PRE-ROLL BEOWULF ANIMATION ##
 # this version (2) has each rig control name with the prefix "grendel_rig_main_" 
-# because the layout scenes seem to have that
+# because the layout scenes have that (the rig file doesn't)
 ############################
 
 #This code is brought to you in part by Daniel Fuller and the number 7
@@ -24,57 +27,61 @@ STARTPRE = -25
 def clearRotate(list):
     print '>>ClearRotate() starting'
     for i in list:
-    # check if attribute needs to be unlocked
-        if (mc.getAttr(i + '.rotateX', lock=True) or mc.getAttr(i + '.rotateY', lock=True) or mc.getAttr(i + '.rotateZ',lock=True)):
-            mc.setAttr(i + '.rotateX', lock=False)  # I hope force unlocking it is ok
-            mc.setAttr(i + '.rotateY', lock=False)
-            mc.setAttr(i + '.rotateZ', lock=False)
-            print '******** Force unlocked ' + str(i) + '.rotate attributes'
-
         if mc.getAttr(i + '.rotateX', settable=True):
             mc.setAttr(i + '.rotateX', 0)
         else:
-            print '************ Unable to clear ' + str(i) + '.rotateX'
+            print '************ Skipping ' + str(i) + '.rotateX'
 
         if mc.getAttr(i + '.rotateY', settable=True):
             mc.setAttr(i + '.rotateY', 0)
         else:
-            print '************ Unable to clear ' + str(i) + '.rotateY'
+            print '************ Skipping' + str(i) + '.rotateY'
 
         if mc.getAttr(i + '.rotateZ', settable=True):
             mc.setAttr(i + '.rotateZ', 0)
         else:
-            print '************ Unable to clear ' + str(i) + '.rotateZ'
+            print '************ Skipping ' + str(i) + '.rotateZ'
 
 #Clears Translation on a List of Objects
 def clearTranslate(list):
     print ">>ClearTranslate() starting"
     for i in list:
-	# check if attribute needs to be unlocked
-        if (mc.getAttr(i + '.translateX', lock=True) or mc.getAttr(i + '.translateY', lock=True) or mc.getAttr(i + '.translateZ',lock=True)):
-            mc.setAttr(i + '.translateX', lock=False)  # I hope force unlocking it is ok
-            mc.setAttr(i + '.translateY', lock=False)
-            mc.setAttr(i + '.translateZ', lock=False)
-            print '******** Force unlocked ' + str(i) + '.translate attributes'
-
         if mc.getAttr(i + '.translateX', settable=True):
             mc.setAttr(i + '.translateX', 0)
         else:
-	    print '************ Unable to clear ' + str(i) + '.translateX' 
+	    print '************ Skipping ' + str(i) + '.translateX' 
         
 	if mc.getAttr(i + '.translateY', settable=True):   
             mc.setAttr(i + '.translateY', 0)
         else:
-	    print '************ Unable to clear ' + str(i) + '.translateY'
+	    print '************ Skipping ' + str(i) + '.translateY'
        
 	if mc.getAttr(i + '.translateZ', settable=True):
             mc.setAttr(i + '.translateZ', 0)
         else:
-	    print '************ Unable to clear ' + str(i) + '.translateZ'
+	    print '************ Skipping ' + str(i) + '.translateZ'
+
+#Clears Scale on a List of Objects
+def clearScale(list):
+    print ">>ClearScale() starting"
+    for i in list:
+        if mc.getAttr(i + '.scaleX', settable=True):
+            mc.setAttr(i + '.scaleX', 0)
+        else:
+	    print '************ Skipping ' + str(i) + '.scaleX' 
+        
+	if mc.getAttr(i + '.scaleY', settable=True):   
+            mc.setAttr(i + '.scaleY', 0)
+        else:
+	    print '************ Skipping ' + str(i) + '.scaleY'
+       
+	if mc.getAttr(i + '.scaleZ', settable=True):
+            mc.setAttr(i + '.scaleZ', 0)
+        else:
+	    print '************ Skipping ' + str(i) + '.scaleZ'
 
 
 #Selects/Returns Full Rig
-# The Hand/Foot "splaying" controls seem to be causing issues - they are connected and won't unlock
 def selectRig():
     print ">>SelectRig() starting"
 
@@ -129,7 +136,6 @@ def selectRig():
     'grendel_rig_main_Beowulf_LOW_belly_cc_01',
     'grendel_rig_main_Beowulf_COG_cc_01']
 
-	#took out the "bendy" controls
     beowulf_arms = [
     'grendel_rig_main_Beowulf_LFT_arm_settings_cc_01',	#Left
     'grendel_rig_main_Beowulf_LFT_IK_arm_cc_01',
@@ -227,40 +233,25 @@ def selectRig():
 def keyArmFK():
     print ">>KeyArmFK() starting"
     #mc.setAttr('ten_rig_main_l_arm_switch_CTL.IKFK_Switch', 1)
-    mc.setAttr('grendel_rig_main_Beowulf_LFT_arm_settings_cc_01.FK_IK', 1)  #really not sure about this 
+    mc.setAttr('grendel_rig_main_Beowulf_LFT_arm_settings_cc_01.FK_IK', 0)  #FK mode
 
     if (mc.getAttr('grendel_rig_main_Beowulf_LFT_arm_settings_cc_01.FK_IK', keyable=True) or mc.getAttr('grendel_rig_main_Beowulf_LFT_arm_settings_cc_01.FK_IK', channelBox=True)):
         mc.setKeyframe('grendel_rig_main_Beowulf_LFT_arm_settings_cc_01.FK_IK');
         
 
    # mc.setAttr('ten_rig_main_r_arm_switch_CTL.IKFK_Switch', 1) 
-    mc.setAttr('grendel_rig_main_Beowulf_RGT_arm_settings_cc_01.FK_IK', 1)  #really not sure about this 
+    mc.setAttr('grendel_rig_main_Beowulf_RGT_arm_settings_cc_01.FK_IK', 0)  #really not sure about this 
 
     if (mc.getAttr('grendel_rig_main_Beowulf_RGT_arm_settings_cc_01.FK_IK', keyable=True) or mc.getAttr('grendel_rig_main_Beowulf_RGT_arm_settings_cc_01.FK_IK', channelBox=True)):
         mc.setKeyframe('grendel_rig_main_Beowulf_RGT_arm_settings_cc_01.FK_IK');
 
 def fingerNames():
     return [
-    #'ten_rig_main_l_hand_CTL',
-    #'ten_rig_main_l_thumb_CTL',
-    #'ten_rig_main_l_index_CTL',
-    #'ten_rig_main_l_middle_CTL',
-    #'ten_rig_main_l_ring_CTL',
-    #'ten_rig_main_l_pinky_CTL',
-    #'ten_rig_main_r_hand_CTL',
-    #'ten_rig_main_r_thumb_CTL',
-    #'ten_rig_main_r_index_CTL',
-    #'ten_rig_main_r_middle_CTL',
-    #'ten_rig_main_r_ring_CTL',
-    #'ten_rig_main_r_pinky_CTL'
-
-    #'grendel_rig_main_Beowulf_LFT_hand_cupping_splaying_cc_01',		#I'm not sure if these are the right controls for this
     'grendel_rig_main_Beowulf_LFT_thumb_primary_cc_01',
     'grendel_rig_main_Beowulf_LFT_index_metacarpal_secondary_cc_01',
     'grendel_rig_main_Beowulf_LFT_middle_metacarpal_secondary_cc_01',
     'grendel_rig_main_Beowulf_LFT_ring_metacarpal_secondary_cc_01',
     'grendel_rig_main_Beowulf_LFT_pinky_metacarpal_secondary_cc_01',
-    #'grendel_rig_main_Beowulf_RGT_hand_cupping_splaying_cc_01',
     'grendel_rig_main_Beowulf_RGT_thumb_primary_cc_01',
     'grendel_rig_main_Beowulf_RGT_index_metacarpal_secondary_cc_01',
     'grendel_rig_main_Beowulf_RGT_middle_metacarpal_secondary_cc_01',
@@ -320,8 +311,10 @@ keyArmFK()
 
 clearRotate(fullRig)
 clearTranslate(fullRig)
+clearScale(fullRig)
 
 #scaleFingers() #Scale Fingers (Only Scalable Control)  #doesn't seem to be working right now - attrs are locked?
+ #might not need this if clearScale() works 
 
 #Key APose (Adjust Arms, Keyframe)
 APose()
@@ -348,12 +341,8 @@ mc.setKeyframe('grendel_rig_main_Beowulf_COG_cc_01', at='rotateZ')
 #mc.setKeyframe('ten_rig_main_r_shoulder_CTL', at='translateY')
 #mc.setKeyframe('ten_rig_main_r_shoulder_CTL', at='translateZ')
 
-#mc.setKeyframe('ten_rig_main_r_shoulder_CTL', at='rotateX')
-#mc.setKeyframe('ten_rig_main_r_shoulder_CTL', at='rotateY')
-#mc.setKeyframe('ten_rig_main_r_shoulder_CTL', at='rotateZ')
-
-
 #Export Alembic (Requires User Input - Select Ten's Rig)
 mc.playbackOptions(animationStartTime=STARTPRE)
 import alembic_exporter
 alembic_exporter.go()
+
