@@ -67,6 +67,7 @@ def clearScale(list):
     for i in list:
         if mc.getAttr(i + '.scaleX', settable=True):
             mc.setAttr(i + '.scaleX', 1)
+
         else:
 	    print '************ Skipping ' + str(i) + '.scaleX' 
         
@@ -76,6 +77,7 @@ def clearScale(list):
 	    print '************ Skipping ' + str(i) + '.scaleY'
        
 	if mc.getAttr(i + '.scaleZ', settable=True):
+
             mc.setAttr(i + '.scaleZ', 1)
         else:
 	    print '************ Skipping ' + str(i) + '.scaleZ'
@@ -282,6 +284,7 @@ def APose():
     #   mc.rotate(0, 0, -45, 'ten_rig_main_l_armRoot_FK_CTL')
     mc.rotate(0, 0, -5, 'grendel_rig_main_Beowulf_RGT_FK_upper_arm_cc_01') 
 
+
 def setRigKey(fullRig):
     print ">>SetRigKey() starting"
     #Key Translation
@@ -314,6 +317,7 @@ keyArmFK()
 clearRotate(fullRig)
 clearTranslate(fullRig)
 clearScale(fullRig)
+
 
 #scaleFingers() #Scale Fingers (Only Scalable Control)
  #might not need this since we have clearScale()
