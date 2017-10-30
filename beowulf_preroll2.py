@@ -35,7 +35,7 @@ def clearRotate(list):
         if mc.getAttr(i + '.rotateY', settable=True):
             mc.setAttr(i + '.rotateY', 0)
         else:
-            print '************ Skipping' + str(i) + '.rotateY'
+            print '************ Skipping ' + str(i) + '.rotateY'
 
         if mc.getAttr(i + '.rotateZ', settable=True):
             mc.setAttr(i + '.rotateZ', 0)
@@ -66,22 +66,24 @@ def clearScale(list):
     print ">>ClearScale() starting"
     for i in list:
         if mc.getAttr(i + '.scaleX', settable=True):
-            mc.setAttr(i + '.scaleX', 0)
+            mc.setAttr(i + '.scaleX', 1)
         else:
 	    print '************ Skipping ' + str(i) + '.scaleX' 
         
 	if mc.getAttr(i + '.scaleY', settable=True):   
-            mc.setAttr(i + '.scaleY', 0)
+            mc.setAttr(i + '.scaleY', 1)
         else:
 	    print '************ Skipping ' + str(i) + '.scaleY'
        
 	if mc.getAttr(i + '.scaleZ', settable=True):
-            mc.setAttr(i + '.scaleZ', 0)
+            mc.setAttr(i + '.scaleZ', 1)
         else:
 	    print '************ Skipping ' + str(i) + '.scaleZ'
 
 
 #Selects/Returns Full Rig
+#TODO: What about accessories? do we need to clear transformations on those too?
+# update: it looks like all the accessories + beard go with the transformation, so that's cool 
 def selectRig():
     print ">>SelectRig() starting"
 
@@ -268,17 +270,17 @@ def scaleFingers():
 def keyFingers():
     print ">>KeyFingers() starting"
     for i in fingerNames():
-	    mc.setKeyframe(i, at='scaleX')
+	mc.setKeyframe(i, at='scaleX')
     
 
 def APose():
     print ">>APose() starting"
     #Handle Right Arm
     #   mc.rotate(0, 0, -45, 'ten_rig_main_r_armRoot_FK_CTL')
-    mc.rotate(0, 0, -45, 'grendel_rig_main_Beowulf_LFT_FK_upper_arm_cc_01') 
+    mc.rotate(0, 0, -5, 'grendel_rig_main_Beowulf_LFT_FK_upper_arm_cc_01') #45 degrees seems to be too straight for A-pose...
     #Handle Left Arm
     #   mc.rotate(0, 0, -45, 'ten_rig_main_l_armRoot_FK_CTL')
-    mc.rotate(0, 0, -45, 'grendel_rig_main_Beowulf_RGT_FK_upper_arm_cc_01') 
+    mc.rotate(0, 0, -5, 'grendel_rig_main_Beowulf_RGT_FK_upper_arm_cc_01') 
 
 def setRigKey(fullRig):
     print ">>SetRigKey() starting"
@@ -313,8 +315,8 @@ clearRotate(fullRig)
 clearTranslate(fullRig)
 clearScale(fullRig)
 
-#scaleFingers() #Scale Fingers (Only Scalable Control)  #doesn't seem to be working right now - attrs are locked?
- #might not need this if clearScale() works 
+#scaleFingers() #Scale Fingers (Only Scalable Control)
+ #might not need this since we have clearScale()
 
 #Key APose (Adjust Arms, Keyframe)
 APose()
