@@ -332,10 +332,6 @@ clearRotate(fullRig)
 clearTranslate(fullRig)
 clearScale(fullRig)
 
-
-#scaleFingers() #Scale Fingers (Only Scalable Control)
- #might not need this since we have clearScale()
-
 #Key APose (Adjust Arms, Keyframe)
 APose()
 setRigKey(fullRig)
@@ -343,23 +339,11 @@ setRigKey(fullRig)
 mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='translateX')
 mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='translateY')
 mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='translateZ')
-#mc.setKeyframe('ten_rig_main_m_COG_CTL', at='translateX') #Hip Controller Not Working?  <-- existing comment
-#mc.setKeyframe('ten_rig_main_m_COG_CTL', at='translateY')
-#mc.setKeyframe('ten_rig_main_m_COG_CTL', at='translateZ')
-
 mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateX')
 mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateY')
 mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateZ')
-#mc.setKeyframe('ten_rig_main_m_COG_CTL', at='rotateX')
-#mc.setKeyframe('ten_rig_main_m_COG_CTL', at='rotateY')
-#mc.setKeyframe('ten_rig_main_m_COG_CTL', at='rotateZ')
 
-# I'm not sure why these are in here, just the right shoulder?
-#mc.setKeyframe('ten_rig_main_r_shoulder_CTL', at='translateX') #Shoulder Controller Not Working?   <-- existing comment
-#mc.setKeyframe('ten_rig_main_r_shoulder_CTL', at='translateY')
-#mc.setKeyframe('ten_rig_main_r_shoulder_CTL', at='translateZ')
-
-#Export Alembic (Requires User Input - Select Ten's Rig)
+#Export Alembic (Requires User Input - Select Beowulf's Rig)
 mc.playbackOptions(animationStartTime=STARTPRE)
 import alembic_exporter
 alembic_exporter.go()

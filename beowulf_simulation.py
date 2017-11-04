@@ -22,11 +22,11 @@ def generateScene():
     project = Project()
     environment = Environment()
 
-    # Create a global position locator for Ten's Starting Location
+    # Create a global position locator for Beowulf's Starting Location
     mc.currentTime(STARTANIM)
     globalPos = mc.spaceLocator(p=[0,0,0])
-    globPos = mc.rename(globalPos, "tenGlobalPos")
-    mc.select("ten_rig_main_m_global_CTL")
+    globPos = mc.rename(globalPos, "beowulfGlobalPos")
+    mc.select("grendel_rig_main_Beowulf_primary_global_cc_01")
     mc.select(globPos, add=True)
     mc.pointConstraint(offset=[0,0,0], weight=1)
     mc.orientConstraint(offset=[0,0,0], weight=1)
@@ -46,7 +46,7 @@ def generateScene():
     checkout_body_name = checkout_element.get_parent()
     body = project.get_body(checkout_body_name)
     element = body.get_element(Department.ANIM)
-    cache_file = os.path.join(element.get_dir(), "cache", "ten_rig_main.abc")
+    cache_file = os.path.join(element.get_dir(), "cache", "beowulf_rig_main.abc")
 
     # checkout cfx scene for corresponding shot number
     current_user = environment.get_current_username()
@@ -79,14 +79,14 @@ def generateScene():
     collide = "TEN_ANIM"
     mc.rename("ten_rig_main_Ten_Skin_RENDER", collide)
 
-    # Reference Ten's Sim Robe
-    body = project.get_body("ten_robe_sim")
+    # Reference Beowulf's Sim Robe
+    body = project.get_body("beowulf_robe_sim")
     element = body.get_element(Department.MODEL)
     robe_file = element.get_app_filepath()
     mc.file(robe_file, reference=True)
     
-    # Reference Ten's Hero Robe
-    body = project.get_body("ten_robe")
+    # Reference Beowulf's Beauty/Hero Robe
+    body = project.get_body("beowulf_robe")
     element = body.get_element(Department.MODEL)
     robe_hero_file = element.get_app_filepath()
     mc.file(robe_hero_file, reference=True)
@@ -107,14 +107,18 @@ def generateScene():
     mc.setAttr("ten_robe_model_main_TEN_ROBE_HERO.rotateY", ry)
     mc.setAttr("ten_robe_model_main_TEN_ROBE_HERO.rotateZ", rz)
     
+
+
+
+#######################
+##       MAIN        ##
+#######################
+
 generateScene()
 
 #######################
 ## Set Up Simulation ##
 #######################
-
-#This code is brought to you in part by Brennan Mitchell and viewers like you. Thank you.
-
 
 mc.select('ten_robe_sim_model_main_ten_collide_body', replace=True)
 mc.viewFit() #Snap View to Body Collider
@@ -175,47 +179,30 @@ mc.setAttr('nClothShape2.compressionResistance', 100.0)
 mc.setAttr('nClothShape2.bendResistance', 1.0)
 mc.setAttr('nClothShape2.damp', 0.8)
 
-#Establish Dynamic Constraints
+#### Establish Dynamic Constraints ####
 
-mc.select(clear=True) #Lapel Constraint
-robe_lapel_verts = [
-'[1004]', '[1371]', '[1373]', '[1410]', '[1418]', '[2600]', '[2592]',
-'[1423]', '[1426]', '[1428]', '[1440:1442]', '[1445:1447]', '[1450]',
-'[1452:1454]', '[1722]', '[1730]', '[1747:1748]', '[1768]', '[2242]',
-'[2394]', '[2403]', '[2406]', '[2408]', '[2410:2411]', '[2417:2424]',
-'[2545]', '[2548]', '[2550]', '[2560:2561]', '[2575:2576]']
+# These are correct for Beowulf's cape beauty mesh
+mc.select(clear=True) #neckline Constraints
+cape_neckline_verts = ['[396:398]', '[403]', '[404]', '[409]', '[410]', '[415]', '[416]', '[421]', '[422]', '[427]', '[1499]', '[1502]', '[1510]', '[1512]', '[1520]', '[1522]', '[1530]', '[1532]', '[1540]', '[1542]', '[1550]', '[1552]', '[8524]', '[8530]', '[8531]', '[8546]', '[8547]', '[8550]', '[8551]', '[8566]', '[8567]', '[8570]', '[8571]', '[8586]', '[8587]', '[8590]', '[8591]', '[8606]', '[8607]', '[8611]', '[8610]', '[8627]', '[8626]', '[8630]', '[8631]' ]
 
-for i in robe_lapel_verts:
+
+for i in cape_neckline_verts:
     mc.select('ten_robe_sim_model_main_ten_sim_robe.vtx' + i, add=True)
 mc.select('ten_robe_sim_model_main_ten_collide_body', add=True)
 mel.eval('createNConstraint pointToSurface 0;')
 
-mc.select(clear=True) #Back Constraint
-robe_back_verts = ['[1909:1911]', '[2663:2667]', '[2756]']
 
-for i in robe_back_verts:
-    mc.select('ten_robe_sim_model_main_ten_sim_robe.vtx' + i, add=True)
-mc.select('ten_robe_sim_model_main_ten_collide_body', add=True)
-mel.eval('createNConstraint pointToSurface 0;') 
+# These are correct for Beowulf's cape beauty mesh
+mc.select(clear=True) #front Constraints
+cape_front_verts = [ '[4950]', '[4951]', '[4954]', '[4955]', '[4998]', '[4999]', '[5010]', '[5011]', '[5015]', '[5018]', '[5019]', '[5022]', '[5026]', '[5027]', '[7712]', '[7716]', '[7760]', '[7772]', '[7780]', '[7784]', '[7788]', '[10731]', '[10732]', '[10757]', '[10758]', '[10764]', '[10767]' ]
 
-mc.select(clear=True) #Front Constraint
-robe_front_verts = ['[177]', '[180:181]', '[1000]', '[1003]', '[1005:1006]', '[2043]']
 
 for i in robe_front_verts:
     mc.select('ten_robe_sim_model_main_ten_sim_robe.vtx' + i, add=True)
 mc.select('ten_robe_sim_model_main_ten_collide_body', add=True)
 mel.eval('createNConstraint pointToSurface 0;') 
 
-mc.select(clear=True) #Pants Constraint
-pants_verts = [
-'[7:8]', '[145:154]', '[335:344]', '[636:658]', '[1017:1037]',
-'[1282:1292]', '[1468:1478]', '[382:393]', '[1115:1138]',
-'[1521:1532]', '[192:203]', '[738:761]', '[1335:1346]']
 
-for i in pants_verts:
-    mc.select('ten_robe_sim_model_main_ten_sim_pants.vtx' + i, add=True)
-mc.select('ten_robe_sim_model_main_ten_collide_body', add=True)
-mel.eval('createNConstraint pointToSurface 0;') 
 
 
 #Set Nucleus Parameters (INCOMPLETE - New Nucleus specific to Ten?)
