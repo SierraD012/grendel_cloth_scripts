@@ -12,7 +12,7 @@ from byuam.project import Project
 from byuam.environment import Department, Environment
 
 STARTANIM = -5
-STARTPRE = 54
+STARTPRE = -25
 
 # Rig Pefix:
 prefix0 = 'viking_rig_main_Viking'
