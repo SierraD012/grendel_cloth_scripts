@@ -12,7 +12,13 @@ from byuam.project import Project
 from byuam.environment import Department, Environment
 
 STARTANIM = -5
-STARTPRE = -25
+STARTPRE = 54
+
+# Rig Pefix:
+prefix0 = 'viking_rig_main_Viking'
+prefix1 = 'viking_with_facial_rig_main_Viking'
+
+rigPrefix = prefix0
 
 
 ############################
@@ -81,136 +87,132 @@ def clearScale(list):
 	    print '************ Skipping ' + str(i) + '.scaleZ'
 
 
-# Prefixes:
-# viking_rig_main_Viking
-# viking_with_facial_rig_main_Viking
-
 #Selects/Returns Full Rig
 def selectRig():
     print ">>SelectRig() starting"
 
     viking_main = [
-    'viking_with_facial_rig_main_Viking_main_cc_01',
-    'viking_with_facial_rig_main_Viking_secondary_global_cc_01',
-    'viking_with_facial_rig_main_Viking_primary_global_cc_01']
+    rigPrefix + '_main_cc_01',
+    rigPrefix + '_secondary_global_cc_01',
+    rigPrefix + '_primary_global_cc_01']
 
     viking_head = [
-    'viking_with_facial_rig_main_Viking_head_cc_01',
-    'viking_with_facial_rig_main_Viking_jaw_cc_01',
-    'viking_with_facial_rig_main_Viking_head_settings_cc_01']
+    rigPrefix + '_head_cc_01',
+    rigPrefix + '_jaw_cc_01',
+    rigPrefix + '_head_settings_cc_01']
 
     viking_eyes = [
-    'viking_with_facial_rig_main_Viking_LFT_eye_rotate_cc_01', 	#Left
-    'viking_with_facial_rig_main_Viking_LFT_LOW_eyelid_cc_01',	
-    'viking_with_facial_rig_main_Viking_LFT_UPP_eyelid_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_OUT_eyebrow_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_MID_eyebrow_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_INN_eyebrow_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_MAIN_eyebrow_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_eye_rotate_cc_01',		#Right
-    'viking_with_facial_rig_main_Viking_RGT_LOW_eyelid_cc_01',	
-    'viking_with_facial_rig_main_Viking_RGT_UPP_eyelid_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_OUT_eyebrow_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_MID_eyebrow_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_INN_eyebrow_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_MAIN_eyebrow_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_eye_aim_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_eye_aim_cc_01',
-    'viking_with_facial_rig_main_Viking_both_eyes_aim_cc_01']
+    rigPrefix + '_LFT_eye_rotate_cc_01', 	#Left
+    rigPrefix + '_LFT_LOW_eyelid_cc_01',	
+    rigPrefix + '_LFT_UPP_eyelid_cc_01',
+    rigPrefix + '_LFT_OUT_eyebrow_cc_01',
+    rigPrefix + '_LFT_MID_eyebrow_cc_01',
+    rigPrefix + '_LFT_INN_eyebrow_cc_01',
+    rigPrefix + '_LFT_MAIN_eyebrow_cc_01',
+    rigPrefix + '_RGT_eye_rotate_cc_01',		#Right
+    rigPrefix + '_RGT_LOW_eyelid_cc_01',	
+    rigPrefix + '_RGT_UPP_eyelid_cc_01',
+    rigPrefix + '_RGT_OUT_eyebrow_cc_01',
+    rigPrefix + '_RGT_MID_eyebrow_cc_01',
+    rigPrefix + '_RGT_INN_eyebrow_cc_01',
+    rigPrefix + '_RGT_MAIN_eyebrow_cc_01',
+    rigPrefix + '_LFT_eye_aim_cc_01',
+    rigPrefix + '_RGT_eye_aim_cc_01',
+    rigPrefix + '_both_eyes_aim_cc_01']
     
     viking_mouth = [
-    'viking_with_facial_rig_main_Viking_tongue_tip_cc_01',
-    'viking_with_facial_rig_main_Viking_tongue_middle_cc_01',
-    'viking_with_facial_rig_main_Viking_tongue_root_cc_01',
-    'viking_with_facial_rig_main_Viking_LOW_teeth_cc_01',
-    'viking_with_facial_rig_main_Viking_UPP_teeth_cc_01']
+    rigPrefix + '_tongue_tip_cc_01',
+    rigPrefix + '_tongue_middle_cc_01',
+    rigPrefix + '_tongue_root_cc_01',
+    rigPrefix + '_LOW_teeth_cc_01',
+    rigPrefix + '_UPP_teeth_cc_01']
 
     viking_neck = [
-    'viking_with_facial_rig_main_Viking_UPP_neck_cc_01',
-    'viking_with_facial_rig_main_Viking_MID_neck_cc_01',
-    'viking_with_facial_rig_main_Viking_LOW_neck_cc_01',
-    'viking_with_facial_rig_main_Viking_neck_base_cc_01',
-    'viking_with_facial_rig_main_Viking_neck_settings_cc_01']
+    rigPrefix + '_UPP_neck_cc_01',
+    rigPrefix + '_MID_neck_cc_01',
+    rigPrefix + '_LOW_neck_cc_01',
+    rigPrefix + '_neck_base_cc_01',
+    rigPrefix + '_neck_settings_cc_01']
 
     viking_torso = [
-    'viking_with_facial_rig_main_Viking_spine_settings_cc_01',
-    'viking_with_facial_rig_main_Viking_chest_cc_01',
-    'viking_with_facial_rig_main_Viking_UPP_belly_cc_01',
-    'viking_with_facial_rig_main_Viking_MID_belly_cc_01',
-    'viking_with_facial_rig_main_Viking_LOW_belly_cc_01',
-    'viking_with_facial_rig_main_Viking_COG_cc_01']
+    rigPrefix + '_spine_settings_cc_01',
+    rigPrefix + '_chest_cc_01',
+    rigPrefix + '_UPP_belly_cc_01',
+    rigPrefix + '_MID_belly_cc_01',
+    rigPrefix + '_LOW_belly_cc_01',
+    rigPrefix + '_COG_cc_01']
 
     viking_arms = [
-    'viking_with_facial_rig_main_Viking_LFT_arm_settings_cc_01',	#Left
-    'viking_with_facial_rig_main_Viking_LFT_IK_arm_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_arm_pole_vector_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_clavicle_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_FK_wrist_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_FK_lower_arm_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_FK_upper_arm_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_arm_settings_cc_01',	#Right
-    'viking_with_facial_rig_main_Viking_RGT_IK_arm_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_arm_pole_vector_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_clavicle_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_FK_wrist_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_FK_lower_arm_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_FK_upper_arm_cc_01']    
+    rigPrefix + '_LFT_arm_settings_cc_01',	#Left
+    rigPrefix + '_LFT_IK_arm_cc_01',
+    rigPrefix + '_LFT_arm_pole_vector_cc_01',
+    rigPrefix + '_LFT_clavicle_cc_01',
+    rigPrefix + '_LFT_FK_wrist_cc_01',
+    rigPrefix + '_LFT_FK_lower_arm_cc_01',
+    rigPrefix + '_LFT_FK_upper_arm_cc_01',
+    rigPrefix + '_RGT_arm_settings_cc_01',	#Right
+    rigPrefix + '_RGT_IK_arm_cc_01',
+    rigPrefix + '_RGT_arm_pole_vector_cc_01',
+    rigPrefix + '_RGT_clavicle_cc_01',
+    rigPrefix + '_RGT_FK_wrist_cc_01',
+    rigPrefix + '_RGT_FK_lower_arm_cc_01',
+    rigPrefix + '_RGT_FK_upper_arm_cc_01']    
 
     viking_hands = [
     #Note: Viking has no ring finger
-    'viking_with_facial_rig_main_Viking_LFT_hand_cupping_splaying_cc_01',     #Left
-    'viking_with_facial_rig_main_Viking_LFT_thumb_primary_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_thumb_DIS_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_index_finger_primary_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_index_finger_DIS_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_index_metacarpal_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_middle_finger_DIS_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_middle_finger_primary_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_middle_metacarpal_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_pinky_finger_DIS_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_pinky_finger_primary_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_pinky_metacarpal_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_hand_cupping_splaying_cc_01',	#Right
-    'viking_with_facial_rig_main_Viking_RGT_thumb_primary_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_thumb_DIS_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_index_finger_primary_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_index_finger_DIS_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_index_metacarpal_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_middle_finger_DIS_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_middle_finger_primary_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_middle_metacarpal_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_pinky_finger_DIS_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_pinky_finger_primary_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_pinky_metacarpal_secondary_cc_01']
+    rigPrefix + '_LFT_hand_cupping_splaying_cc_01',     #Left
+    rigPrefix + '_LFT_thumb_primary_cc_01',
+    rigPrefix + '_LFT_thumb_DIS_secondary_cc_01',
+    rigPrefix + '_LFT_index_finger_primary_cc_01',
+    rigPrefix + '_LFT_index_finger_DIS_secondary_cc_01',
+    rigPrefix + '_LFT_index_metacarpal_secondary_cc_01',
+    rigPrefix + '_LFT_middle_finger_DIS_secondary_cc_01',
+    rigPrefix + '_LFT_middle_finger_primary_cc_01',
+    rigPrefix + '_LFT_middle_metacarpal_secondary_cc_01',
+    rigPrefix + '_LFT_pinky_finger_DIS_secondary_cc_01',
+    rigPrefix + '_LFT_pinky_finger_primary_cc_01',
+    rigPrefix + '_LFT_pinky_metacarpal_secondary_cc_01',
+    rigPrefix + '_RGT_hand_cupping_splaying_cc_01',	#Right
+    rigPrefix + '_RGT_thumb_primary_cc_01',
+    rigPrefix + '_RGT_thumb_DIS_secondary_cc_01',
+    rigPrefix + '_RGT_index_finger_primary_cc_01',
+    rigPrefix + '_RGT_index_finger_DIS_secondary_cc_01',
+    rigPrefix + '_RGT_index_metacarpal_secondary_cc_01',
+    rigPrefix + '_RGT_middle_finger_DIS_secondary_cc_01',
+    rigPrefix + '_RGT_middle_finger_primary_cc_01',
+    rigPrefix + '_RGT_middle_metacarpal_secondary_cc_01',
+    rigPrefix + '_RGT_pinky_finger_DIS_secondary_cc_01',
+    rigPrefix + '_RGT_pinky_finger_primary_cc_01',
+    rigPrefix + '_RGT_pinky_metacarpal_secondary_cc_01']
 
     viking_hips = [
-    'viking_with_facial_rig_main_Viking_hips_cc_01']
+    rigPrefix + '_hips_cc_01']
 
     viking_legs_feet = [
-    'viking_with_facial_rig_main_Viking_LFT_leg_settings_cc_01',	#Left
-    'viking_with_facial_rig_main_Viking_LFT_FK_ankle_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_FK_lower_leg_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_FK_upper_leg_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_leg_pole_vector_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_IK_leg_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_foot_splaying_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_foot_ball_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_big_toe_DIS_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_big_toe_MED_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_big_toe_primary_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_foot_ball_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_leg_settings_cc_01',	#Right
-    'viking_with_facial_rig_main_Viking_RGT_FK_ankle_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_FK_lower_leg_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_FK_upper_leg_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_leg_pole_vector_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_IK_leg_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_foot_splaying_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_foot_ball_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_big_toe_DIS_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_big_toe_MED_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_big_toe_primary_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_foot_ball_cc_01']
+    rigPrefix + '_LFT_leg_settings_cc_01',	#Left
+    rigPrefix + '_LFT_FK_ankle_cc_01',
+    rigPrefix + '_LFT_FK_lower_leg_cc_01',
+    rigPrefix + '_LFT_FK_upper_leg_cc_01',
+    rigPrefix + '_LFT_leg_pole_vector_cc_01',
+    rigPrefix + '_LFT_IK_leg_cc_01',
+    rigPrefix + '_LFT_foot_splaying_cc_01',
+    rigPrefix + '_LFT_foot_ball_cc_01',
+    rigPrefix + '_LFT_big_toe_DIS_secondary_cc_01',
+    rigPrefix + '_LFT_big_toe_MED_secondary_cc_01',
+    rigPrefix + '_LFT_big_toe_primary_cc_01',
+    rigPrefix + '_LFT_foot_ball_cc_01',
+    rigPrefix + '_RGT_leg_settings_cc_01',	#Right
+    rigPrefix + '_RGT_FK_ankle_cc_01',
+    rigPrefix + '_RGT_FK_lower_leg_cc_01',
+    rigPrefix + '_RGT_FK_upper_leg_cc_01',
+    rigPrefix + '_RGT_leg_pole_vector_cc_01',
+    rigPrefix + '_RGT_IK_leg_cc_01',
+    rigPrefix + '_RGT_foot_splaying_cc_01',
+    rigPrefix + '_RGT_foot_ball_cc_01',
+    rigPrefix + '_RGT_big_toe_DIS_secondary_cc_01',
+    rigPrefix + '_RGT_big_toe_MED_secondary_cc_01',
+    rigPrefix + '_RGT_big_toe_primary_cc_01',
+    rigPrefix + '_RGT_foot_ball_cc_01']
 
     fullRig = viking_main + viking_head + viking_mouth + viking_neck + viking_torso + viking_arms + viking_hands + viking_hips + viking_legs_feet
     
@@ -222,28 +224,28 @@ def selectRig():
 def keyArmFK():
     print ">>KeyArmFK() starting"
     #mc.setAttr('ten_rig_main_l_arm_switch_CTL.IKFK_Switch', 1)
-    mc.setAttr('viking_with_facial_rig_main_Viking_LFT_arm_settings_cc_01.FK_IK', 0)  #FK mode
+    mc.setAttr(rigPrefix + '_LFT_arm_settings_cc_01.FK_IK', 0)  #FK mode
 
-    if (mc.getAttr('viking_with_facial_rig_main_Viking_LFT_arm_settings_cc_01.FK_IK', keyable=True) or mc.getAttr('viking_with_facial_rig_main_Viking_LFT_arm_settings_cc_01.FK_IK', channelBox=True)):
-        mc.setKeyframe('viking_with_facial_rig_main_Viking_LFT_arm_settings_cc_01.FK_IK');
+    if (mc.getAttr(rigPrefix + '_LFT_arm_settings_cc_01.FK_IK', keyable=True) or mc.getAttr(rigPrefix + '_LFT_arm_settings_cc_01.FK_IK', channelBox=True)):
+        mc.setKeyframe(rigPrefix + '_LFT_arm_settings_cc_01.FK_IK');
         
     #mc.setAttr('ten_rig_main_r_arm_switch_CTL.IKFK_Switch', 1) 
-    mc.setAttr('viking_with_facial_rig_main_Viking_RGT_arm_settings_cc_01.FK_IK', 0)  #really not sure about this 
+    mc.setAttr(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK', 0)  #really not sure about this 
 
-    if (mc.getAttr('viking_with_facial_rig_main_Viking_RGT_arm_settings_cc_01.FK_IK', keyable=True) or mc.getAttr('viking_with_facial_rig_main_Viking_RGT_arm_settings_cc_01.FK_IK', channelBox=True)):
-        mc.setKeyframe('viking_with_facial_rig_main_Viking_RGT_arm_settings_cc_01.FK_IK');
+    if (mc.getAttr(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK', keyable=True) or mc.getAttr(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK', channelBox=True)):
+        mc.setKeyframe(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK');
 
 def fingerNames():
     #Note: Viking has no ring finger
     return [
-    'viking_with_facial_rig_main_Viking_LFT_thumb_primary_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_index_metacarpal_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_middle_metacarpal_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_LFT_pinky_metacarpal_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_thumb_primary_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_index_metacarpal_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_middle_metacarpal_secondary_cc_01',
-    'viking_with_facial_rig_main_Viking_RGT_pinky_metacarpal_secondary_cc_01'
+    rigPrefix + '_LFT_thumb_primary_cc_01',
+    rigPrefix + '_LFT_index_metacarpal_secondary_cc_01',
+    rigPrefix + '_LFT_middle_metacarpal_secondary_cc_01',
+    rigPrefix + '_LFT_pinky_metacarpal_secondary_cc_01',
+    rigPrefix + '_RGT_thumb_primary_cc_01',
+    rigPrefix + '_RGT_index_metacarpal_secondary_cc_01',
+    rigPrefix + '_RGT_middle_metacarpal_secondary_cc_01',
+    rigPrefix + '_RGT_pinky_metacarpal_secondary_cc_01'
 ]
     
 def scaleFingers():
@@ -260,8 +262,8 @@ def keyFingers():
 
 def APose():
     print ">>APose() starting"
-    mc.rotate(0, 0, -45, 'viking_with_facial_rig_main_Viking_LFT_FK_upper_arm_cc_01')
-    mc.rotate(0, 0, -45, 'viking_with_facial_rig_main_Viking_RGT_FK_upper_arm_cc_01') 
+    mc.rotate(0, 0, -45, rigPrefix + '_LFT_FK_upper_arm_cc_01')
+    mc.rotate(0, 0, -45, rigPrefix + '_RGT_FK_upper_arm_cc_01') 
 
 
 def setRigKey(fullRig):
@@ -277,14 +279,26 @@ def setRigKey(fullRig):
     
     keyFingers()
 
+def clearKeys(fullRig, offset):
+    print ">>Clearing Keys"
+    cmds.cutKey(fullRig, time=('0pal', (str(STARTANIM + offset) + 'pal')))
+    
+def translateRig(x, y, z):
+    mc.setAttr(rigPrefix + '_geo_GRP_01.translateX', x)
+    mc.setAttr(rigPrefix + '_geo_GRP_01.translateX', y)
+    mc.setAttr(rigPrefix + '_geo_GRP_01.translateX', z)
 
 ###########################################
 #### MAIN ####
 ###########################################
 
+fullRig = selectRig()
+
+#Clear any unnecessary animation
+#clearKeys(fullRig, 2)
+
 #Keyframe Initial Frame
 mc.currentTime(STARTANIM)
-fullRig = selectRig()
 setRigKey(fullRig)
 
 #Set T-Pose (Clear Transformations)
@@ -303,13 +317,13 @@ clearScale(fullRig)
 #APose() -- No need to call APose() because Viking was built in A-Pose
 setRigKey(fullRig)
 
-mc.setKeyframe('viking_with_facial_rig_main_Viking_COG_cc_01', at='translateX')
-mc.setKeyframe('viking_with_facial_rig_main_Viking_COG_cc_01', at='translateY')
-mc.setKeyframe('viking_with_facial_rig_main_Viking_COG_cc_01', at='translateZ')
+mc.setKeyframe(rigPrefix + '_COG_cc_01', at='translateX')
+mc.setKeyframe(rigPrefix + '_COG_cc_01', at='translateY')
+mc.setKeyframe(rigPrefix + '_COG_cc_01', at='translateZ')
 
-mc.setKeyframe('viking_with_facial_rig_main_Viking_COG_cc_01', at='rotateX')
-mc.setKeyframe('viking_with_facial_rig_main_Viking_COG_cc_01', at='rotateY')
-mc.setKeyframe('viking_with_facial_rig_main_Viking_COG_cc_01', at='rotateZ')
+mc.setKeyframe(rigPrefix + '_COG_cc_01', at='rotateX')
+mc.setKeyframe(rigPrefix + '_COG_cc_01', at='rotateY')
+mc.setKeyframe(rigPrefix + '_COG_cc_01', at='rotateZ')
 
 #Export Alembic (Requires User Input - Select Viking's Rig)
 mc.playbackOptions(animationStartTime=STARTPRE)
