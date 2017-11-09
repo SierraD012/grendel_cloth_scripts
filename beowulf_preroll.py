@@ -84,7 +84,6 @@ def clearScale(list):
 
 
 #Selects/Returns Full Rig
-#TODO: What about accessories? do we need to clear transformations on those too?
 # update: it looks like all the accessories + beard go with the transformation, so that's cool 
 def selectRig():
     print ">>SelectRig() starting"
@@ -255,13 +254,13 @@ def keyArmFK():
 
     rightArmFK = rigPrefix + 'Beowulf_RGT_arm_settings_cc_01.FK_IK'
 
-    mc.setAttr(rigPrefix+'Beowulf_RGT_arm_settings_cc_01.FK_IK', 0)  #really not sure about this 
+    mc.setAttr(rigPrefix+'Beowulf_RGT_arm_settings_cc_01.FK_IK', 0)
 
     if (mc.getAttr(rightArmFK, keyable=True) or (mc.getAttr(rightArmFK, channelBox=True))):
         mc.setKeyframe(rightArmFK);
 
 def fingerNames():
-    return [
+    baseFingerNames = [
     'Beowulf_LFT_thumb_primary_cc_01',
     'Beowulf_LFT_index_metacarpal_secondary_cc_01',
     'Beowulf_LFT_middle_metacarpal_secondary_cc_01',
@@ -271,29 +270,34 @@ def fingerNames():
     'Beowulf_RGT_index_metacarpal_secondary_cc_01',
     'Beowulf_RGT_middle_metacarpal_secondary_cc_01',
     'Beowulf_RGT_ring_metacarpal_secondary_cc_01',
-    'Beowulf_RGT_pinky_metacarpal_secondary_cc_01'
-]
+    'Beowulf_RGT_pinky_metacarpal_secondary_cc_01' ]
+    completeFingerNames = []
+
+    for i in baseFingerNames:
+         # Add name prefix to each finger name
+        i = rigPrefix + i
+        completeFingerNames.append(i) 
+
+    return completeFingerNames
     
 def scaleFingers():
     print ">>ScaleFingers() starting"
     for i in fingerNames():
-        mc.setAttr(rigPrefix + i + '.scaleX', 1)
+        mc.setAttr(i + '.scaleX', 1)
         mc.setKeyframe(rigPrefix + i, at='scaleX')
 
 def keyFingers():
     print ">>KeyFingers() starting"
     for i in fingerNames():
-	mc.setKeyframe(rigPrefix + i, at='scaleX')
+	mc.setKeyframe(i, at='scaleX')
     
 
 def APose():
     print ">>APose() starting"
     #Handle Right Arm
-    #   mc.rotate(0, 0, -45, 'ten_rig_main_r_armRoot_FK_CTL')
-    mc.rotate(0, 0, -5, rigPrefix + 'Beowulf_LFT_FK_upper_arm_cc_01') #45 degrees seems to be too straight for A-pose...
+    mc.rotate(0, 0, 0, rigPrefix + 'Beowulf_LFT_FK_upper_arm_cc_01') #so far, we don't seem to need to rotate the arms to get them to match the collision mesh arms 
     #Handle Left Arm
-    #   mc.rotate(0, 0, -45, 'ten_rig_main_l_armRoot_FK_CTL')
-    mc.rotate(0, 0, -5, rigPrefix + 'Beowulf_RGT_FK_upper_arm_cc_01') 
+    mc.rotate(0, 0, 0, rigPrefix + 'Beowulf_RGT_FK_upper_arm_cc_01') 
 
 
 def setRigKey(fullRig):
@@ -343,8 +347,10 @@ mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateX')
 mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateY')
 mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateZ')
 
+#may need to call selectRig() again before this 
 #Export Alembic (Requires User Input - Select Beowulf's Rig)
 mc.playbackOptions(animationStartTime=STARTPRE)
 import alembic_exporter
 alembic_exporter.go()
+#getting error here:   Unable to locate Alembic Export tag for grendel_rig_mainRN.
 
