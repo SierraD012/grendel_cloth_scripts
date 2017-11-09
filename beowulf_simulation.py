@@ -120,96 +120,74 @@ generateScene()
 ## Set Up Simulation ##
 #######################
 
-mc.select('ten_robe_sim_model_main_ten_collide_body', replace=True)
+mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth', replace=True)
 mc.viewFit() #Snap View to Body Collider
 mc.playbackOptions(animationStartTime=STARTPRE)
 mc.playbackOptions(minTime=STARTPRE)
 mc.currentTime(STARTPRE)
 
 #Wrap Colliders to Alembic
-mc.select('ten_robe_sim_model_main_ten_collide_body', replace=True) #Wrap Body
+mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth', replace=True) #Wrap Body
 mc.select('TEN_ANIM', add=True)
 mc.CreateWrap()
 #mc.setAttr('wrap1.exclusiveBind', 0)
 
-mc.select('ten_robe_sim_model_main_ten_collide_mitten_l', replace=True) #Wrap Left Mitten
-mc.select('TEN_ANIM', add=True)
-mc.CreateWrap()
-#mc.setAttr('wrap2.exclusiveBind', 0)
-
-mc.select('ten_robe_sim_model_main_ten_collide_mitten_r', replace=True) #Wrap Right Mitten
-mc.select('TEN_ANIM', add=True)
-mc.CreateWrap()
-#mc.setAttr('wrap3.exclusiveBind', 0)
-
 #Establish Colliders
-mc.select('ten_robe_sim_model_main_ten_collide_body', replace=True) #Collider Body
+mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth', replace=True) #Collider Body
 mel.eval('makeCollideNCloth;')
+mc.setAttr('nRigid1.thickness', 0.001)
 
-mc.select('ten_robe_sim_model_main_ten_collide_mitten_l', replace=True) #Collider Left Mitten
-mel.eval('makeCollideNCloth;')
-
-mc.select('ten_robe_sim_model_main_ten_collide_mitten_r', replace=True) #Collider Right Mitten
-mel.eval('makeCollideNCloth;')
 
 #Establish nCloth Objects
-mc.select('ten_robe_sim_model_main_ten_sim_robe', replace=True) #nCloth: Robe
+mc.select('beowulf_cape_model_main_beowulf_cape_simMesh', replace=True) #nCloth: Robe
 mel.eval('createNCloth 0;')
 
-mc.setAttr('nClothShape1.thickness', 0.003) #Collision Properties: Robe
-mc.setAttr('nClothShape1.selfCollideWidthScale', 5.0)
-mc.setAttr('nClothShape1.friction', 0.0)
-mc.setAttr('nClothShape1.stickiness', 0.1)
-
-mc.setAttr('nClothShape1.stretchResistance', 200.0) #Dynamic Properties: Robe
+mc.setAttr('nClothShape1.thickness', 0.006) #Collision Properties: Cape
+mc.setAttr('nClothShape1.selfCollideWidthScale', 2.5)
+mc.setAttr('nClothShape1.friction', 1.0)
+mc.setAttr('nClothShape1.stickiness', 0.4)
+mc.setAttr('nClothShape1.stretchResistance', 200.0) #Dynamic Properties: Cape
 mc.setAttr('nClothShape1.compressionResistance', 100.0)
 mc.setAttr('nClothShape1.bendResistance', 1.0)
-mc.setAttr('nClothShape1.damp', 0.8)
-
-mc.select('ten_robe_sim_model_main_ten_sim_pants', replace=True) #nCloth: Pants
-mel.eval('createNCloth 0;')
-
-mc.setAttr('nClothShape2.thickness', 0.003) #Collision Properties: Pants
-mc.setAttr('nClothShape2.selfCollideWidthScale', 5.0)
-mc.setAttr('nClothShape2.friction', 0.0)
-mc.setAttr('nClothShape2.stickiness', 0.1)
-
-mc.setAttr('nClothShape2.stretchResistance', 200.0) #Dynamic Properties: Pants
-mc.setAttr('nClothShape2.compressionResistance', 100.0)
-mc.setAttr('nClothShape2.bendResistance', 1.0)
-mc.setAttr('nClothShape2.damp', 0.8)
+mc.setAttr('nClothShape1.pointMass', 2.0)
+mc.setAttr('nClothShape1.lift', 0.1)
+mc.setAttr('nClothShape1.drag', 0.05)
+mc.setAttr('nClothShape1.tangentialDrag', 0.2)
+mc.setAttr('nClothShape1.damp', 2.5)
 
 #### Establish Dynamic Constraints ####
 
-# These are correct for Beowulf's cape beauty mesh
-mc.select(clear=True) #neckline Constraints
-cape_neckline_verts = ['[396:398]', '[403]', '[404]', '[409]', '[410]', '[415]', '[416]', '[421]', '[422]', '[427]', '[1499]', '[1502]', '[1510]', '[1512]', '[1520]', '[1522]', '[1530]', '[1532]', '[1540]', '[1542]', '[1550]', '[1552]', '[8524]', '[8530]', '[8531]', '[8546]', '[8547]', '[8550]', '[8551]', '[8566]', '[8567]', '[8570]', '[8571]', '[8586]', '[8587]', '[8590]', '[8591]', '[8606]', '[8607]', '[8611]', '[8610]', '[8627]', '[8626]', '[8630]', '[8631]' ]
 
+# These are correct for the new Beowulf cape SIM mesh
+mc.select(clear=True) #neckline Constraints
+cape_neckline_verts = [ '[72]', '[73]', '[78]', '[79]', '[84]', '[85]', '[90]', '[91]', '[96]', '[97]', '[102]',  '[513]', '[517]', '[528]', '[531]', '[542]', '[545]', '[556]', '[559]', '[570]', '[573]', '[584]', '[587]',  '[3031]', '[3034]', '[3041]', '[3044]', '[3065]', '[3068]', '[3073]', '[3076]', '[3097]', '[3100]', '[3105]', '[3108]', '[3129]', '[3132]', '[3137]', '[3140]', '[3161]', '[3164]', '[3169]', '[3172]', '[3193]', '[3196]', '[3201]', '[3204]' ]
 
 for i in cape_neckline_verts:
-    mc.select('ten_robe_sim_model_main_ten_sim_robe.vtx' + i, add=True)
-mc.select('ten_robe_sim_model_main_ten_collide_body', add=True)
+    mc.select('beowulf_cape_model_main_beowulf_cape_simMesh.vtx' + i, add=True) #might want to add a dynamic prefix thing like in the other script?
+mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth', add=True) #idk why it came in as a reference with such a long name
 mel.eval('createNConstraint pointToSurface 0;')
+mel.eval('setAttr "dynamicConstraintShape1.strengthDropoff[1].strengthDropoff_Position" 1;') #test
+mel.eval('setAttr "dynamicConstraintShape1.strengthDropoff[1].strengthDropoff_FloatValue" 0;')
+#mc.rename('dynamicConstraint1','constraint_cape_neckline') #this may not work if there are already dynamic constraints in the scene
 
-
-# These are correct for Beowulf's cape beauty mesh
+# These are correct for Beowulf's cape SIM mesh
 mc.select(clear=True) #front Constraints
-cape_front_verts = [ '[4950]', '[4951]', '[4954]', '[4955]', '[4998]', '[4999]', '[5010]', '[5011]', '[5015]', '[5018]', '[5019]', '[5022]', '[5026]', '[5027]', '[7712]', '[7716]', '[7760]', '[7772]', '[7780]', '[7784]', '[7788]', '[10731]', '[10732]', '[10757]', '[10758]', '[10764]', '[10767]' ]
+cape_front_verts = [ '[42]', '[62]', '[69]', '[70]', '[71]', '[99]', '[101]', '[103]', '[106]', '[116]', '[509]', '[514]', '[575]', '[586]', '[594]', '[597]', '[641]', '[649]', '[1610]', '[1595]', '[1715]', '[1730]', '[2860]', '[2979]', '[3024]', '[3027]', '[3035]', '[3038]', '[3176]', '[3219]', '[3200]', '[3222]', '[3227]', '[3230]', '[3342]', '[3362]' ]
 
-
-for i in robe_front_verts:
-    mc.select('ten_robe_sim_model_main_ten_sim_robe.vtx' + i, add=True)
-mc.select('ten_robe_sim_model_main_ten_collide_body', add=True)
+for i in cape_front_verts:
+    mc.select('beowulf_cape_model_main_beowulf_cape_simMesh.vtx' + i, add=True)
+mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth', add=True)
 mel.eval('createNConstraint pointToSurface 0;') 
+mel.eval('setAttr "dynamicConstraintShape2.strengthDropoff[1].strengthDropoff_Position" 1;') #test
+mel.eval('setAttr "dynamicConstraintShape2.strengthDropoff[1].strengthDropoff_FloatValue" 0;')
+#mc.rename('dynamicConstraint1','constraint_cape_neckline')  #this may not work if there are already dynamic constraints in the scene
 
 
-
-
-#Set Nucleus Parameters (INCOMPLETE - New Nucleus specific to Ten?)
-mc.setAttr('nucleus1.subSteps', 15)
-mc.setAttr('nucleus1.maxCollisionIterations', 20)
+#Set Nucleus Parameters
+mc.setAttr('nucleus1.subSteps', 4)
+mc.setAttr('nucleus1.maxCollisionIterations', 8)
 mc.setAttr('nucleus1.startFrame', STARTPRE)
-mc.setAttr('nucleus1.spaceScale', 0.45)
+mc.setAttr('nucleus1.spaceScale', 1.0)
 
 #########################
 ## PREPARE HERO MESHES ##
