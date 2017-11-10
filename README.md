@@ -18,7 +18,7 @@ Steps for PREROLL scripts:
 
 
 Steps for SIMULATION scripts:
-1) Generate CFX Scene:
+1) Generate CFX Scene (or open the existing one, if any):
 		- Create a position locator and set it to the rig's primary control position
 		- Pull in the alembic exported from the previous (PREROLL) scripts
 		- Checkout the CFX file for this scene or create a new one if it doesn't exist yet
@@ -28,4 +28,5 @@ Steps for SIMULATION scripts:
 		- Note that the dynamic constraints are attached to the character's collision mesh, not the actual rigged geo!
 4) Wrap the cloth beauty mesh to the cloth sim mesh 
 5) Group related objects, rename them & their groups for clarity, hide unnecessary objects (sim meshes, etc)
-6) Export an alembic of the simmed cloth beauty mesh? 
+6) Export an alembic of the simmed cloth beauty mesh? (probably do this manually)
+7) Publish the CFX scene to pipeline (do this manually)
