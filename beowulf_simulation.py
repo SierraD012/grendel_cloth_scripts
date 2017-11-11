@@ -16,8 +16,6 @@ STARTPRE = -25
 ## ESTABLISH CFX SCENE ##
 #########################
 
-#This code is brought to you in part by Trevor Barrus and the letter G
-
 def generateScene():
     project = Project()
     environment = Environment()
@@ -26,10 +24,10 @@ def generateScene():
     mc.currentTime(STARTANIM)
     globalPos = mc.spaceLocator(p=[0,0,0])
     globPos = mc.rename(globalPos, "beowulfGlobalPos")
-    mc.select("grendel_rig_main_Beowulf_primary_global_cc_01")
+    mc.select("beowulf_rig_main_Beowulf_primary_global_cc_01")
     mc.select(globPos, add=True)
-    mc.pointConstraint(offset=[0,0,0], weight=1)
-    mc.orientConstraint(offset=[0,0,0], weight=1)
+    mc.pointConstraint(offset=[0,0,0], weight=1) #constrains the globPos position to where Beowulf's rig_main is 
+    mc.orientConstraint(offset=[0,0,0], weight=1) #orients the globPos to match Beowulf's rig_main (I think it just does the rotation)
 
     # Get transformation variables from globPos locator
     tx = mc.getAttr(globPos+".translateX")
@@ -52,18 +50,19 @@ def generateScene():
     current_user = environment.get_current_username()
     element = body.get_element(Department.CFX)
     cfx_filepath = element.checkout(current_user)
+    print(">GenScene(): cfx_filepath= " + cfx_filepath) # see where it's expecting the file to be/what it's called
 
     #open cfx file 
     if cfx_filepath is not None:
         if not mc.file(q=True, sceneName=True) == '':
             mc.file(save=True, force=True) #save file
 
-        if not os.path.exists(cfx_filepath):
+        if not os.path.exists(cfx_filepath): #make a new CFX scene file 
             mc.file(new=True, force=True)
             mc.file(rename=cfx_filepath)
             mc.file(save=True, force=True)
         else:
-            mc.file(cfx_filepath, open=True, force=True)
+            mc.file(cfx_filepath, open=True, force=True) # the file exists already
 
     # import alembic
     command = "AbcImport -mode import \"" + cache_file + "\""
@@ -130,6 +129,8 @@ mc.currentTime(STARTPRE)
 mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth', replace=True) #Wrap Body
 mc.select('TEN_ANIM', add=True)
 mc.CreateWrap()
+#From Brennan: Do your best to only have one thing wrapping per sim - they are slow to calculate
+# if you need to adjust the collision mesh for a weird cloth thing, you can duplicate the collisionmesh, adjust the shape/add more or whatever, then make it a blend shape to the original collision mesh. Blend shapes DO require the same exact # of polygons bu tthey're also a lot faster than regular wraps. 
 #mc.setAttr('wrap1.exclusiveBind', 0)
 
 #Establish Colliders
@@ -142,6 +143,8 @@ mc.setAttr('nRigid1.thickness', 0.001)
 mc.select('beowulf_cape_model_main_beowulf_cape_simMesh', replace=True) #nCloth: Robe
 mel.eval('createNCloth 0;')
 
+
+#TODO: get ncloth settings from beowulf_cape_simsWithABC_01.mb and copy them into here! these are outdated now
 mc.setAttr('nClothShape1.thickness', 0.006) #Collision Properties: Cape
 mc.setAttr('nClothShape1.selfCollideWidthScale', 2.5)
 mc.setAttr('nClothShape1.friction', 1.0)
@@ -188,43 +191,22 @@ mc.setAttr('nucleus1.subSteps', 4)
 mc.setAttr('nucleus1.maxCollisionIterations', 8)
 mc.setAttr('nucleus1.startFrame', STARTPRE)
 mc.setAttr('nucleus1.spaceScale', 1.0)
+# mess wtih time scale to increase substeps
+#may  need to set the ground plane coords to match the collisionMesh coords
+
+
 
 #########################
 ## PREPARE HERO MESHES ##
 #########################
 
-#Create Sleeveless Robe for Sash Sim
-mc.duplicate('ten_robe_model_main_ten_Hero_Robe')
-mc.rename('ten_robe_model_main_ten_Hero_Robe1', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless')
-
-mc.select('ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1861:1862]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1866:1869]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1872:1873]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1878:1881]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1884:1885]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1888]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1891]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1893:1894]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1898:1899]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2009:2010]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2021:2022]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2396:2397]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2402:2403]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2412]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2415]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2428:2429]', replace=True)
-mc.select('ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[968]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[971:972]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[975:976]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[979:980]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[983:984]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[987:988]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[991:992]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[995:996]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[999:1000]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1003:1004]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1007:1008]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1011:1012]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1015:1016]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1019:1020]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1023:1024]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1027:1028]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1031]', add=True)
-mc.delete()
-
-mc.select('ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[0:895]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[4452:4579]', replace=True)
-mc.select('ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[968:1639]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[3872:3935]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[4000:4127]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[4324:4451]', add=True)
-mc.delete()
 
 # Wrap Hero Meshes to Sim Meshes
 mc.select('ten_robe_model_main_ten_Hero_Robe', replace=True) #Wrap Robe
 mc.select('ten_robe_sim_model_main_ten_sim_robe', add=True)
-mc.CreateWrap()
-#mc.setAttr('wrap4.exclusiveBind', 0)
+mc.CreateWrap() # see if you can pass in params to CreateWrap(), i.e. exclusiveBind boolean
+#mc.setAttr('wrap4.exclusiveBind', 0) #this is important! 
 
-mc.select('ten_robe_model_main_ten_Hero_Pants', replace=True) #Wrap Pants
-mc.select('ten_robe_sim_model_main_ten_sim_pants', add=True)
-mc.CreateWrap()
-#mc.setAttr('wrap5.exclusiveBind', 0)
-
-mc.select('ten_robe_model_main_ten_Hero_Robe_Sleeveless', replace=True) #Wrap Sleeveless Robe (Exclusive Bind)
-mc.select('ten_robe_model_main_ten_Hero_Robe', add=True)
-mc.CreateWrap()
-#mc.setAttr('wrap6.exclusiveBind', 1)
-
-mc.select('ten_robe_model_main_ten_Hero_Sash', replace=True) #Wrap Sash
-mc.select('ten_robe_model_main_ten_Hero_Robe_Sleeveless', add=True)
-mc.CreateWrap()
-#mc.setAttr('wrap7.exclusiveBind', 0)
 
 #Rename/Group Simulation Objects
 mc.rename('nucleus1', 'nucleus_ten') #Nucleus

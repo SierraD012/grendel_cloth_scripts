@@ -21,7 +21,12 @@ STARTPRE = -25
 # because the layout scenes have that (the rig file doesn't)
 ############################
 
-#This code is brought to you in part by Daniel Fuller and the number 7
+
+#maybe instead of zeroing out all the transformations/rotations we could get the pos/rot of the global rig control and create a key in A-pose
+# right next to the same spot it'll be when frame 0 hits. That way we don't have to worry about the cloth getting ripped off when the 
+# rig flies from origin over to its starting spot super fast
+# ask Brennan how to approach this! 
+
 
 #Clears Rotation on a List of Objects
 def clearRotate(list):
@@ -89,7 +94,7 @@ def selectRig():
     print ">>SelectRig() starting"
 
     beowulf_main = [
-    'Beowulf_main_cc_01',
+    #'Beowulf_main_cc_01', #this is what moves the entire rig group - if we skip this one I think the rig will move from A-pose to scene start pose without flying back from origin
     'Beowulf_secondary_global_cc_01',
     'Beowulf_primary_global_cc_01']
 
@@ -337,7 +342,7 @@ clearTranslate(fullRig)
 clearScale(fullRig)
 
 #Key APose (Adjust Arms, Keyframe)
-APose()
+APose() #this may not be necessary for Beowulf's model
 setRigKey(fullRig)
 
 mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='translateX')
@@ -353,4 +358,5 @@ mc.playbackOptions(animationStartTime=STARTPRE)
 import alembic_exporter
 alembic_exporter.go()
 #getting error here:   Unable to locate Alembic Export tag for grendel_rig_mainRN.
+# means you need to select the geo and add the ABC export tag
 
