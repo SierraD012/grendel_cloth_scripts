@@ -17,15 +17,15 @@ STARTPRE = -25
 
 ############################
 ## PRE-ROLL BEOWULF ANIMATION ##
-# this version (2) has each rig control name with the prefix "_" 
+# this version (2) has each rig control name with the prefix "_"
 # because the layout scenes have that (the rig file doesn't)
 ############################
 
 
 #maybe instead of zeroing out all the transformations/rotations we could get the pos/rot of the global rig control and create a key in A-pose
-# right next to the same spot it'll be when frame 0 hits. That way we don't have to worry about the cloth getting ripped off when the 
+# right next to the same spot it'll be when frame 0 hits. That way we don't have to worry about the cloth getting ripped off when the
 # rig flies from origin over to its starting spot super fast
-# ask Brennan how to approach this! 
+# ask Brennan how to approach this!
 
 
 #Clears Rotation on a List of Objects
@@ -54,13 +54,13 @@ def clearTranslate(list):
         if mc.getAttr(i + '.translateX', settable=True):
             mc.setAttr(i + '.translateX', 0)
         else:
-	    print '************ Skipping ' + str(i) + '.translateX' 
-        
-	if mc.getAttr(i + '.translateY', settable=True):   
+	    print '************ Skipping ' + str(i) + '.translateX'
+
+	if mc.getAttr(i + '.translateY', settable=True):
             mc.setAttr(i + '.translateY', 0)
         else:
 	    print '************ Skipping ' + str(i) + '.translateY'
-       
+
 	if mc.getAttr(i + '.translateZ', settable=True):
             mc.setAttr(i + '.translateZ', 0)
         else:
@@ -74,13 +74,13 @@ def clearScale(list):
             mc.setAttr(i + '.scaleX', 1)
 
         else:
-	    print '************ Skipping ' + str(i) + '.scaleX' 
-        
-	if mc.getAttr(i + '.scaleY', settable=True):   
+	    print '************ Skipping ' + str(i) + '.scaleX'
+
+	if mc.getAttr(i + '.scaleY', settable=True):
             mc.setAttr(i + '.scaleY', 1)
         else:
 	    print '************ Skipping ' + str(i) + '.scaleY'
-       
+
 	if mc.getAttr(i + '.scaleZ', settable=True):
 
             mc.setAttr(i + '.scaleZ', 1)
@@ -89,7 +89,7 @@ def clearScale(list):
 
 
 #Selects/Returns Full Rig
-# update: it looks like all the accessories + beard go with the transformation, so that's cool 
+# update: it looks like all the accessories + beard go with the transformation, so that's cool
 def selectRig():
     print ">>SelectRig() starting"
 
@@ -105,14 +105,14 @@ def selectRig():
 
     beowulf_eyes = [
     'Beowulf_LFT_eye_rotate_cc_01', 	#Left
-    'Beowulf_LFT_LOW_eyelid_cc_01',	
+    'Beowulf_LFT_LOW_eyelid_cc_01',
     'Beowulf_LFT_UPP_eyelid_cc_01',
     'Beowulf_LFT_OUT_eyebrow_cc_01',
     'Beowulf_LFT_MID_eyebrow_cc_01',
     'Beowulf_LFT_INN_eyebrow_cc_01',
     'Beowulf_LFT_MAIN_eyebrow_cc_01',
     'Beowulf_RGT_eye_rotate_cc_01',		#Right
-    'Beowulf_RGT_LOW_eyelid_cc_01',	
+    'Beowulf_RGT_LOW_eyelid_cc_01',
     'Beowulf_RGT_UPP_eyelid_cc_01',
     'Beowulf_RGT_OUT_eyebrow_cc_01',
     'Beowulf_RGT_MID_eyebrow_cc_01',
@@ -121,7 +121,7 @@ def selectRig():
     'Beowulf_LFT_eye_aim_cc_01',
     'Beowulf_RGT_eye_aim_cc_01',
     'Beowulf_both_eyes_aim_cc_01']
-    
+
     beowulf_mouth = [
     'Beowulf_tongue_tip_cc_01',
     'Beowulf_tongue_middle_cc_01',
@@ -158,7 +158,7 @@ def selectRig():
     'Beowulf_RGT_clavicle_cc_01',
     'Beowulf_RGT_FK_wrist_cc_01',
     'Beowulf_RGT_FK_lower_arm_cc_01',
-    'Beowulf_RGT_FK_upper_arm_cc_01']    
+    'Beowulf_RGT_FK_upper_arm_cc_01']
 
     beowulf_hands = [
     'Beowulf_LFT_hand_cupping_splaying_cc_01',     #Left
@@ -233,14 +233,14 @@ def selectRig():
 
     fullRigNoPrefix = beowulf_main + beowulf_head + beowulf_mouth + beowulf_neck + beowulf_torso + beowulf_arms + beowulf_hands + beowulf_hips + beowulf_legs_feet
     fullRig = []
-    
+
     #Create Selection from 'fullRig'
     mc.select(cl=True);
     for i in fullRigNoPrefix:
          # Add name prefix to each control
         i = rigPrefix + i
         fullRig.append(i)
-        
+
     for i in fullRig:
         mc.select(i, add=True)
 
@@ -250,12 +250,12 @@ def selectRig():
 def keyArmFK():
     print ">>KeyArmFK() starting"
     leftArmFK = rigPrefix + 'Beowulf_LFT_arm_settings_cc_01.FK_IK'
-    
+
     mc.setAttr(leftArmFK, 0)  #FK mode
 
     if (mc.getAttr(leftArmFK, keyable=True) or mc.getAttr(leftArmFK, channelBox=True)):
         mc.setKeyframe(leftArmFK);
-        
+
 
     rightArmFK = rigPrefix + 'Beowulf_RGT_arm_settings_cc_01.FK_IK'
 
@@ -281,10 +281,10 @@ def fingerNames():
     for i in baseFingerNames:
          # Add name prefix to each finger name
         i = rigPrefix + i
-        completeFingerNames.append(i) 
+        completeFingerNames.append(i)
 
     return completeFingerNames
-    
+
 def scaleFingers():
     print ">>ScaleFingers() starting"
     for i in fingerNames():
@@ -295,14 +295,14 @@ def keyFingers():
     print ">>KeyFingers() starting"
     for i in fingerNames():
 	mc.setKeyframe(i, at='scaleX')
-    
+
 
 def APose():
     print ">>APose() starting"
     #Handle Right Arm
-    mc.rotate(0, 0, 0, rigPrefix + 'Beowulf_LFT_FK_upper_arm_cc_01') #so far, we don't seem to need to rotate the arms to get them to match the collision mesh arms 
+    mc.rotate(0, 0, 0, rigPrefix + 'Beowulf_LFT_FK_upper_arm_cc_01') #so far, we don't seem to need to rotate the arms to get them to match the collision mesh arms
     #Handle Left Arm
-    mc.rotate(0, 0, 0, rigPrefix + 'Beowulf_RGT_FK_upper_arm_cc_01') 
+    mc.rotate(0, 0, 0, rigPrefix + 'Beowulf_RGT_FK_upper_arm_cc_01')
 
 
 def setRigKey(fullRig):
@@ -315,7 +315,7 @@ def setRigKey(fullRig):
     mc.setKeyframe(fullRig, at='rotateX')
     mc.setKeyframe(fullRig, at='rotateY')
     mc.setKeyframe(fullRig, at='rotateZ')
-    
+
     keyFingers()
 
 
@@ -352,11 +352,10 @@ mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateX')
 mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateY')
 mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateZ')
 
-#may need to call selectRig() again before this 
+#may need to call selectRig() again before this
 #Export Alembic (Requires User Input - Select Beowulf's Rig)
 mc.playbackOptions(animationStartTime=STARTPRE)
 import alembic_exporter
 alembic_exporter.go()
 #getting error here:   Unable to locate Alembic Export tag for grendel_rig_mainRN.
 # means you need to select the geo and add the ABC export tag
-
