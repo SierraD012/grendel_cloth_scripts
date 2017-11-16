@@ -21,7 +21,7 @@ def generateScene():
     environment = Environment()
 
     # Create a global position locator for Beowulf's Starting Location
-    mc.currentTime(STARTANIM)
+    mc.currentTime(STARTPRE)
     globalPos = mc.spaceLocator(p=[0,0,0])
     globPos = mc.rename(globalPos, "beowulfGlobalPos")
     mc.select("beowulf_rig_main_Beowulf_primary_global_cc_01")
@@ -44,13 +44,16 @@ def generateScene():
     checkout_body_name = checkout_element.get_parent()
     body = project.get_body(checkout_body_name)
     element = body.get_element(Department.ANIM)
-    cache_file = os.path.join(element.get_dir(), "cache", "beowulf_rig_main.abc") #is this the right cache_file name?
+    cache_file = os.path.join(element.get_dir(), "cache", sceneName + ".abc") #check if this export file name works
+    #we could make a while loop to check if an alembic with this name exists already, if it does increment a suffix number on the filename
 
     # checkout cfx scene for corresponding shot number
     current_user = environment.get_current_username()
     element = body.get_element(Department.CFX)
     cfx_filepath = element.checkout(current_user)
     print(">GenScene(): cfx_filepath= " + cfx_filepath) # see where it's expecting the file to be/what it's called
+    print(">GenScene(): cache_file= " + cache_file) # this is where ABCimporter expects the character geo abc to be
+
 
     #open cfx file
     if cfx_filepath is not None:
@@ -62,38 +65,15 @@ def generateScene():
             mc.file(rename=cfx_filepath)
             mc.file(save=True, force=True)
         else:
+             mc.file(cfx_filepath, open=True, force=True)
     # import alembic
     command = "AbcImport -mode import \"" + cache_file + "\""
     maya.mel.eval(command)
 
-    # delete all geo except ten's skin and rename - this is so the eyes/teeth/etc don't slow down the cloth sim
-#    geometry = mc.ls(geometry=True)
-#    transforms = mc.listRelatives(geometry, p=True, path=True)
-#    mc.select(transforms, r=True)
-#    for geo in mc.ls(sl=True):
-#        if(geo != "ten_rig_main_Ten_Skin_RENDER"):
-#            mc.delete(geo)
-#    collide = "TEN_ANIM"
-#    mc.rename("ten_rig_main_Ten_Skin_RENDER", collide)
-
-#### PULL IN REFERENCE OBJECTS ####
-    #Reference Beowulf's CollisionMesh
-    body = project.get_body("beowulf_collision_mesh_cloth")
-    element = body.get_element(Department.MODEL)
-    collisionMesh_file = element.get_app_filepath()
-    mc.file(collisionMesh_file, reference=True)
-
-    # Reference Beowulf's Cape - it comes with both sim and beauty meshes
-    body = project.get_body("beowulf_cape")
-    element = body.get_element(Department.MODEL)
-    cape_sim_file = element.get_app_filepath()
-    mc.file(cape_sim_file, reference=True)  #it looks like this is bringing in the Beowulf rig/geo as well for some reason
-
+    #### PULL IN REFERENCE OBJECTS ####
+    getReferenceObjects()
 
     # Set full cape group transforms to match Beowulf's alembic
-# i think this is giving us rounding issues
-#maybe if we need to we can position them both at a closeby round number and then translate them (cape wrapped to mesh) to the real starting pos
-#actually it looks like translating the entire cape group fixed the rounding issues... cool
     mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateX", tx)
     mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateY", ty)
     mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateZ", tz)
@@ -109,13 +89,29 @@ def generateScene():
     mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.rotateY", ry)
     mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.rotateZ", rz)
 
+    #### PULL IN REFERENCE OBJECTS ####
+    getReferenceObjects()
+
+
+def getReferenceObjects():
+    #Reference Beowulf's CollisionMesh
+    body = project.get_body("beowulf_collision_mesh_cloth")
+    element = body.get_element(Department.MODEL)
+    collisionMesh_file = element.get_app_filepath()
+    mc.file(collisionMesh_file, reference=True)
+
+    # Reference Beowulf's Cape - it comes with both sim and beauty meshes
+    body = project.get_body("beowulf_cape")
+    element = body.get_element(Department.MODEL)
+    cape_sim_file = element.get_app_filepath()
+    mc.file(cape_sim_file, reference=True)
+
 
 #######################
 ##       MAIN        ##
 #######################
 
 generateScene()
-
 
 #######################
 ## Set Up Simulation ##
@@ -159,12 +155,11 @@ mc.select(clear=True)
 cape_neckline_verts = [ '[72]', '[73]', '[78]', '[79]', '[84]', '[85]', '[90]', '[91]', '[96]', '[97]', '[102]',  '[513]', '[517]', '[528]', '[531]', '[542]', '[545]', '[556]', '[559]', '[570]', '[573]', '[584]', '[587]',  '[3031]', '[3034]', '[3041]', '[3044]', '[3065]', '[3068]', '[3073]', '[3076]', '[3097]', '[3100]', '[3105]', '[3108]', '[3129]', '[3132]', '[3137]', '[3140]', '[3161]', '[3164]', '[3169]', '[3172]', '[3193]', '[3196]', '[3201]', '[3204]' ]
 
 for i in cape_neckline_verts:
-    mc.select('beowulf_cape_model_main_beowulf_cape_simMesh.vtx' + i, add=True) #might want to add a dynamic prefix thing like in the other script?
+    mc.select('beowulf_cape_model_main_beowulf_cape_simMesh.vtx' + i, add=True)
 mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth', add=True)
 mel.eval('createNConstraint pointToSurface 0;')
 mel.eval('setAttr "dynamicConstraintShape1.strengthDropoff[1].strengthDropoff_Position" 1;')
 mel.eval('setAttr "dynamicConstraintShape1.strengthDropoff[1].strengthDropoff_FloatValue" 0;')
-
 
 #Front Constraints
 mc.select(clear=True)
@@ -193,7 +188,6 @@ mc.setAttr("nucleus1.timeScale", 2)
 # you can try messing with nucleus time scale to increase substeps
 
 
-
 #########################
 ## PREPARE HERO MESHES ##
 #########################
@@ -203,22 +197,22 @@ mc.setAttr("nucleus1.timeScale", 2)
 mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth', replace=True) #Wrap Body
 mc.select('beowulf_rig_main_Beowulf_body_GEO_01', add=True)  #wrap the collision mesh to Beowulf skin
 mc.CreateWrap()
+
 #From Brennan: Do your best to only have one thing wrapping per sim - they are slow to calculate
 # if you need to adjust the collision mesh for a weird cloth thing, you can duplicate the collisionmesh, adjust the shape/add more or whatever, then make it a blend shape to the original collision mesh. Blend shapes DO require the same exact # of polygons but they're also a lot faster than regular wraps.
 #mc.setAttr('wrap1.exclusiveBind', 0) #it looks like this is the default
 
 
-# Wrap Hero Meshes to Sim Meshes
-mc.select('beowulf_cape_model_main_beowulf_cape_beautyMesh', replace=True) #Wrap Robe
+# Wrap Cape Beauty Mesh to Sim Mesh
+mc.select('beowulf_cape_model_main_beowulf_cape_beautyMesh', replace=True)
 mc.select('beowulf_cape_model_main_beowulf_cape_simMesh', add=True)
-mc.CreateWrap() # see if you can pass in params to CreateWrap(), i.e. exclusiveBind boolean
-#mc.setAttr('wrap4.exclusiveBind', 0) #this is important!
+mc.CreateWrap()
 
 
 #Rename/Group Simulation Objects
-mc.rename('nucleus1', 'nucleus_beowulf') #Nucleus
-mc.rename('nRigid1', 'nRigid_beowulf_body') #nRigid
-mc.rename('nCloth1', 'nCloth_beowulf_cape') #nCloth
+mc.rename('nucleus1', 'nucleus_beowulf')
+mc.rename('nRigid1', 'nRigid_beowulf_body')
+mc.rename('nCloth1', 'nCloth_beowulf_cape')
 
 mc.rename('dynamicConstraint1','constraint_cape_neckline')
 mc.rename('dynamicConstraint2','constraint_cape_front')
@@ -229,3 +223,8 @@ mc.group('nucleus_beowulf', 'nRigid_beowulf_body', 'nCloth_beowulf_cape', 'beowu
 #Hide Unnescessary Objects
 mc.hide('beowulf_cape_model_main_beowulf_cape_simMesh')
 mc.hide('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth')
+
+#Tag cape object for export
+mc.select("beowulf_cape_model_main_beowulf_cape_beautyMesh", replace = True)
+import alembic_tagger;
+alembic_tagger.go()

@@ -93,8 +93,9 @@ def clearScale(list):
 def selectRig():
     print ">>SelectRig() starting"
 
+    #these are what moves the entire rig group - if we skip these the rig will move from A-pose to scene start pose without flying back from origin
     beowulf_main = [
-    #'Beowulf_main_cc_01', #this is what moves the entire rig group - if we skip this one I think the rig will move from A-pose to scene start pose without flying back from origin
+    #'Beowulf_main_cc_01',
     'Beowulf_secondary_global_cc_01',
     'Beowulf_primary_global_cc_01']
 
@@ -231,7 +232,8 @@ def selectRig():
     'Beowulf_RGT_big_toe_primary_cc_01',
     'Beowulf_RGT_foot_ball_cc_01']
 
-    fullRigNoPrefix = beowulf_main + beowulf_head + beowulf_mouth + beowulf_neck + beowulf_torso + beowulf_arms + beowulf_hands + beowulf_hips + beowulf_legs_feet
+    #beowulf_main +
+    fullRigNoPrefix = beowulf_head + beowulf_mouth + beowulf_neck + beowulf_torso + beowulf_arms + beowulf_hands + beowulf_hips + beowulf_legs_feet
     fullRig = []
 
     #Create Selection from 'fullRig'
@@ -318,13 +320,61 @@ def setRigKey(fullRig):
 
     keyFingers()
 
+#Used to constrain the clasps/chain on the front of the cape to Beowulf's chest rig control
+#this is kind of a fake sim, we should probably just use it when the chain is not directly visible!
+def constrainCapeChain():
+    # Create a global position locator for Beowulf's main rig control location
+    globalPos = mc.spaceLocator(p=[0,0,0])
+    globPos = mc.rename(globalPos, "beowulfGlobalPos")
+    mc.select("beowulf_rig_main_Beowulf_primary_global_cc_01")
+    mc.select(globPos, add=True)
+    mc.pointConstraint(offset=[0,0,0], weight=1) #constrains the globPos position to where Beowulf's rig_main is
+    mc.orientConstraint(offset=[0,0,0], weight=1) #orients the globPos to match Beowulf's rig_main (I think it just does the rotation)
+
+    # Get transformation variables from globPos locator
+    tx = mc.getAttr(globPos+".translateX")
+    ty = mc.getAttr(globPos+".translateY")
+    tz = mc.getAttr(globPos+".translateZ")
+    rx = mc.getAttr(globPos+".rotateX")
+    ry = mc.getAttr(globPos+".rotateY")
+    rz = mc.getAttr(globPos+".rotateZ")
+
+    # Set full cape group transforms to match Beowulf's location
+    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateX", tx)
+    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateY", ty)
+    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateZ", tz)
+    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.rotateX", rx)
+    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.rotateY", ry)
+    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.rotateZ", rz)
+
+    #Hide meshes we don't want to work with right now
+    mc.hide('beowulf_cape_model_main_beowulf_cape_simMesh')
+    mc.hide('beowulf_cape_model_main_beowulf_cape_beautyMesh')
+
+    #Select & combine the clasps & chain meshes
+    mc.select("beowulf_cape_model_main_beowulf_cape_clasps", replace=True)
+    mc.select("beowulf_cape_model_main_beowulf_cape_clasp_chain", add=True) #not really necessary to select these two
+    mc.polyUnite("beowulf_cape_model_main_beowulf_cape_clasps", "beowulf_cape_model_main_beowulf_cape_clasp_chain", name="beowulf_cape_model_main_beowulf_capeChain_combined")
+
+    #Select the rig control we want to parent the chain/clasp to
+    mc.select("beowulf_rig_main_Beowulf_chest_cc_01", replace=True) #I think this is the right one
+    #Now select the chainCombined object
+    mc.select("beowulf_cape_model_main_beowulf_capeChain_combined", add=True)
+
+    #Create parent constraint: (targetObject, childObject)
+    mc.parentConstraint("beowulf_rig_main_Beowulf_chest_cc_01", "beowulf_cape_model_main_beowulf_capeChain_combined", maintainOffset=1, weight=1.0)
+
 
 ###########################################
 #### MAIN ####
 ###########################################
-
+# Reference Beowulf's Cape - it comes with both sim and beauty meshes
+body = project.get_body("beowulf_cape")
+element = body.get_element(Department.MODEL)
+cape_sim_file = element.get_app_filepath()
+mc.file(cape_sim_file, reference=True)
 global rigPrefix
-rigPrefix = "grendel_rig_main_"  #concatenate this with every other control name
+rigPrefix = "beowulf_rig_main_"  #concatenate this with every other control name
 
 #Keyframe Initial Frame
 mc.currentTime(STARTANIM)
@@ -333,6 +383,7 @@ setRigKey(fullRig)
 
 #Set T-Pose (Clear Transformations)
 mc.currentTime(STARTPRE)
+mc.playbackOptions(minTime=STARTPRE) #this might help
 
 selectRig()
 keyArmFK()
@@ -352,10 +403,20 @@ mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateX')
 mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateY')
 mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateZ')
 
-#may need to call selectRig() again before this
-#Export Alembic (Requires User Input - Select Beowulf's Rig)
+
+#Since we have Beowulf's rig available right now, let's constrain the cape chain/clasps
+#to his rig right now and export an alembic of that (you probs need to do that manually since we can't ABC tag it)
+constrainCapeChain()
+
+#Export full mesh alembic - Just Beowulf's geo
 mc.playbackOptions(animationStartTime=STARTPRE)
+#Tag Beowulf's geo only for alembic export:
+mc.select(rigPrefix + "Beowulf_geo_GRP_01", replace = True)
+import alembic_tagger;
+alembic_tagger.go()
+#Export alembic of just Beowulf's geo
 import alembic_exporter
 alembic_exporter.go()
-#getting error here:   Unable to locate Alembic Export tag for grendel_rig_mainRN.
-# means you need to select the geo and add the ABC export tag
+
+#Export alembic of just the cape chain - might need do this manually because the ABC Exporter doesn't know how to find the tag on this one since it's not a reference
+#AbcExport -j "-frameRange -30 120 -step 0.25 -dataFormat ogawa -root |beowulf_cape_model_main_beowulf_capeChain_combined -file /groups/grendel/production/shots/b023/anim/main/cache/beowulf_capeChain.abc";
