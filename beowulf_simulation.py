@@ -44,7 +44,9 @@ def generateScene():
     checkout_body_name = checkout_element.get_parent()
     body = project.get_body(checkout_body_name)
     element = body.get_element(Department.ANIM)
-    cache_file = os.path.join(element.get_dir(), "cache", sceneName + ".abc") #check if this export file name works
+    cache_name = "beowulf_"+checkout_body_name+"_anim_main" # this is me doing it arbitrarily but I think the preroll script picks its own name
+    cache_file = os.path.join(element.get_dir(), "cache", cache_name + ".abc")
+    #print("Expecting mesh alembic with name " + cache_name)
     #we could make a while loop to check if an alembic with this name exists already, if it does increment a suffix number on the filename
 
     # checkout cfx scene for corresponding shot number
@@ -88,9 +90,6 @@ def generateScene():
     mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.rotateX", rx)
     mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.rotateY", ry)
     mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.rotateZ", rz)
-
-    #### PULL IN REFERENCE OBJECTS ####
-    getReferenceObjects()
 
 
 def getReferenceObjects():
@@ -178,12 +177,12 @@ mc.setAttr('nucleus1.subSteps', 4)
 mc.setAttr('nucleus1.maxCollisionIterations', 8)
 mc.setAttr('nucleus1.startFrame', STARTPRE)
 mc.setAttr('nucleus1.spaceScale', 1.0)
-mc.setAttr("nucleus1.usePlane", 1);
+mc.setAttr("nucleus1.usePlane", 1)
 mc.setAttr("nucleus1.planeOriginX", tx)
 mc.setAttr("nucleus1.planeOriginY", ty)
 mc.setAttr("nucleus1.planeOriginZ", tz)
-mc.setAttr("nucleus1.windDirectionX" 0.9)  # add in wind here if necessary
-mc.setAttr("nucleus1.windDirectionZ" 0.1)
+mc.setAttr("nucleus1.windDirectionX", 0.9)  # add in wind here if necessary
+mc.setAttr("nucleus1.windDirectionZ", 0.1)
 mc.setAttr("nucleus1.timeScale", 2)
 # you can try messing with nucleus time scale to increase substeps
 
@@ -222,6 +221,8 @@ mc.group('nucleus_beowulf', 'nRigid_beowulf_body', 'nCloth_beowulf_cape', 'beowu
 
 #Hide Unnescessary Objects
 mc.hide('beowulf_cape_model_main_beowulf_cape_simMesh')
+mc.hide('beowulf_cape_model_main_beowulf_cape_clasps') #the chain/clasps are taken care of in the other script
+mc.hide('beowulf_cape_model_main_beowulf_cape_clasp_chain')
 mc.hide('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth')
 
 #Tag cape object for export

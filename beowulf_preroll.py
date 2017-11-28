@@ -12,7 +12,7 @@ from byuam.project import Project
 from byuam.environment import Department, Environment
 
 STARTANIM = -5
-STARTPRE = -25
+STARTPRE = -30
 
 
 ############################
@@ -21,11 +21,11 @@ STARTPRE = -25
 # because the layout scenes have that (the rig file doesn't)
 ############################
 
-
-#maybe instead of zeroing out all the transformations/rotations we could get the pos/rot of the global rig control and create a key in A-pose
-# right next to the same spot it'll be when frame 0 hits. That way we don't have to worry about the cloth getting ripped off when the
-# rig flies from origin over to its starting spot super fast
-# ask Brennan how to approach this!
+# If you come across a shot where the rig's primary control is far away from the actual mesh for some reason
+# you can go far back in the preroll and set a keyframe on the primary control at a position really close to
+# where the mesh will start at frame 0, so then when you run this script the character mesh will be at A-pose
+# really close to where it should be at frame 0. This makes it so you don't have to deal with the mesh
+# flying 500 units over to its start point during preroll.
 
 
 #Clears Rotation on a List of Objects
@@ -96,8 +96,8 @@ def selectRig():
     #these are what moves the entire rig group - if we skip these the rig will move from A-pose to scene start pose without flying back from origin
     beowulf_main = [
     #'Beowulf_main_cc_01',
-    'Beowulf_secondary_global_cc_01',
-    'Beowulf_primary_global_cc_01']
+    #'Beowulf_secondary_global_cc_01',
+    #'Beowulf_primary_global_cc_01']
 
     beowulf_head = [
     'Beowulf_head_cc_01',
@@ -288,27 +288,28 @@ def fingerNames():
     return completeFingerNames
 
 def scaleFingers():
-    print ">>ScaleFingers() starting"
+    print ">>ScaleFingers(): starting"
     for i in fingerNames():
         mc.setAttr(i + '.scaleX', 1)
         mc.setKeyframe(rigPrefix + i, at='scaleX')
 
 def keyFingers():
-    print ">>KeyFingers() starting"
+    print ">>KeyFingers(): starting"
     for i in fingerNames():
 	mc.setKeyframe(i, at='scaleX')
 
 
 def APose():
-    print ">>APose() starting"
+    print ">>APose(): starting"
     #Handle Right Arm
     mc.rotate(0, 0, 0, rigPrefix + 'Beowulf_LFT_FK_upper_arm_cc_01') #so far, we don't seem to need to rotate the arms to get them to match the collision mesh arms
     #Handle Left Arm
     mc.rotate(0, 0, 0, rigPrefix + 'Beowulf_RGT_FK_upper_arm_cc_01')
+    print ">>APose(): done"
 
 
 def setRigKey(fullRig):
-    print ">>SetRigKey() starting"
+    print ">>SetRigKey(): starting"
     #Key Translation
     mc.setKeyframe(fullRig, at='translateX')
     mc.setKeyframe(fullRig, at='translateY')
@@ -319,6 +320,7 @@ def setRigKey(fullRig):
     mc.setKeyframe(fullRig, at='rotateZ')
 
     keyFingers()
+    print ">>SetRigKey(): done"
 
 #Used to constrain the clasps/chain on the front of the cape to Beowulf's chest rig control
 #this is kind of a fake sim, we should probably just use it when the chain is not directly visible!
@@ -326,7 +328,7 @@ def constrainCapeChain():
     # Create a global position locator for Beowulf's main rig control location
     globalPos = mc.spaceLocator(p=[0,0,0])
     globPos = mc.rename(globalPos, "beowulfGlobalPos")
-    mc.select("beowulf_rig_main_Beowulf_primary_global_cc_01")
+    mc.select(rigPrefix+"Beowulf_primary_global_cc_01")
     mc.select(globPos, add=True)
     mc.pointConstraint(offset=[0,0,0], weight=1) #constrains the globPos position to where Beowulf's rig_main is
     mc.orientConstraint(offset=[0,0,0], weight=1) #orients the globPos to match Beowulf's rig_main (I think it just does the rotation)
@@ -357,18 +359,20 @@ def constrainCapeChain():
     mc.polyUnite("beowulf_cape_model_main_beowulf_cape_clasps", "beowulf_cape_model_main_beowulf_cape_clasp_chain", name="beowulf_cape_model_main_beowulf_capeChain_combined")
 
     #Select the rig control we want to parent the chain/clasp to
-    mc.select("beowulf_rig_main_Beowulf_chest_cc_01", replace=True) #I think this is the right one
+    mc.select(rigPrefix+"Beowulf_chest_cc_01", replace=True) #I think this is the right one
     #Now select the chainCombined object
     mc.select("beowulf_cape_model_main_beowulf_capeChain_combined", add=True)
 
     #Create parent constraint: (targetObject, childObject)
-    mc.parentConstraint("beowulf_rig_main_Beowulf_chest_cc_01", "beowulf_cape_model_main_beowulf_capeChain_combined", maintainOffset=1, weight=1.0)
+    mc.parentConstraint(rigPrefix+"Beowulf_chest_cc_01", "beowulf_cape_model_main_beowulf_capeChain_combined", maintainOffset=1, weight=1.0)
 
 
 ###########################################
 #### MAIN ####
 ###########################################
 # Reference Beowulf's Cape - it comes with both sim and beauty meshes
+project = Project()
+environment = Environment()
 body = project.get_body("beowulf_cape")
 element = body.get_element(Department.MODEL)
 cape_sim_file = element.get_app_filepath()
