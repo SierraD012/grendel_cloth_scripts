@@ -12,20 +12,25 @@ from byuam.project import Project
 from byuam.environment import Department, Environment
 
 STARTANIM = -5
-STARTPRE = -25
+STARTPRE = -30
 
 
 ############################
 ## PRE-ROLL BEOWULF ANIMATION ##
-# this version (2) has each rig control name with the prefix "_" 
+# this version (2) has each rig control name with the prefix "_"
 # because the layout scenes have that (the rig file doesn't)
 ############################
 
-#This code is brought to you in part by Daniel Fuller and the number 7
+# If you come across a shot where the rig's primary control is far away from the actual mesh for some reason
+# you can go far back in the preroll and set a keyframe on the primary control at a position really close to
+# where the mesh will start at frame 0, so then when you run this script the character mesh will be at A-pose
+# really close to where it should be at frame 0. This makes it so you don't have to deal with the mesh
+# flying 500 units over to its start point during preroll.
+
 
 #Clears Rotation on a List of Objects
 def clearRotate(list):
-    print '>>ClearRotate() starting'
+    print ">>ClearRotate() starting"        #TODO: apparently all the print stmts should have parentheses around them...
     for i in list:
         if mc.getAttr(i + '.rotateX', settable=True):
             mc.setAttr(i + '.rotateX', 0)
@@ -49,13 +54,13 @@ def clearTranslate(list):
         if mc.getAttr(i + '.translateX', settable=True):
             mc.setAttr(i + '.translateX', 0)
         else:
-	    print '************ Skipping ' + str(i) + '.translateX' 
-        
-	if mc.getAttr(i + '.translateY', settable=True):   
+	    print '************ Skipping ' + str(i) + '.translateX'
+
+	if mc.getAttr(i + '.translateY', settable=True):
             mc.setAttr(i + '.translateY', 0)
         else:
 	    print '************ Skipping ' + str(i) + '.translateY'
-       
+
 	if mc.getAttr(i + '.translateZ', settable=True):
             mc.setAttr(i + '.translateZ', 0)
         else:
@@ -69,13 +74,13 @@ def clearScale(list):
             mc.setAttr(i + '.scaleX', 1)
 
         else:
-	    print '************ Skipping ' + str(i) + '.scaleX' 
-        
-	if mc.getAttr(i + '.scaleY', settable=True):   
+	    print '************ Skipping ' + str(i) + '.scaleX'
+
+	if mc.getAttr(i + '.scaleY', settable=True):
             mc.setAttr(i + '.scaleY', 1)
         else:
 	    print '************ Skipping ' + str(i) + '.scaleY'
-       
+
 	if mc.getAttr(i + '.scaleZ', settable=True):
 
             mc.setAttr(i + '.scaleZ', 1)
@@ -84,15 +89,15 @@ def clearScale(list):
 
 
 #Selects/Returns Full Rig
-#TODO: What about accessories? do we need to clear transformations on those too?
-# update: it looks like all the accessories + beard go with the transformation, so that's cool 
+# update: it looks like all the accessories + beard go with the transformation, so that's cool
 def selectRig():
     print ">>SelectRig() starting"
 
+    #these are what moves the entire rig group - if we skip these the rig will move from A-pose to scene start pose without flying back from origin
     beowulf_main = [
-    'Beowulf_main_cc_01',
-    'Beowulf_secondary_global_cc_01',
-    'Beowulf_primary_global_cc_01']
+    #'Beowulf_main_cc_01',
+    #'Beowulf_secondary_global_cc_01',
+    #'Beowulf_primary_global_cc_01']
 
     beowulf_head = [
     'Beowulf_head_cc_01',
@@ -101,14 +106,14 @@ def selectRig():
 
     beowulf_eyes = [
     'Beowulf_LFT_eye_rotate_cc_01', 	#Left
-    'Beowulf_LFT_LOW_eyelid_cc_01',	
+    'Beowulf_LFT_LOW_eyelid_cc_01',
     'Beowulf_LFT_UPP_eyelid_cc_01',
     'Beowulf_LFT_OUT_eyebrow_cc_01',
     'Beowulf_LFT_MID_eyebrow_cc_01',
     'Beowulf_LFT_INN_eyebrow_cc_01',
     'Beowulf_LFT_MAIN_eyebrow_cc_01',
     'Beowulf_RGT_eye_rotate_cc_01',		#Right
-    'Beowulf_RGT_LOW_eyelid_cc_01',	
+    'Beowulf_RGT_LOW_eyelid_cc_01',
     'Beowulf_RGT_UPP_eyelid_cc_01',
     'Beowulf_RGT_OUT_eyebrow_cc_01',
     'Beowulf_RGT_MID_eyebrow_cc_01',
@@ -117,7 +122,7 @@ def selectRig():
     'Beowulf_LFT_eye_aim_cc_01',
     'Beowulf_RGT_eye_aim_cc_01',
     'Beowulf_both_eyes_aim_cc_01']
-    
+
     beowulf_mouth = [
     'Beowulf_tongue_tip_cc_01',
     'Beowulf_tongue_middle_cc_01',
@@ -154,7 +159,7 @@ def selectRig():
     'Beowulf_RGT_clavicle_cc_01',
     'Beowulf_RGT_FK_wrist_cc_01',
     'Beowulf_RGT_FK_lower_arm_cc_01',
-    'Beowulf_RGT_FK_upper_arm_cc_01']    
+    'Beowulf_RGT_FK_upper_arm_cc_01']
 
     beowulf_hands = [
     'Beowulf_LFT_hand_cupping_splaying_cc_01',     #Left
@@ -227,16 +232,17 @@ def selectRig():
     'Beowulf_RGT_big_toe_primary_cc_01',
     'Beowulf_RGT_foot_ball_cc_01']
 
-    fullRigNoPrefix = beowulf_main + beowulf_head + beowulf_mouth + beowulf_neck + beowulf_torso + beowulf_arms + beowulf_hands + beowulf_hips + beowulf_legs_feet
+    #beowulf_main +
+    fullRigNoPrefix = beowulf_head + beowulf_mouth + beowulf_neck + beowulf_torso + beowulf_arms + beowulf_hands + beowulf_hips + beowulf_legs_feet
     fullRig = []
-    
+
     #Create Selection from 'fullRig'
     mc.select(cl=True);
     for i in fullRigNoPrefix:
          # Add name prefix to each control
         i = rigPrefix + i
         fullRig.append(i)
-        
+
     for i in fullRig:
         mc.select(i, add=True)
 
@@ -246,22 +252,22 @@ def selectRig():
 def keyArmFK():
     print ">>KeyArmFK() starting"
     leftArmFK = rigPrefix + 'Beowulf_LFT_arm_settings_cc_01.FK_IK'
-    
+
     mc.setAttr(leftArmFK, 0)  #FK mode
 
     if (mc.getAttr(leftArmFK, keyable=True) or mc.getAttr(leftArmFK, channelBox=True)):
         mc.setKeyframe(leftArmFK);
-        
+
 
     rightArmFK = rigPrefix + 'Beowulf_RGT_arm_settings_cc_01.FK_IK'
 
-    mc.setAttr(rigPrefix+'Beowulf_RGT_arm_settings_cc_01.FK_IK', 0)  #really not sure about this 
+    mc.setAttr(rigPrefix+'Beowulf_RGT_arm_settings_cc_01.FK_IK', 0)
 
     if (mc.getAttr(rightArmFK, keyable=True) or (mc.getAttr(rightArmFK, channelBox=True))):
         mc.setKeyframe(rightArmFK);
 
 def fingerNames():
-    return [
+    baseFingerNames = [
     'Beowulf_LFT_thumb_primary_cc_01',
     'Beowulf_LFT_index_metacarpal_secondary_cc_01',
     'Beowulf_LFT_middle_metacarpal_secondary_cc_01',
@@ -271,33 +277,39 @@ def fingerNames():
     'Beowulf_RGT_index_metacarpal_secondary_cc_01',
     'Beowulf_RGT_middle_metacarpal_secondary_cc_01',
     'Beowulf_RGT_ring_metacarpal_secondary_cc_01',
-    'Beowulf_RGT_pinky_metacarpal_secondary_cc_01'
-]
-    
+    'Beowulf_RGT_pinky_metacarpal_secondary_cc_01' ]
+    completeFingerNames = []
+
+    for i in baseFingerNames:
+         # Add name prefix to each finger name
+        i = rigPrefix + i
+        completeFingerNames.append(i)
+
+    return completeFingerNames
+
 def scaleFingers():
-    print ">>ScaleFingers() starting"
+    print ">>ScaleFingers(): starting"
     for i in fingerNames():
-        mc.setAttr(rigPrefix + i + '.scaleX', 1)
+        mc.setAttr(i + '.scaleX', 1)
         mc.setKeyframe(rigPrefix + i, at='scaleX')
 
 def keyFingers():
-    print ">>KeyFingers() starting"
+    print ">>KeyFingers(): starting"
     for i in fingerNames():
-	mc.setKeyframe(rigPrefix + i, at='scaleX')
-    
+	mc.setKeyframe(i, at='scaleX')
+
 
 def APose():
-    print ">>APose() starting"
+    print ">>APose(): starting"
     #Handle Right Arm
-    #   mc.rotate(0, 0, -45, 'ten_rig_main_r_armRoot_FK_CTL')
-    mc.rotate(0, 0, -5, rigPrefix + 'Beowulf_LFT_FK_upper_arm_cc_01') #45 degrees seems to be too straight for A-pose...
+    mc.rotate(0, 0, 0, rigPrefix + 'Beowulf_LFT_FK_upper_arm_cc_01') #so far, we don't seem to need to rotate the arms to get them to match the collision mesh arms
     #Handle Left Arm
-    #   mc.rotate(0, 0, -45, 'ten_rig_main_l_armRoot_FK_CTL')
-    mc.rotate(0, 0, -5, rigPrefix + 'Beowulf_RGT_FK_upper_arm_cc_01') 
+    mc.rotate(0, 0, 0, rigPrefix + 'Beowulf_RGT_FK_upper_arm_cc_01')
+    print ">>APose(): done"
 
 
 def setRigKey(fullRig):
-    print ">>SetRigKey() starting"
+    print ">>SetRigKey(): starting"
     #Key Translation
     mc.setKeyframe(fullRig, at='translateX')
     mc.setKeyframe(fullRig, at='translateY')
@@ -306,16 +318,73 @@ def setRigKey(fullRig):
     mc.setKeyframe(fullRig, at='rotateX')
     mc.setKeyframe(fullRig, at='rotateY')
     mc.setKeyframe(fullRig, at='rotateZ')
-    
-    keyFingers()
 
+    keyFingers()
+    print ">>SetRigKey(): done"
+
+#Used to constrain the clasps/chain on the front of the cape to Beowulf's chest rig control
+#this is kind of a fake sim, we should probably just use it when the chain is not directly visible!
+def constrainCapeChain():
+    # Create a global position locator for Beowulf's main rig control location
+    globalPos = mc.spaceLocator(p=[0,0,0])
+    globPos = mc.rename(globalPos, "beowulfGlobalPos")
+    mc.select(rigPrefix+"Beowulf_primary_global_cc_01")
+    mc.select(globPos, add=True)
+    mc.pointConstraint(offset=[0,0,0], weight=1) #constrains the globPos position to where Beowulf's rig_main is
+    mc.orientConstraint(offset=[0,0,0], weight=1) #orients the globPos to match Beowulf's rig_main (I think it just does the rotation)
+
+    # Get transformation variables from globPos locator
+    tx = mc.getAttr(globPos+".translateX")
+    ty = mc.getAttr(globPos+".translateY")
+    tz = mc.getAttr(globPos+".translateZ")
+    rx = mc.getAttr(globPos+".rotateX")
+    ry = mc.getAttr(globPos+".rotateY")
+    rz = mc.getAttr(globPos+".rotateZ")
+
+    # Set full cape group transforms to match Beowulf's location
+    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateX", tx)
+    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateY", ty)
+    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateZ", tz)
+    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.rotateX", rx)
+    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.rotateY", ry)
+    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.rotateZ", rz)
+
+    #Hide meshes we don't want to work with right now
+    mc.hide('beowulf_cape_model_main_beowulf_cape_simMesh')
+    mc.hide('beowulf_cape_model_main_beowulf_cape_beautyMesh')
+
+    #Select & combine the clasps & chain meshes
+    mc.select("beowulf_cape_model_main_beowulf_cape_clasps", replace=True)
+    mc.select("beowulf_cape_model_main_beowulf_cape_clasp_chain", add=True) #not really necessary to select these two
+    mc.polyUnite("beowulf_cape_model_main_beowulf_cape_clasps", "beowulf_cape_model_main_beowulf_cape_clasp_chain", name="beowulf_cape_model_main_beowulf_capeChain_combined")
+    #center the combined object's pivot so we can rotate it to look more normal
+    mc.xform("beowulf_cape_model_main_beowulf_capeChain_combined", centerPivots=True)
+    mc.setAttr("beowulf_cape_model_main_beowulf_capeChain_combined.rotateX", -16.0)
+
+    #Select the rig control we want to parent the chain/clasp to
+    mc.select(rigPrefix+"Beowulf_chest_cc_01", replace=True)
+    #Now select the chainCombined object
+    mc.select("beowulf_cape_model_main_beowulf_capeChain_combined", add=True)
+
+    #Create parent constraint: (targetObject, childObject)
+    mc.parentConstraint(rigPrefix+"Beowulf_chest_cc_01", "beowulf_cape_model_main_beowulf_capeChain_combined", maintainOffset=1, weight=1.0)
+
+    #Hide original chain/clasp because we don't need them for this part
+    mc.hide('beowulf_cape_model_main_beowulf_cape_clasps')
+    mc.hide('beowulf_cape_model_main_beowulf_cape_clasp_chain')
 
 ###########################################
 #### MAIN ####
 ###########################################
-
+# Reference Beowulf's Cape - it comes with both sim and beauty meshes
+project = Project()
+environment = Environment()
+body = project.get_body("beowulf_cape")
+element = body.get_element(Department.MODEL)
+cape_sim_file = element.get_app_filepath()
+mc.file(cape_sim_file, reference=True)
 global rigPrefix
-rigPrefix = "grendel_rig_main_"  #concatenate this with every other control name
+rigPrefix = "beowulf_rig_main_"  #concatenate this with every other control name
 
 #Keyframe Initial Frame
 mc.currentTime(STARTANIM)
@@ -324,6 +393,7 @@ setRigKey(fullRig)
 
 #Set T-Pose (Clear Transformations)
 mc.currentTime(STARTPRE)
+mc.playbackOptions(minTime=STARTPRE)
 
 selectRig()
 keyArmFK()
@@ -333,7 +403,7 @@ clearTranslate(fullRig)
 clearScale(fullRig)
 
 #Key APose (Adjust Arms, Keyframe)
-APose()
+APose() #this may not be necessary for Beowulf's model
 setRigKey(fullRig)
 
 mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='translateX')
@@ -343,8 +413,20 @@ mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateX')
 mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateY')
 mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateZ')
 
-#Export Alembic (Requires User Input - Select Beowulf's Rig)
+
+#Since we have Beowulf's rig available right now, let's constrain the cape chain/clasps
+#to his rig right now and export an alembic of that (you probs need to do that manually since we can't ABC tag it)
+constrainCapeChain()
+
+#Export full mesh alembic - Just Beowulf's geo
 mc.playbackOptions(animationStartTime=STARTPRE)
+#Tag Beowulf's geo only for alembic export:
+mc.select(rigPrefix + "Beowulf_geo_GRP_01", replace = True)
+import alembic_tagger;
+alembic_tagger.go()
+#Export alembic of just Beowulf's geo
 import alembic_exporter
 alembic_exporter.go()
 
+#Export alembic of just the cape chain - might need do this manually because the ABC Exporter doesn't know how to find the tag on this one since it's not a reference
+#AbcExport -j "-frameRange -30 120 -step 0.25 -dataFormat ogawa -root |beowulf_cape_model_main_beowulf_capeChain_combined -file /groups/grendel/production/shots/b023/anim/main/cache/beowulf_capeChain.abc";

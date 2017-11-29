@@ -9,27 +9,25 @@ import maya.cmds as mc
 from byuam.project import Project
 from byuam.environment import Department, Environment
 
-STARTANIM = -5
-STARTPRE = -25
+STARTANIM = -0
+STARTPRE = -30
 
 #########################
 ## ESTABLISH CFX SCENE ##
 #########################
-
-#This code is brought to you in part by Trevor Barrus and the letter G
 
 def generateScene():
     project = Project()
     environment = Environment()
 
     # Create a global position locator for Beowulf's Starting Location
-    mc.currentTime(STARTANIM)
+    mc.currentTime(STARTPRE)
     globalPos = mc.spaceLocator(p=[0,0,0])
     globPos = mc.rename(globalPos, "beowulfGlobalPos")
-    mc.select("grendel_rig_main_Beowulf_primary_global_cc_01")
+    mc.select("beowulf_rig_main_Beowulf_primary_global_cc_01")
     mc.select(globPos, add=True)
-    mc.pointConstraint(offset=[0,0,0], weight=1)
-    mc.orientConstraint(offset=[0,0,0], weight=1)
+    mc.pointConstraint(offset=[0,0,0], weight=1) #constrains the globPos position to where Beowulf's rig_main is
+    mc.orientConstraint(offset=[0,0,0], weight=1) #orients the globPos to match Beowulf's rig_main (I think it just does the rotation)
 
     # Get transformation variables from globPos locator
     tx = mc.getAttr(globPos+".translateX")
@@ -46,68 +44,69 @@ def generateScene():
     checkout_body_name = checkout_element.get_parent()
     body = project.get_body(checkout_body_name)
     element = body.get_element(Department.ANIM)
-    cache_file = os.path.join(element.get_dir(), "cache", "beowulf_rig_main.abc")
+    cache_name = "beowulf_"+checkout_body_name+"_anim_main" # this is me doing it arbitrarily but I think the preroll script picks its own name
+    cache_file = os.path.join(element.get_dir(), "cache", cache_name + ".abc")
+    #print("Expecting mesh alembic with name " + cache_name)
+    #we could make a while loop to check if an alembic with this name exists already, if it does increment a suffix number on the filename
 
     # checkout cfx scene for corresponding shot number
     current_user = environment.get_current_username()
     element = body.get_element(Department.CFX)
     cfx_filepath = element.checkout(current_user)
+    print(">GenScene(): cfx_filepath= " + cfx_filepath) # see where it's expecting the file to be/what it's called
+    print(">GenScene(): cache_file= " + cache_file) # this is where ABCimporter expects the character geo abc to be
 
-    #open cfx file 
+
+    #open cfx file
     if cfx_filepath is not None:
         if not mc.file(q=True, sceneName=True) == '':
             mc.file(save=True, force=True) #save file
 
-        if not os.path.exists(cfx_filepath):
+        if not os.path.exists(cfx_filepath): #make a new CFX scene file
+            print(">GenScene(): CFX scene doesn't exist yet. Creating a new one")
             mc.file(new=True, force=True)
             mc.file(rename=cfx_filepath)
             mc.file(save=True, force=True)
         else:
-            mc.file(cfx_filepath, open=True, force=True)
-
+             mc.file(cfx_filepath, open=True, force=True)
     # import alembic
     command = "AbcImport -mode import \"" + cache_file + "\""
     maya.mel.eval(command)
 
-    # delete all geo except ten's skin and rename
-    geometry = mc.ls(geometry=True)
-    transforms = mc.listRelatives(geometry, p=True, path=True)
-    mc.select(transforms, r=True)
-    for geo in mc.ls(sl=True):
-        if(geo != "ten_rig_main_Ten_Skin_RENDER"):
-            mc.delete(geo)
-    collide = "TEN_ANIM"
-    mc.rename("ten_rig_main_Ten_Skin_RENDER", collide)
+    #### PULL IN REFERENCE OBJECTS ####
+    getReferenceObjects()
 
-    # Reference Beowulf's Sim Robe
-    body = project.get_body("beowulf_robe_sim")
-    element = body.get_element(Department.MODEL)
-    robe_file = element.get_app_filepath()
-    mc.file(robe_file, reference=True)
-    
-    # Reference Beowulf's Beauty/Hero Robe
-    body = project.get_body("beowulf_robe")
-    element = body.get_element(Department.MODEL)
-    robe_hero_file = element.get_app_filepath()
-    mc.file(robe_hero_file, reference=True)
-    
-    # Set Sim Robe transforms to variables above
-    mc.setAttr("ten_robe_sim_model_main_ten_cloth.translateX", tx)
-    mc.setAttr("ten_robe_sim_model_main_ten_cloth.translateY", ty)
-    mc.setAttr("ten_robe_sim_model_main_ten_cloth.translateZ", tz)
-    mc.setAttr("ten_robe_sim_model_main_ten_cloth.rotateX", rx)
-    mc.setAttr("ten_robe_sim_model_main_ten_cloth.rotateY", ry)
-    mc.setAttr("ten_robe_sim_model_main_ten_cloth.rotateZ", rz)
-    
-    # Set Hero Robe transforms to variables above
-    mc.setAttr("ten_robe_model_main_TEN_ROBE_HERO.translateX", tx)
-    mc.setAttr("ten_robe_model_main_TEN_ROBE_HERO.translateY", ty)
-    mc.setAttr("ten_robe_model_main_TEN_ROBE_HERO.translateZ", tz)
-    mc.setAttr("ten_robe_model_main_TEN_ROBE_HERO.rotateX", rx)
-    mc.setAttr("ten_robe_model_main_TEN_ROBE_HERO.rotateY", ry)
-    mc.setAttr("ten_robe_model_main_TEN_ROBE_HERO.rotateZ", rz)
-    
+    # Set full cape group transforms to match Beowulf's alembic
+    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateX", tx)
+    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateY", ty)
+    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateZ", tz)
+    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.rotateX", rx)
+    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.rotateY", ry)
+    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.rotateZ", rz)
 
+    #Set collisionMesh transforms to match Beowulf's alembic
+    mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.translateX", tx)
+    mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.translateY", ty)
+    mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.translateZ", tz)
+    mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.rotateX", rx)
+    mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.rotateY", ry)
+    mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.rotateZ", rz)
+
+
+def getReferenceObjects():
+    #Reference Beowulf's CollisionMesh
+    body = project.get_body("beowulf_collision_mesh_cloth")
+    element = body.get_element(Department.MODEL)
+    collisionMesh_file = element.get_app_filepath()
+    mc.file(collisionMesh_file, reference=True)
+
+    # Reference Beowulf's Cape - it comes with both sim and beauty meshes
+    body = project.get_body("beowulf_cape")
+    element = body.get_element(Department.MODEL)
+    cape_sim_file = element.get_app_filepath()
+    mc.file(cape_sim_file, reference=True)
+
+    #Should also import the cape chain alembic too?
 
 
 #######################
@@ -120,160 +119,116 @@ generateScene()
 ## Set Up Simulation ##
 #######################
 
-mc.select('ten_robe_sim_model_main_ten_collide_body', replace=True)
+mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth', replace=True)
 mc.viewFit() #Snap View to Body Collider
 mc.playbackOptions(animationStartTime=STARTPRE)
 mc.playbackOptions(minTime=STARTPRE)
 mc.currentTime(STARTPRE)
 
-#Wrap Colliders to Alembic
-mc.select('ten_robe_sim_model_main_ten_collide_body', replace=True) #Wrap Body
-mc.select('TEN_ANIM', add=True)
-mc.CreateWrap()
-#mc.setAttr('wrap1.exclusiveBind', 0)
-
-mc.select('ten_robe_sim_model_main_ten_collide_mitten_l', replace=True) #Wrap Left Mitten
-mc.select('TEN_ANIM', add=True)
-mc.CreateWrap()
-#mc.setAttr('wrap2.exclusiveBind', 0)
-
-mc.select('ten_robe_sim_model_main_ten_collide_mitten_r', replace=True) #Wrap Right Mitten
-mc.select('TEN_ANIM', add=True)
-mc.CreateWrap()
-#mc.setAttr('wrap3.exclusiveBind', 0)
-
-#Establish Colliders
-mc.select('ten_robe_sim_model_main_ten_collide_body', replace=True) #Collider Body
+#### Establish Colliders ###
+mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth', replace=True) #Collider Body
 mel.eval('makeCollideNCloth;')
+mc.setAttr('nRigid1.thickness', 0.001)
 
-mc.select('ten_robe_sim_model_main_ten_collide_mitten_l', replace=True) #Collider Left Mitten
-mel.eval('makeCollideNCloth;')
 
-mc.select('ten_robe_sim_model_main_ten_collide_mitten_r', replace=True) #Collider Right Mitten
-mel.eval('makeCollideNCloth;')
-
-#Establish nCloth Objects
-mc.select('ten_robe_sim_model_main_ten_sim_robe', replace=True) #nCloth: Robe
+#### Establish nCloth Objects ####
+mc.select('beowulf_cape_model_main_beowulf_cape_simMesh', replace=True) #nCloth: Robe
 mel.eval('createNCloth 0;')
 
-mc.setAttr('nClothShape1.thickness', 0.003) #Collision Properties: Robe
-mc.setAttr('nClothShape1.selfCollideWidthScale', 5.0)
-mc.setAttr('nClothShape1.friction', 0.0)
-mc.setAttr('nClothShape1.stickiness', 0.1)
-
-mc.setAttr('nClothShape1.stretchResistance', 200.0) #Dynamic Properties: Robe
+mc.setAttr('nClothShape1.thickness', 0.008) #Collision Properties
+mc.setAttr('nClothShape1.selfCollideWidthScale', 2.5)
+mc.setAttr('nClothShape1.friction', 1.0)
+mc.setAttr('nClothShape1.stickiness', 0.4)
+mc.setAttr('nClothShape1.stretchResistance', 350.0) #Dynamic Properties
 mc.setAttr('nClothShape1.compressionResistance', 100.0)
 mc.setAttr('nClothShape1.bendResistance', 1.0)
-mc.setAttr('nClothShape1.damp', 0.8)
-
-mc.select('ten_robe_sim_model_main_ten_sim_pants', replace=True) #nCloth: Pants
-mel.eval('createNCloth 0;')
-
-mc.setAttr('nClothShape2.thickness', 0.003) #Collision Properties: Pants
-mc.setAttr('nClothShape2.selfCollideWidthScale', 5.0)
-mc.setAttr('nClothShape2.friction', 0.0)
-mc.setAttr('nClothShape2.stickiness', 0.1)
-
-mc.setAttr('nClothShape2.stretchResistance', 200.0) #Dynamic Properties: Pants
-mc.setAttr('nClothShape2.compressionResistance', 100.0)
-mc.setAttr('nClothShape2.bendResistance', 1.0)
-mc.setAttr('nClothShape2.damp', 0.8)
+mc.setAttr('nClothShape1.pointMass', 3.0)
+mc.setAttr('nClothShape1.lift', 0.1)
+mc.setAttr('nClothShape1.drag', 0.05)
+mc.setAttr('nClothShape1.tangentialDrag', 0.2)
+mc.setAttr('nClothShape1.damp', 4.0)		#Quality Properties
+mc.setAttr('nClothShape1.maxSelfCollisionIterations', 12)
+mc.setAttr('nClothShape1.trappedCheck', 1)
+mc.setAttr('nClothShape1.pushOut', 0.025)
 
 #### Establish Dynamic Constraints ####
-
-# These are correct for Beowulf's cape beauty mesh
-mc.select(clear=True) #neckline Constraints
-cape_neckline_verts = ['[396:398]', '[403]', '[404]', '[409]', '[410]', '[415]', '[416]', '[421]', '[422]', '[427]', '[1499]', '[1502]', '[1510]', '[1512]', '[1520]', '[1522]', '[1530]', '[1532]', '[1540]', '[1542]', '[1550]', '[1552]', '[8524]', '[8530]', '[8531]', '[8546]', '[8547]', '[8550]', '[8551]', '[8566]', '[8567]', '[8570]', '[8571]', '[8586]', '[8587]', '[8590]', '[8591]', '[8606]', '[8607]', '[8611]', '[8610]', '[8627]', '[8626]', '[8630]', '[8631]' ]
-
+#Neckline Constraints
+mc.select(clear=True)
+cape_neckline_verts = [ '[72]', '[73]', '[78]', '[79]', '[84]', '[85]', '[90]', '[91]', '[96]', '[97]', '[102]',  '[513]', '[517]', '[528]', '[531]', '[542]', '[545]', '[556]', '[559]', '[570]', '[573]', '[584]', '[587]',  '[3031]', '[3034]', '[3041]', '[3044]', '[3065]', '[3068]', '[3073]', '[3076]', '[3097]', '[3100]', '[3105]', '[3108]', '[3129]', '[3132]', '[3137]', '[3140]', '[3161]', '[3164]', '[3169]', '[3172]', '[3193]', '[3196]', '[3201]', '[3204]' ]
 
 for i in cape_neckline_verts:
-    mc.select('ten_robe_sim_model_main_ten_sim_robe.vtx' + i, add=True)
-mc.select('ten_robe_sim_model_main_ten_collide_body', add=True)
+    mc.select('beowulf_cape_model_main_beowulf_cape_simMesh.vtx' + i, add=True)
+mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth', add=True)
 mel.eval('createNConstraint pointToSurface 0;')
+mel.eval('setAttr "dynamicConstraintShape1.strengthDropoff[1].strengthDropoff_Position" 1;')
+mel.eval('setAttr "dynamicConstraintShape1.strengthDropoff[1].strengthDropoff_FloatValue" 0;')
+
+#Front Constraints
+mc.select(clear=True)
+cape_front_verts = [ '[42]', '[62]', '[69]', '[70]', '[71]', '[99]', '[101]', '[103]', '[106]', '[116]', '[509]', '[514]', '[575]', '[586]', '[594]', '[597]', '[641]', '[649]', '[1610]', '[1595]', '[1715]', '[1730]', '[2860]', '[2979]', '[3024]', '[3027]', '[3035]', '[3038]', '[3176]', '[3219]', '[3200]', '[3222]', '[3227]', '[3230]', '[3342]', '[3362]' ]
+
+for i in cape_front_verts:
+    mc.select('beowulf_cape_model_main_beowulf_cape_simMesh.vtx' + i, add=True)
+mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth', add=True)
+mel.eval('createNConstraint pointToSurface 0;')
+mel.eval('setAttr "dynamicConstraintShape2.strengthDropoff[1].strengthDropoff_Position" 1;')
+mel.eval('setAttr "dynamicConstraintShape2.strengthDropoff[1].strengthDropoff_FloatValue" 0;')
 
 
-# These are correct for Beowulf's cape beauty mesh
-mc.select(clear=True) #front Constraints
-cape_front_verts = [ '[4950]', '[4951]', '[4954]', '[4955]', '[4998]', '[4999]', '[5010]', '[5011]', '[5015]', '[5018]', '[5019]', '[5022]', '[5026]', '[5027]', '[7712]', '[7716]', '[7760]', '[7772]', '[7780]', '[7784]', '[7788]', '[10731]', '[10732]', '[10757]', '[10758]', '[10764]', '[10767]' ]
-
-
-for i in robe_front_verts:
-    mc.select('ten_robe_sim_model_main_ten_sim_robe.vtx' + i, add=True)
-mc.select('ten_robe_sim_model_main_ten_collide_body', add=True)
-mel.eval('createNConstraint pointToSurface 0;') 
-
-
-
-
-#Set Nucleus Parameters (INCOMPLETE - New Nucleus specific to Ten?)
-mc.setAttr('nucleus1.subSteps', 15)
-mc.setAttr('nucleus1.maxCollisionIterations', 20)
+#Set Nucleus Parameters
+mc.setAttr('nucleus1.subSteps', 4)
+mc.setAttr('nucleus1.maxCollisionIterations', 8)
 mc.setAttr('nucleus1.startFrame', STARTPRE)
-mc.setAttr('nucleus1.spaceScale', 0.45)
+mc.setAttr('nucleus1.spaceScale', 1.0)
+mc.setAttr("nucleus1.usePlane", 1)
+mc.setAttr("nucleus1.planeOriginX", tx)
+mc.setAttr("nucleus1.planeOriginY", ty)
+mc.setAttr("nucleus1.planeOriginZ", tz)
+mc.setAttr("nucleus1.windDirectionX", 0.9)  # add in wind here if necessary
+mc.setAttr("nucleus1.windDirectionZ", 0.1)
+mc.setAttr("nucleus1.timeScale", 2)
+# you can try messing with nucleus time scale to increase substeps
+
 
 #########################
 ## PREPARE HERO MESHES ##
 #########################
 
-#Create Sleeveless Robe for Sash Sim
-mc.duplicate('ten_robe_model_main_ten_Hero_Robe')
-mc.rename('ten_robe_model_main_ten_Hero_Robe1', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless')
-
-mc.select('ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1861:1862]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1866:1869]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1872:1873]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1878:1881]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1884:1885]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1888]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1891]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1893:1894]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1898:1899]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2009:2010]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2021:2022]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2396:2397]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2402:2403]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2412]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2415]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[2428:2429]', replace=True)
-mc.select('ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[968]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[971:972]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[975:976]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[979:980]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[983:984]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[987:988]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[991:992]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[995:996]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[999:1000]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1003:1004]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1007:1008]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1011:1012]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1015:1016]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1019:1020]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1023:1024]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1027:1028]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[1031]', add=True)
-mc.delete()
-
-mc.select('ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[0:895]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[4452:4579]', replace=True)
-mc.select('ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[968:1639]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[3872:3935]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[4000:4127]', 'ten_robe_model_main_ten_Hero_Robe_Sleeveless.f[4324:4451]', add=True)
-mc.delete()
-
-# Wrap Hero Meshes to Sim Meshes
-mc.select('ten_robe_model_main_ten_Hero_Robe', replace=True) #Wrap Robe
-mc.select('ten_robe_sim_model_main_ten_sim_robe', add=True)
+#Wrap Colliders to Beowulf's character alembic
+#NOTE: if the dynamic constraints freak out, try changing the order that you do (collisionMesh wrap to character mesh) and (create dynamicConstraint)
+mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth', replace=True) #Wrap Body
+mc.select('beowulf_rig_main_Beowulf_body_GEO_01', add=True)  #wrap the collision mesh to Beowulf skin
 mc.CreateWrap()
-#mc.setAttr('wrap4.exclusiveBind', 0)
 
-mc.select('ten_robe_model_main_ten_Hero_Pants', replace=True) #Wrap Pants
-mc.select('ten_robe_sim_model_main_ten_sim_pants', add=True)
-mc.CreateWrap()
-#mc.setAttr('wrap5.exclusiveBind', 0)
+#From Brennan: Do your best to only have one thing wrapping per sim - they are slow to calculate
+# if you need to adjust the collision mesh for a weird cloth thing, you can duplicate the collisionmesh, adjust the shape/add more or whatever, then make it a blend shape to the original collision mesh. Blend shapes DO require the same exact # of polygons but they're also a lot faster than regular wraps.
+#mc.setAttr('wrap1.exclusiveBind', 0) #it looks like this is the default
 
-mc.select('ten_robe_model_main_ten_Hero_Robe_Sleeveless', replace=True) #Wrap Sleeveless Robe (Exclusive Bind)
-mc.select('ten_robe_model_main_ten_Hero_Robe', add=True)
-mc.CreateWrap()
-#mc.setAttr('wrap6.exclusiveBind', 1)
 
-mc.select('ten_robe_model_main_ten_Hero_Sash', replace=True) #Wrap Sash
-mc.select('ten_robe_model_main_ten_Hero_Robe_Sleeveless', add=True)
+# Wrap Cape Beauty Mesh to Sim Mesh
+mc.select('beowulf_cape_model_main_beowulf_cape_beautyMesh', replace=True)
+mc.select('beowulf_cape_model_main_beowulf_cape_simMesh', add=True)
 mc.CreateWrap()
-#mc.setAttr('wrap7.exclusiveBind', 0)
+
 
 #Rename/Group Simulation Objects
-mc.rename('nucleus1', 'nucleus_ten') #Nucleus
+mc.rename('nucleus1', 'nucleus_beowulf')
+mc.rename('nRigid1', 'nRigid_beowulf_body')
+mc.rename('nCloth1', 'nCloth_beowulf_cape')
 
-mc.rename('nRigid1', 'nRigid_ten_body') #nRigid
-mc.rename('nRigid2', 'nRigid_ten_mitten_l')
-mc.rename('nRigid3', 'nRigid_ten_mitten_r')
-mc.group('nRigid_ten_body', 'nRigid_ten_mitten_l', 'nRigid_ten_mitten_r', name='ten_nRigid')
+mc.rename('dynamicConstraint1','constraint_cape_neckline')
+mc.rename('dynamicConstraint2','constraint_cape_front')
+mc.group('constraint_cape_neckline', 'constraint_cape_front', name='beowulf_capeConstraints')
 
-mc.rename('nCloth1', 'nCloth_ten_robe') #nCloth
-mc.rename('nCloth2', 'nCloth_ten_pants')
-mc.group('nCloth_ten_robe', 'nCloth_ten_pants', name='ten_nCloth')
-
-mc.rename('dynamicConstraint1', 'dynamicConstraint_ten_robe_lapel') #dynamicConstraint
-mc.rename('dynamicConstraint2', 'dynamicConstraint_ten_robe_back')
-mc.rename('dynamicConstraint3', 'dynamicConstraint_ten_robe_front')
-mc.rename('dynamicConstraint4', 'dynamicConstraint_ten_pants')
-mc.group('dynamicConstraint_ten_robe_lapel', 'dynamicConstraint_ten_robe_back', 'dynamicConstraint_ten_robe_front', 'dynamicConstraint_ten_pants', name='ten_dynamicConstraint')
-
-mc.group('nucleus_ten', 'ten_nRigid', 'ten_nCloth', 'ten_dynamicConstraint', name='ten_simulation')
-
-#Group Alembic Objects
-mc.group('TEN_ANIM', 'TEN_ANIMBase', 'TEN_ANIMBase1', 'TEN_ANIMBase2', name='ten_alembic')
-
-#Group Ten Cloth
-mc.group('ten_robe_sim_model_main_ten_cloth', 'ten_robe_model_main_TEN_ROBE_HERO', 'ten_simulation', 'ten_alembic', name='ten_cloth')
+mc.group('nucleus_beowulf', 'nRigid_beowulf_body', 'nCloth_beowulf_cape', 'beowulf_capeConstraints', name='beowulf_cape_simulation')
 
 #Hide Unnescessary Objects
-mc.hide('ten_simulation')
-mc.hide('ten_robe_sim_model_main_ten_cloth')
+mc.hide('beowulf_cape_model_main_beowulf_cape_simMesh')
+mc.hide('beowulf_cape_model_main_beowulf_cape_clasps') #the chain/clasps are taken care of in the other script
+mc.hide('beowulf_cape_model_main_beowulf_cape_clasp_chain')
+mc.hide('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth')
+
+#Tag cape object for export
+mc.select("beowulf_cape_model_main_beowulf_cape_beautyMesh", replace = True)
+import alembic_tagger;
+alembic_tagger.go()
