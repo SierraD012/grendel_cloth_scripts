@@ -11,7 +11,7 @@ import maya.cmds as mc
 from byuam.project import Project
 from byuam.environment import Department, Environment
 
-STARTANIM = -5
+STARTANIM = 1
 STARTPRE = -25
 
 # Rig Pefix:
@@ -279,14 +279,13 @@ def setRigKey(fullRig):
     
     keyFingers()
 
-def clearKeys(fullRig, offset):
-    print ">>Clearing Keys"
-    cmds.cutKey(fullRig, time=('0pal', (str(STARTANIM + offset) + 'pal')))
-    
+def clearKeys(rig, startFrame, endFrame):
+    cmds.cutKey(rig, time=(startFrame, endFrame))
+
 def translateRig(x, y, z):
-    mc.setAttr(rigPrefix + '_geo_GRP_01.translateX', x)
-    mc.setAttr(rigPrefix + '_geo_GRP_01.translateX', y)
-    mc.setAttr(rigPrefix + '_geo_GRP_01.translateX', z)
+    mc.setAttr(rigPrefix + '_primary_global_cc_01.translateX', x)
+    mc.setAttr(rigPrefix + '_primary_global_cc_01.translateY', y)
+    mc.setAttr(rigPrefix + '_primary_global_cc_01.translateZ', z)
 
 ###########################################
 #### MAIN ####
@@ -294,14 +293,19 @@ def translateRig(x, y, z):
 
 fullRig = selectRig()
 
+#Remember anim start position
+startX = mc.getAttr(rigPrefix + '_primary_global_cc_01.translateX') 
+startY = mc.getAttr(rigPrefix + '_primary_global_cc_01.translateY') 
+startZ = mc.getAttr(rigPrefix + '_primary_global_cc_01.translateZ') 
+
 #Clear any unnecessary animation
-#clearKeys(fullRig, 2)
+clearKeys(fullRig, STARTPRE, STARTANIM)
 
 #Keyframe Initial Frame
 mc.currentTime(STARTANIM)
 setRigKey(fullRig)
 
-#Set T-Pose (Clear Transformations)
+#Clear Transformations
 mc.currentTime(STARTPRE)
 
 selectRig()
@@ -311,8 +315,8 @@ clearRotate(fullRig)
 clearTranslate(fullRig)
 clearScale(fullRig)
 
-#scaleFingers() #Scale Fingers (Only Scalable Control)
- #might not need this since we have clearScale()
+#Move rig to anim start position position
+translateRig(startX, startY, startZ)
 
 #APose() -- No need to call APose() because Viking was built in A-Pose
 setRigKey(fullRig)

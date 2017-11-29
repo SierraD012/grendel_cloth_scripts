@@ -1,0 +1,59 @@
+// Script to attach the tunic rig to the viking rig
+{
+    string $tunicPrefix = "viking_tunic_rig_main_";
+    string $vikingPrefix = "viking_with_facial_rig_main";
+
+    select -cl;
+    string $tunicJoints[] = `ls -type joint ($tunicPrefix + "*")`;
+
+    // Parent tunic joints to viking joints
+    for($tunicJoint in $tunicJoints)
+    {
+        int $startChar = size($tunicPrefix) + 1;
+        int $endChar = size($tunicJoint) - 1;
+        string $jointName = `substring $tunicJoint $startChar $endChar`;
+        string $vikingPart[] = `ls -type joint ($vikingPrefix + $jointName + "1")`;
+
+        if (size($vikingPart) >= 1)
+        {
+            select -r ($vikingPart[0]);
+            select -add ($tunicJoint);
+            doCreateParentConstraintArgList 1 { "1","0","0","0","0","0","0","0","1","","1" };
+            parentConstraint -mo -weight 1;
+        }
+    }
+    
+    // Parent bottom hem controls to primary viking handle
+    select -cl;
+    select -r ($vikingPrefix + "Viking_primary_global_cc_01");
+    select -add ($tunicPrefix + "hemHandle");
+    doCreateParentConstraintArgList 1 { "1","0","0","0","0","0","0","0","1","","0" };
+    parentConstraint -mo -weight 1;
+    
+    // Parent collar controls to neck control
+    select -cl;
+    select -r ($vikingPrefix + "Viking_neck_base_cc_01");
+    select -add ($tunicPrefix + "collarHandle");
+    doCreateParentConstraintArgList 1 { "1","0","0","0","0","0","0","0","1","","0" };
+    parentConstraint -mo -weight 1;
+    
+    // Parent left sleeve to left wrist
+    select -cl;
+    select -r ($vikingPrefix + "Viking_LFT_FK_wrist_cc_01");
+    select -add ($tunicPrefix + "sleeveLeftHandle");
+    doCreateParentConstraintArgList 1 { "1","0","0","0","0","0","0","0","1","","0" };
+    parentConstraint -mo -weight 1;
+
+    // Parent right sleeve to right wrist
+    select -cl;
+    select -r ($vikingPrefix + "Viking_RGT_FK_wrist_cc_01");
+    select -add ($tunicPrefix + "sleeveRightHandle");
+    doCreateParentConstraintArgList 1 { "1","0","0","0","0","0","0","0","1","","0" };
+    parentConstraint -mo -weight 1;
+    
+    // Wrap arm bracers to body geometry (DOESN'T WORK)
+    //select -cl;
+    //select -r viking_tunic_model_main_bracelets;
+    //select -add ($vikingPrefix + "Viking_body_GEO_01");
+    //deformer -type wrap viking_tunic_model_main_bracelets;
+}
