@@ -63,6 +63,7 @@ def generateScene():
             mc.file(save=True, force=True) #save file
 
         if not os.path.exists(cfx_filepath): #make a new CFX scene file
+            print(">GenScene(): CFX scene doesn't exist yet. Creating a new one")
             mc.file(new=True, force=True)
             mc.file(rename=cfx_filepath)
             mc.file(save=True, force=True)
@@ -104,6 +105,8 @@ def getReferenceObjects():
     element = body.get_element(Department.MODEL)
     cape_sim_file = element.get_app_filepath()
     mc.file(cape_sim_file, reference=True)
+
+    #Should also import the cape chain alembic too?
 
 
 #######################

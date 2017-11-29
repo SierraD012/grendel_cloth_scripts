@@ -30,7 +30,7 @@ STARTPRE = -30
 
 #Clears Rotation on a List of Objects
 def clearRotate(list):
-    print '>>ClearRotate() starting'
+    print ">>ClearRotate() starting"        #TODO: apparently all the print stmts should have parentheses around them...
     for i in list:
         if mc.getAttr(i + '.rotateX', settable=True):
             mc.setAttr(i + '.rotateX', 0)
@@ -357,15 +357,21 @@ def constrainCapeChain():
     mc.select("beowulf_cape_model_main_beowulf_cape_clasps", replace=True)
     mc.select("beowulf_cape_model_main_beowulf_cape_clasp_chain", add=True) #not really necessary to select these two
     mc.polyUnite("beowulf_cape_model_main_beowulf_cape_clasps", "beowulf_cape_model_main_beowulf_cape_clasp_chain", name="beowulf_cape_model_main_beowulf_capeChain_combined")
+    #center the combined object's pivot so we can rotate it to look more normal
+    mc.xform("beowulf_cape_model_main_beowulf_capeChain_combined", centerPivots=True)
+    mc.setAttr("beowulf_cape_model_main_beowulf_capeChain_combined.rotateX", -16.0)
 
     #Select the rig control we want to parent the chain/clasp to
-    mc.select(rigPrefix+"Beowulf_chest_cc_01", replace=True) #I think this is the right one
+    mc.select(rigPrefix+"Beowulf_chest_cc_01", replace=True)
     #Now select the chainCombined object
     mc.select("beowulf_cape_model_main_beowulf_capeChain_combined", add=True)
 
     #Create parent constraint: (targetObject, childObject)
     mc.parentConstraint(rigPrefix+"Beowulf_chest_cc_01", "beowulf_cape_model_main_beowulf_capeChain_combined", maintainOffset=1, weight=1.0)
 
+    #Hide original chain/clasp because we don't need them for this part
+    mc.hide('beowulf_cape_model_main_beowulf_cape_clasps')
+    mc.hide('beowulf_cape_model_main_beowulf_cape_clasp_chain')
 
 ###########################################
 #### MAIN ####
@@ -387,7 +393,7 @@ setRigKey(fullRig)
 
 #Set T-Pose (Clear Transformations)
 mc.currentTime(STARTPRE)
-mc.playbackOptions(minTime=STARTPRE) #this might help
+mc.playbackOptions(minTime=STARTPRE)
 
 selectRig()
 keyArmFK()
