@@ -13,6 +13,7 @@ from byuam.environment import Department, Environment
 
 STARTANIM = 1
 STARTPRE = -25
+STARTPRE_0= -50
 
 # Rig Pefix:
 prefix0 = 'viking_rig_main_Viking'
@@ -299,15 +300,18 @@ startY = mc.getAttr(rigPrefix + '_primary_global_cc_01.translateY')
 startZ = mc.getAttr(rigPrefix + '_primary_global_cc_01.translateZ') 
 
 #Clear any unnecessary animation
-clearKeys(fullRig, STARTPRE, STARTANIM)
+clearKeys(fullRig, STARTPRE_0, STARTANIM)
 
 #Keyframe Initial Frame
 mc.currentTime(STARTANIM)
 setRigKey(fullRig)
 
-#Clear Transformations
+#Get some frames at start pose
 mc.currentTime(STARTPRE)
+setRigKey(fullRig)
 
+#Clear Transformations
+mc.currentTime(STARTPRE_0)
 selectRig()
 keyArmFK()
 
@@ -330,6 +334,6 @@ mc.setKeyframe(rigPrefix + '_COG_cc_01', at='rotateY')
 mc.setKeyframe(rigPrefix + '_COG_cc_01', at='rotateZ')
 
 #Export Alembic (Requires User Input - Select Viking's Rig)
-mc.playbackOptions(animationStartTime=STARTPRE)
+mc.playbackOptions(animationStartTime=STARTPRE_0)
 import alembic_exporter
 alembic_exporter.go()
