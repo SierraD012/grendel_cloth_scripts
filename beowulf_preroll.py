@@ -30,71 +30,71 @@ STARTPRE = -30
 
 #Clears Rotation on a List of Objects
 def clearRotate(list):
-    print ">>ClearRotate() starting"        #TODO: apparently all the print stmts should have parentheses around them...
+    print (">>ClearRotate() starting")        #TODO: apparently all the print stmts should have parentheses around them...
     for i in list:
         if mc.getAttr(i + '.rotateX', settable=True):
             mc.setAttr(i + '.rotateX', 0)
         else:
-            print '************ Skipping ' + str(i) + '.rotateX'
+            print ('************ Skipping ' + str(i) + '.rotateX')
 
         if mc.getAttr(i + '.rotateY', settable=True):
             mc.setAttr(i + '.rotateY', 0)
         else:
-            print '************ Skipping ' + str(i) + '.rotateY'
+            print ('************ Skipping ' + str(i) + '.rotateY')
 
         if mc.getAttr(i + '.rotateZ', settable=True):
             mc.setAttr(i + '.rotateZ', 0)
         else:
-            print '************ Skipping ' + str(i) + '.rotateZ'
+            print ('************ Skipping ' + str(i) + '.rotateZ')
 
 #Clears Translation on a List of Objects
 def clearTranslate(list):
-    print ">>ClearTranslate() starting"
+    print (">>ClearTranslate() starting")
     for i in list:
         if mc.getAttr(i + '.translateX', settable=True):
             mc.setAttr(i + '.translateX', 0)
         else:
-	    print '************ Skipping ' + str(i) + '.translateX'
+	    print ('************ Skipping ' + str(i) + '.translateX')
 
 	if mc.getAttr(i + '.translateY', settable=True):
             mc.setAttr(i + '.translateY', 0)
         else:
-	    print '************ Skipping ' + str(i) + '.translateY'
+	    print ('************ Skipping ' + str(i) + '.translateY')
 
 	if mc.getAttr(i + '.translateZ', settable=True):
             mc.setAttr(i + '.translateZ', 0)
         else:
-	    print '************ Skipping ' + str(i) + '.translateZ'
+	    print ('************ Skipping ' + str(i) + '.translateZ')
 
 #Clears Scale on a List of Objects
 def clearScale(list):
-    print ">>ClearScale() starting"
+    print (">>ClearScale() starting")
     for i in list:
         if mc.getAttr(i + '.scaleX', settable=True):
             mc.setAttr(i + '.scaleX', 1)
 
         else:
-	    print '************ Skipping ' + str(i) + '.scaleX'
+	    print ('************ Skipping ' + str(i) + '.scaleX')
 
 	if mc.getAttr(i + '.scaleY', settable=True):
             mc.setAttr(i + '.scaleY', 1)
         else:
-	    print '************ Skipping ' + str(i) + '.scaleY'
+	    print ('************ Skipping ' + str(i) + '.scaleY')
 
 	if mc.getAttr(i + '.scaleZ', settable=True):
 
             mc.setAttr(i + '.scaleZ', 1)
         else:
-	    print '************ Skipping ' + str(i) + '.scaleZ'
+	    print ('************ Skipping ' + str(i) + '.scaleZ')
 
 
 #Selects/Returns Full Rig
 # update: it looks like all the accessories + beard go with the transformation, so that's cool
 def selectRig():
-    print ">>SelectRig() starting"
+    print (">>SelectRig() starting")
 
     #these are what moves the entire rig group - if we skip these the rig will move from A-pose to scene start pose without flying back from origin
-    beowulf_main = [
+    #beowulf_main = [
     #'Beowulf_main_cc_01',
     #'Beowulf_secondary_global_cc_01',
     #'Beowulf_primary_global_cc_01']
@@ -250,7 +250,7 @@ def selectRig():
 
 
 def keyArmFK():
-    print ">>KeyArmFK() starting"
+    print (">>KeyArmFK() starting")
     leftArmFK = rigPrefix + 'Beowulf_LFT_arm_settings_cc_01.FK_IK'
 
     mc.setAttr(leftArmFK, 0)  #FK mode
@@ -288,28 +288,28 @@ def fingerNames():
     return completeFingerNames
 
 def scaleFingers():
-    print ">>ScaleFingers(): starting"
+    print (">>ScaleFingers(): starting")
     for i in fingerNames():
         mc.setAttr(i + '.scaleX', 1)
         mc.setKeyframe(rigPrefix + i, at='scaleX')
 
 def keyFingers():
-    print ">>KeyFingers(): starting"
+    print (">>KeyFingers(): starting")
     for i in fingerNames():
 	mc.setKeyframe(i, at='scaleX')
 
 
 def APose():
-    print ">>APose(): starting"
+    print (">>APose(): starting")
     #Handle Right Arm
     mc.rotate(0, 0, 0, rigPrefix + 'Beowulf_LFT_FK_upper_arm_cc_01') #so far, we don't seem to need to rotate the arms to get them to match the collision mesh arms
     #Handle Left Arm
     mc.rotate(0, 0, 0, rigPrefix + 'Beowulf_RGT_FK_upper_arm_cc_01')
-    print ">>APose(): done"
+    print (">>APose(): done")
 
 
 def setRigKey(fullRig):
-    print ">>SetRigKey(): starting"
+    print (">>SetRigKey(): starting")
     #Key Translation
     mc.setKeyframe(fullRig, at='translateX')
     mc.setKeyframe(fullRig, at='translateY')
@@ -320,7 +320,7 @@ def setRigKey(fullRig):
     mc.setKeyframe(fullRig, at='rotateZ')
 
     keyFingers()
-    print ">>SetRigKey(): done"
+    print (">>SetRigKey(): done")
 
 #Used to constrain the clasps/chain on the front of the cape to Beowulf's chest rig control
 #this is kind of a fake sim, we should probably just use it when the chain is not directly visible!
@@ -339,10 +339,6 @@ def constrainCapeChain():
     tz = mc.getAttr(globPos+".translateZ")
     rx = mc.getAttr(globPos+".rotateX")
     ry = mc.getAttr(globPos+".rotateY")
-    rz = mc.getAttr(globPos+".rotateZ")
-
-    # Set full cape group transforms to match Beowulf's location
-    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateX", tx)
     mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateY", ty)
     mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateZ", tz)
     mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.rotateX", rx)
