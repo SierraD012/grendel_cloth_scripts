@@ -30,7 +30,7 @@ STARTPRE = -30
 
 #Clears Rotation on a List of Objects
 def clearRotate(list):
-    print (">>ClearRotate() starting")        #TODO: apparently all the print stmts should have parentheses around them...
+    print (">>ClearRotate() starting")
     for i in list:
         if mc.getAttr(i + '.rotateX', settable=True):
             mc.setAttr(i + '.rotateX', 0)
@@ -339,6 +339,8 @@ def constrainCapeChain():
     tz = mc.getAttr(globPos+".translateZ")
     rx = mc.getAttr(globPos+".rotateX")
     ry = mc.getAttr(globPos+".rotateY")
+    rz = mc.getAttr(globPos+".rotateZ")
+    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateX", tx)
     mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateY", ty)
     mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateZ", tz)
     mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.rotateX", rx)
@@ -355,7 +357,7 @@ def constrainCapeChain():
     mc.polyUnite("beowulf_cape_model_main_beowulf_cape_clasps", "beowulf_cape_model_main_beowulf_cape_clasp_chain", name="beowulf_cape_model_main_beowulf_capeChain_combined")
     #center the combined object's pivot so we can rotate it to look more normal
     mc.xform("beowulf_cape_model_main_beowulf_capeChain_combined", centerPivots=True)
-    mc.setAttr("beowulf_cape_model_main_beowulf_capeChain_combined.rotateX", -16.0)
+    mc.setAttr("beowulf_cape_model_main_beowulf_capeChain_combined.rotateZ", -16.0)
 
     #Select the rig control we want to parent the chain/clasp to
     mc.select(rigPrefix+"Beowulf_chest_cc_01", replace=True)
@@ -368,6 +370,8 @@ def constrainCapeChain():
     #Hide original chain/clasp because we don't need them for this part
     mc.hide('beowulf_cape_model_main_beowulf_cape_clasps')
     mc.hide('beowulf_cape_model_main_beowulf_cape_clasp_chain')
+
+    #Export an alembic of just the chaingroup in the ANIM folder for this shot with the name:  beowulf_cape_chain_main.abc - you probably have to do this manually 
 
 ###########################################
 #### MAIN ####
