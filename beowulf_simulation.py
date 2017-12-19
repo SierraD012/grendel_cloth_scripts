@@ -10,7 +10,7 @@ from byuam.project import Project
 from byuam.environment import Department, Environment
 
 STARTANIM = -0
-STARTPRE = -30
+STARTPRE = -50
 
 #########################
 ## ESTABLISH CFX SCENE ##
@@ -24,7 +24,7 @@ def generateScene():
     mc.currentTime(STARTPRE)
     globalPos = mc.spaceLocator(p=[0,0,0])
     globPos = mc.rename(globalPos, "beowulfGlobalPos")
-    mc.select("beowulf_rig_main_Beowulf_primary_global_cc_01")
+    mc.select(rigPrefix+"Beowulf_primary_global_cc_01")
     mc.select(globPos, add=True)
     mc.pointConstraint(offset=[0,0,0], weight=1) #constrains the globPos position to where Beowulf's rig_main is
     mc.orientConstraint(offset=[0,0,0], weight=1) #orients the globPos to match Beowulf's rig_main (I think it just does the rotation)
@@ -44,9 +44,11 @@ def generateScene():
     checkout_body_name = checkout_element.get_parent()
     body = project.get_body(checkout_body_name)
     element = body.get_element(Department.ANIM)
-    cache_name = "beowulf_"+checkout_body_name+"_anim_main" # this is me doing it arbitrarily but I think the preroll script picks its own name
+    #cache_name = "beowulf_"+checkout_body_name+"_anim_main" # this is me doing it arbitrarily but I think the preroll script picks its own name
+    cache_name = "beowulf_rig_main"
+    #I'm prettty sure cache_name should always be "beowulf_rig_main" - or whatever the ABCExporter created at the end of the preroll script
     cache_file = os.path.join(element.get_dir(), "cache", cache_name + ".abc")
-    #print("Expecting mesh alembic with name " + cache_name)
+    print("Expecting mesh alembic with name " + cache_name)
     #we could make a while loop to check if an alembic with this name exists already, if it does increment a suffix number on the filename
 
     # checkout cfx scene for corresponding shot number
@@ -59,7 +61,7 @@ def generateScene():
 
     #open cfx file
     if cfx_filepath is not None:
-        if not mc.file(q=True, sceneName=True) == '':
+        if not mc.file(q=True, sceneName=True) == '': #I think this means if we already have the CFX scene open just save it...
             mc.file(save=True, force=True) #save file
 
         if not os.path.exists(cfx_filepath): #make a new CFX scene file
@@ -68,8 +70,11 @@ def generateScene():
             mc.file(rename=cfx_filepath)
             mc.file(save=True, force=True)
         else:
-             mc.file(cfx_filepath, open=True, force=True)
-    # import alembic
+            print(">GenScene(): found existing CFX scene. Opening")
+            mc.file(cfx_filepath, open=True, force=True)
+
+    mc.currentTime(STARTPRE)
+    # import alembic for Beowulf's mesh
     command = "AbcImport -mode import \"" + cache_file + "\""
     maya.mel.eval(command)
 
@@ -106,12 +111,18 @@ def getReferenceObjects():
     cape_sim_file = element.get_app_filepath()
     mc.file(cape_sim_file, reference=True)
 
-    #Should also import the cape chain alembic too?
+    # also import the cape chain alembic too
+    beowulf_capeChain_abc = "beowulf_cape_chain_main.abc"
+    command = "AbcImport -mode import \"" + beowulf_capeChain_abc + "\""
+    maya.mel.eval(command)
 
 
 #######################
 ##       MAIN        ##
 #######################
+
+global rigPrefix
+rigPrefix = "beowulf_rig_main_"  #concatenate this with every other control name
 
 generateScene()
 

@@ -357,7 +357,7 @@ def constrainCapeChain():
     mc.polyUnite("beowulf_cape_model_main_beowulf_cape_clasps", "beowulf_cape_model_main_beowulf_cape_clasp_chain", name="beowulf_cape_model_main_beowulf_capeChain_combined")
     #center the combined object's pivot so we can rotate it to look more normal
     mc.xform("beowulf_cape_model_main_beowulf_capeChain_combined", centerPivots=True)
-    mc.setAttr("beowulf_cape_model_main_beowulf_capeChain_combined.rotateZ", -16.0)
+    #mc.setAttr("beowulf_cape_model_main_beowulf_capeChain_combined.rotateZ", -16.0) #probably need to tweak this every time
 
     #Select the rig control we want to parent the chain/clasp to
     mc.select(rigPrefix+"Beowulf_chest_cc_01", replace=True)
@@ -371,7 +371,7 @@ def constrainCapeChain():
     mc.hide('beowulf_cape_model_main_beowulf_cape_clasps')
     mc.hide('beowulf_cape_model_main_beowulf_cape_clasp_chain')
 
-    #Export an alembic of just the chaingroup in the ANIM folder for this shot with the name:  beowulf_cape_chain_main.abc - you probably have to do this manually 
+    #Export an alembic of just the chaingroup in the ANIM folder for this shot with the name:  beowulf_cape_chain_main.abc - you probably have to do this manually
 
 ###########################################
 #### MAIN ####
@@ -430,3 +430,4 @@ alembic_exporter.go()
 
 #Export alembic of just the cape chain - might need do this manually because the ABC Exporter doesn't know how to find the tag on this one since it's not a reference
 #AbcExport -j "-frameRange -30 120 -step 0.25 -dataFormat ogawa -root |beowulf_cape_model_main_beowulf_capeChain_combined -file /groups/grendel/production/shots/b023/anim/main/cache/beowulf_capeChain.abc";
+#EXPORT IT WITH THIS NAME: beowulf_cape_chain_main.abc
