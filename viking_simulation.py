@@ -12,6 +12,17 @@ from byuam.environment import Department, Environment
 STARTANIM = 1
 STARTPRE = -50
 
+vikingBodyGeo0 = 'viking_rig_main_Viking_body_GEO_01'
+vikingBodyGeo1 = 'Viking_body_GEO_01'
+vikingBodyGeo = vikingBodyGeo1
+
+vikingRigName0 = "viking_rig_main_Viking_primary_global_cc_01"
+vikingRigName1 = "viking_with_facial_rig_main_mb29866846:Viking_primary_global_cc_01"
+vikingRigName = vikingRigName1
+
+cache_name0 = "viking_with_facial_rig_main"
+cache_name1 = "viking_with_facial_rig_main4"
+cache_name = cache_name1 # look in shots anim/main/cache
 
 #########################
 ## ESTABLISH CFX SCENE ##
@@ -25,10 +36,12 @@ def generateScene():
     mc.currentTime(STARTPRE)
     globalPos = mc.spaceLocator(p=[0,0,0])
     globPos = mc.rename(globalPos, "vikingGlobalPos")
-    mc.select("viking_rig_main_Viking_primary_global_cc_01")
+    mc.select(vikingRigName)
     mc.select(globPos, add=True)
     mc.pointConstraint(offset=[0,0,0], weight=1) #constrains the globPos position to where viking's rig_main is
     mc.orientConstraint(offset=[0,0,0], weight=1) #orients the globPos to match viking's rig_main (I think it just does the rotation)
+
+    global cache_name
 
     # Get transformation variables from globPos locator
     global tx
@@ -51,7 +64,6 @@ def generateScene():
     checkout_body_name = checkout_element.get_parent()
     body = project.get_body(checkout_body_name)
     element = body.get_element(Department.ANIM)
-    cache_name = "viking_with_facial_rig_main" # this is me doing it arbitrarily but I think the preroll script picks its own name
     cache_file = os.path.join(element.get_dir(), "cache", cache_name + ".abc")
     print("Expecting mesh alembic with name " + cache_name)
     # we could make a while loop to check if an alembic with this name exists already, if it does increment a suffix number on the filename
@@ -210,12 +222,12 @@ mc.setAttr("nucleus1.timeScale", 1)
 # Wrap Colliders to viking's character alembic
 # NOTE: if the dynamic constraints freak out, try changing the order that you do (collisionMesh wrap to character mesh) and (create dynamicConstraint)
 mc.select('viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth', replace=True) #Wrap Body
-mc.select('viking_rig_main_Viking_body_GEO_01', add=True)  #wrap the collision mesh to viking skin
+mc.select(vikingBodyGeo, add=True)  #wrap the collision mesh to viking skin
 mc.CreateWrap()
 
 # Wrap bracelets to viking's character alembic
 mc.select('viking_tunic_model_main_bracelets', replace=True) #Wrap bracelets
-mc.select('viking_rig_main_Viking_body_GEO_01', add=True)  #wrap the bracelets to viking skin
+mc.select(vikingBodyGeo, add=True)  #wrap the bracelets to viking skin
 mc.CreateWrap()
 
 # Wrap Tunic Beauty Mesh to Sim Mesh

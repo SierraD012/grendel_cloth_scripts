@@ -13,18 +13,19 @@ from byuam.environment import Department, Environment
 
 STARTANIM = 1
 STARTPRE = -25
-STARTPRE_0= -50
+STARTPRE_0 = -50
 
 # Rig Pefix:
 prefix0 = 'viking_rig_main_Viking'
 prefix1 = 'viking_with_facial_rig_main_Viking'
+prefix2 = 'viking_with_facial_rig_main_mb29866846:Viking'
 
-rigPrefix = prefix0
+rigPrefix = prefix2
 
 
 ############################
 # PRE-ROLL VIKING ANIMATION
-# this version has each rig control name with the prefix "viking_rig_main_" 
+# this version has each rig control name with the prefix "viking_rig_main_"
 # because the layout scenes have that (the rig file doesn't)
 ############################
 
@@ -54,13 +55,13 @@ def clearTranslate(list):
         if mc.getAttr(i + '.translateX', settable=True):
             mc.setAttr(i + '.translateX', 0)
         else:
-	    print '************ Skipping ' + str(i) + '.translateX' 
-        
-	if mc.getAttr(i + '.translateY', settable=True):   
+	    print '************ Skipping ' + str(i) + '.translateX'
+
+	if mc.getAttr(i + '.translateY', settable=True):
             mc.setAttr(i + '.translateY', 0)
         else:
 	    print '************ Skipping ' + str(i) + '.translateY'
-       
+
 	if mc.getAttr(i + '.translateZ', settable=True):
             mc.setAttr(i + '.translateZ', 0)
         else:
@@ -74,13 +75,13 @@ def clearScale(list):
             mc.setAttr(i + '.scaleX', 1)
 
         else:
-	    print '************ Skipping ' + str(i) + '.scaleX' 
-        
-	if mc.getAttr(i + '.scaleY', settable=True):   
+	    print '************ Skipping ' + str(i) + '.scaleX'
+
+	if mc.getAttr(i + '.scaleY', settable=True):
             mc.setAttr(i + '.scaleY', 1)
         else:
 	    print '************ Skipping ' + str(i) + '.scaleY'
-       
+
 	if mc.getAttr(i + '.scaleZ', settable=True):
 
             mc.setAttr(i + '.scaleZ', 1)
@@ -104,14 +105,14 @@ def selectRig():
 
     viking_eyes = [
     rigPrefix + '_LFT_eye_rotate_cc_01', 	#Left
-    rigPrefix + '_LFT_LOW_eyelid_cc_01',	
+    rigPrefix + '_LFT_LOW_eyelid_cc_01',
     rigPrefix + '_LFT_UPP_eyelid_cc_01',
     rigPrefix + '_LFT_OUT_eyebrow_cc_01',
     rigPrefix + '_LFT_MID_eyebrow_cc_01',
     rigPrefix + '_LFT_INN_eyebrow_cc_01',
     rigPrefix + '_LFT_MAIN_eyebrow_cc_01',
     rigPrefix + '_RGT_eye_rotate_cc_01',		#Right
-    rigPrefix + '_RGT_LOW_eyelid_cc_01',	
+    rigPrefix + '_RGT_LOW_eyelid_cc_01',
     rigPrefix + '_RGT_UPP_eyelid_cc_01',
     rigPrefix + '_RGT_OUT_eyebrow_cc_01',
     rigPrefix + '_RGT_MID_eyebrow_cc_01',
@@ -120,7 +121,7 @@ def selectRig():
     rigPrefix + '_LFT_eye_aim_cc_01',
     rigPrefix + '_RGT_eye_aim_cc_01',
     rigPrefix + '_both_eyes_aim_cc_01']
-    
+
     viking_mouth = [
     rigPrefix + '_tongue_tip_cc_01',
     rigPrefix + '_tongue_middle_cc_01',
@@ -157,7 +158,7 @@ def selectRig():
     rigPrefix + '_RGT_clavicle_cc_01',
     rigPrefix + '_RGT_FK_wrist_cc_01',
     rigPrefix + '_RGT_FK_lower_arm_cc_01',
-    rigPrefix + '_RGT_FK_upper_arm_cc_01']    
+    rigPrefix + '_RGT_FK_upper_arm_cc_01']
 
     viking_hands = [
     #Note: Viking has no ring finger
@@ -216,7 +217,7 @@ def selectRig():
     rigPrefix + '_RGT_foot_ball_cc_01']
 
     fullRig = viking_main + viking_head + viking_mouth + viking_neck + viking_torso + viking_arms + viking_hands + viking_hips + viking_legs_feet
-    
+
     #Create Selection from 'fullRig'
     mc.select(viking_hands, replace=True)
     return fullRig
@@ -229,9 +230,9 @@ def keyArmFK():
 
     if (mc.getAttr(rigPrefix + '_LFT_arm_settings_cc_01.FK_IK', keyable=True) or mc.getAttr(rigPrefix + '_LFT_arm_settings_cc_01.FK_IK', channelBox=True)):
         mc.setKeyframe(rigPrefix + '_LFT_arm_settings_cc_01.FK_IK');
-        
-    #mc.setAttr('ten_rig_main_r_arm_switch_CTL.IKFK_Switch', 1) 
-    mc.setAttr(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK', 0)  #really not sure about this 
+
+    #mc.setAttr('ten_rig_main_r_arm_switch_CTL.IKFK_Switch', 1)
+    mc.setAttr(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK', 0)  #really not sure about this
 
     if (mc.getAttr(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK', keyable=True) or mc.getAttr(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK', channelBox=True)):
         mc.setKeyframe(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK');
@@ -248,7 +249,7 @@ def fingerNames():
     rigPrefix + '_RGT_middle_metacarpal_secondary_cc_01',
     rigPrefix + '_RGT_pinky_metacarpal_secondary_cc_01'
 ]
-    
+
 def scaleFingers():
     print ">>ScaleFingers() starting"
     for i in fingerNames():
@@ -259,12 +260,12 @@ def keyFingers():
     print ">>KeyFingers() starting"
     for i in fingerNames():
 	mc.setKeyframe(i, at='scaleX')
-    
+
 
 def APose():
     print ">>APose() starting"
     mc.rotate(0, 0, -45, rigPrefix + '_LFT_FK_upper_arm_cc_01')
-    mc.rotate(0, 0, -45, rigPrefix + '_RGT_FK_upper_arm_cc_01') 
+    mc.rotate(0, 0, -45, rigPrefix + '_RGT_FK_upper_arm_cc_01')
 
 
 def setRigKey(fullRig):
@@ -277,7 +278,7 @@ def setRigKey(fullRig):
     mc.setKeyframe(fullRig, at='rotateX')
     mc.setKeyframe(fullRig, at='rotateY')
     mc.setKeyframe(fullRig, at='rotateZ')
-    
+
     keyFingers()
 
 def clearKeys(rig, startFrame, endFrame):
@@ -295,9 +296,9 @@ def translateRig(x, y, z):
 fullRig = selectRig()
 
 #Remember anim start position
-startX = mc.getAttr(rigPrefix + '_primary_global_cc_01.translateX') 
-startY = mc.getAttr(rigPrefix + '_primary_global_cc_01.translateY') 
-startZ = mc.getAttr(rigPrefix + '_primary_global_cc_01.translateZ') 
+startX = mc.getAttr(rigPrefix + '_primary_global_cc_01.translateX')
+startY = mc.getAttr(rigPrefix + '_primary_global_cc_01.translateY')
+startZ = mc.getAttr(rigPrefix + '_primary_global_cc_01.translateZ')
 
 #Clear any unnecessary animation
 clearKeys(fullRig, STARTPRE_0, STARTANIM)
