@@ -258,13 +258,15 @@ mc.hide('viking_tunic_model_main_tunic_sim_mesh')
 mc.hide('viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth')
 
 # Set display smoothness
-mc.select('viking_tunic_model_main_tunic_sim_mesh', replace=True)
-mc.select('viking_tunic_model_main_tunic_beauty_mesh', add=True)
-mc.select('viking_tunic_model_main_bracelets', add=True)
-cmds.displaySmoothness(du=3, dv=3, pw=16, ps=4, polygonObject=3)
+#mc.select('viking_tunic_model_main_tunic_sim_mesh', replace=True)
+#mc.select('viking_tunic_model_main_tunic_beauty_mesh', add=True)
+#mc.select('viking_tunic_model_main_bracelets', add=True)
+#cmds.displaySmoothness(du=3, dv=3, pw=16, ps=4, polygonObject=3)
+
+### Export tunic and braceletes as an alembic to shot cfx/main/cache, named tunic_sim.abc !!!!
 
 # Tag beauty mesh and bracelets for export
-mc.select("viking_tunic_model_main_tunic_beauty_mesh", replace=True)
-mc.select('viking_tunic_model_main_bracelets', add=True)
-import alembic_tagger;
-alembic_tagger.go()
+#mc.select("viking_tunic_model_main_tunic_beauty_mesh", replace=True)
+#mc.select('viking_tunic_model_main_bracelets', add=True)
+#import alembic_tagger;
+#alembic_tagger.go()
