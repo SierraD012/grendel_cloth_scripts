@@ -28,112 +28,90 @@ cache_name = cache_name1 # look in shots anim/main/cache
 ## ESTABLISH CFX SCENE ##
 #########################
 
-def generateScene():
-    project = Project()
-    environment = Environment()
+project = Project()
+environment = Environment()
 
-    # Create a global position locator for viking's starting location
-    mc.currentTime(STARTPRE)
-    globalPos = mc.spaceLocator(p=[0,0,0])
-    globPos = mc.rename(globalPos, "vikingGlobalPos")
-    mc.select(vikingRigName)
-    mc.select(globPos, add=True)
-    mc.pointConstraint(offset=[0,0,0], weight=1) #constrains the globPos position to where viking's rig_main is
-    mc.orientConstraint(offset=[0,0,0], weight=1) #orients the globPos to match viking's rig_main (I think it just does the rotation)
+# Create a global position locator for viking's starting location
+mc.currentTime(STARTPRE)
+globalPos = mc.spaceLocator(p=[0,0,0])
+globPos = mc.rename(globalPos, "vikingGlobalPos")
+mc.select(vikingRigName)
+mc.select(globPos, add=True)
+mc.pointConstraint(offset=[0,0,0], weight=1) #constrains the globPos position to where viking's rig_main is
+mc.orientConstraint(offset=[0,0,0], weight=1) #orients the globPos to match viking's rig_main (I think it just does the rotation)
 
-    global cache_name
+# Get transformation variables from globPos locator
+tx = mc.getAttr(globPos+".translateX")
+ty = mc.getAttr(globPos+".translateY")
+tz = mc.getAttr(globPos+".translateZ")
+rx = mc.getAttr(globPos+".rotateX")
+ry = mc.getAttr(globPos+".rotateY")
+rz = mc.getAttr(globPos+".rotateZ")
 
-    # Get transformation variables from globPos locator
-    global tx
-    global ty
-    global tz
-    global rx
-    global ry
-    global rz
-    tx = mc.getAttr(globPos+".translateX")
-    ty = mc.getAttr(globPos+".translateY")
-    tz = mc.getAttr(globPos+".translateZ")
-    rx = mc.getAttr(globPos+".rotateX")
-    ry = mc.getAttr(globPos+".rotateY")
-    rz = mc.getAttr(globPos+".rotateZ")
+# get alembic filepath for scene's animation (requires prior export)
+src = mc.file(q=True, sceneName=True)
+src_dir = os.path.dirname(src)
+checkout_element = project.get_checkout_element(src_dir)
+checkout_body_name = checkout_element.get_parent()
+body = project.get_body(checkout_body_name)
+element = body.get_element(Department.ANIM)
+cache_file = os.path.join(element.get_dir(), "cache", cache_name + ".abc")
+print("Expecting mesh alembic with name " + cache_name)
+# we could make a while loop to check if an alembic with this name exists already, if it does increment a suffix number on the filename
 
-    # get alembic filepath for scene's animation (requires prior export)
-    src = mc.file(q=True, sceneName=True)
-    src_dir = os.path.dirname(src)
-    checkout_element = project.get_checkout_element(src_dir)
-    checkout_body_name = checkout_element.get_parent()
-    body = project.get_body(checkout_body_name)
-    element = body.get_element(Department.ANIM)
-    cache_file = os.path.join(element.get_dir(), "cache", cache_name + ".abc")
-    print("Expecting mesh alembic with name " + cache_name)
-    # we could make a while loop to check if an alembic with this name exists already, if it does increment a suffix number on the filename
+# checkout cfx scene for corresponding shot number
+current_user = environment.get_current_username()
+element = body.get_element(Department.CFX)
+cfx_filepath = element.checkout(current_user)
+print(">GenScene(): cfx_filepath= " + cfx_filepath) # see where it's expecting the file to be/what it's called
+print(">GenScene(): cache_file= " + cache_file) # this is where ABCimporter expects the character geo abc to be
 
-    # checkout cfx scene for corresponding shot number
-    current_user = environment.get_current_username()
-    element = body.get_element(Department.CFX)
-    cfx_filepath = element.checkout(current_user)
-    print(">GenScene(): cfx_filepath= " + cfx_filepath) # see where it's expecting the file to be/what it's called
-    print(">GenScene(): cache_file= " + cache_file) # this is where ABCimporter expects the character geo abc to be
+# open cfx file
+if cfx_filepath is not None:
+    if not mc.file(q=True, sceneName=True) == '':
+        mc.file(save=True, force=True) #save file
 
-    # open cfx file
-    if cfx_filepath is not None:
-        if not mc.file(q=True, sceneName=True) == '':
-            mc.file(save=True, force=True) #save file
+    if not os.path.exists(cfx_filepath): #make a new CFX scene file
+        print(">GenScene(): CFX scene doesn't exist yet. Creating a new one")
+        mc.file(new=True, force=True)
+        mc.file(rename=cfx_filepath)
+        mc.file(save=True, force=True)
+    else:
+         mc.file(cfx_filepath, open=True, force=True)
 
-        if not os.path.exists(cfx_filepath): #make a new CFX scene file
-            print(">GenScene(): CFX scene doesn't exist yet. Creating a new one")
-            mc.file(new=True, force=True)
-            mc.file(rename=cfx_filepath)
-            mc.file(save=True, force=True)
-        else:
-             mc.file(cfx_filepath, open=True, force=True)
+# import alembic
+command = "AbcImport -mode import \"" + cache_file + "\""
 
-    # import alembic
-    command = "AbcImport -mode import \"" + cache_file + "\""
+maya.mel.eval(command)
 
-    maya.mel.eval(command)
+#### PULL IN REFERENCE OBJECTS ####
+#Reference viking's CollisionMesh
+body = project.get_body("viking_collision_mesh_cloth")
+element = body.get_element(Department.MODEL)
+collisionMesh_file = element.get_app_filepath()
+mc.file(collisionMesh_file, reference=True)
 
-    #### PULL IN REFERENCE OBJECTS ####
-    getReferenceObjects(project)
+# Reference viking's tunic - it comes with both sim and beauty meshes
+body = project.get_body("viking_tunic")
+element = body.get_element(Department.MODEL)
+tunic_sim_file = element.get_app_filepath()
+mc.file(tunic_sim_file, reference=True)
 
-    # Set full tunic group transforms to match viking's alembic
-    mc.setAttr("viking_tunic_model_main_tunic.translateX", tx)
-    mc.setAttr("viking_tunic_model_main_tunic.translateY", ty)
-    mc.setAttr("viking_tunic_model_main_tunic.translateZ", tz)
-    mc.setAttr("viking_tunic_model_main_tunic.rotateX", rx)
-    mc.setAttr("viking_tunic_model_main_tunic.rotateY", ry)
-    mc.setAttr("viking_tunic_model_main_tunic.rotateZ", rz)
+# Set full tunic group transforms to match viking's alembic
+mc.setAttr("viking_tunic_model_main_tunic.translateX", tx)
+mc.setAttr("viking_tunic_model_main_tunic.translateY", ty)
+mc.setAttr("viking_tunic_model_main_tunic.translateZ", tz)
+mc.setAttr("viking_tunic_model_main_tunic.rotateX", rx)
+mc.setAttr("viking_tunic_model_main_tunic.rotateY", ry)
+mc.setAttr("viking_tunic_model_main_tunic.rotateZ", rz)
 
-    #Set collisionMesh transforms to match viking's alembic
-    mc.setAttr("viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth.translateX", tx)
-    mc.setAttr("viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth.translateY", ty)
-    mc.setAttr("viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth.translateZ", tz)
-    mc.setAttr("viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth.rotateX", rx)
-    mc.setAttr("viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth.rotateY", ry)
-    mc.setAttr("viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth.rotateZ", rz)
-
-
-def getReferenceObjects(project):
-    #Reference viking's CollisionMesh
-    body = project.get_body("viking_collision_mesh_cloth")
-    element = body.get_element(Department.MODEL)
-    collisionMesh_file = element.get_app_filepath()
-    mc.file(collisionMesh_file, reference=True)
-
-    # Reference viking's tunic - it comes with both sim and beauty meshes
-    body = project.get_body("viking_tunic")
-    element = body.get_element(Department.MODEL)
-    tunic_sim_file = element.get_app_filepath()
-    mc.file(tunic_sim_file, reference=True)
-
-    #Should also import the bracelet alembic too?
-
-
-#######################
-##       MAIN        ##
-#######################
-
-generateScene()
+#Set collisionMesh transforms to match viking's alembic
+mc.setAttr("viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth.translateX", tx)
+mc.setAttr("viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth.translateY", ty)
+mc.setAttr("viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth.translateZ", tz)
+mc.setAttr("viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth.rotateX", rx)
+mc.setAttr("viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth.rotateY", ry)
+mc.setAttr("viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth.rotateZ", rz)
 
 #######################
 ## Set Up Simulation ##
@@ -145,16 +123,22 @@ mc.playbackOptions(animationStartTime=STARTPRE)
 mc.playbackOptions(minTime=STARTPRE)
 mc.currentTime(STARTPRE)
 
-#### Establish Colliders ###
+#### Establish collision body
 mc.select('viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth', replace=True) #Collider Body
 mel.eval('makeCollideNCloth;')
 mc.setAttr('nRigid1.thickness', 0.001)
 
-
-#### Establish nCloth Objects ####
+#### Create nCloth
 mc.select('viking_tunic_model_main_tunic_sim_mesh', replace=True) #nCloth: tunic
 mel.eval('createNCloth 0;')
 
+### Attract to target mesh
+#mc.select('viking_rig_main_viking_tunic_model_main_tunic', replace=True)
+mc.select('viking_with_facial_rig_main_viking_tunic_model_main_tunic', replace=True)
+mc.select('viking_tunic_model_main_tunic_sim_mesh', add=True)
+mel.eval('createNConstraint match 1;')
+
+#### Establish Dynamic Constraints ####
 mc.setAttr('nClothShape1.thickness', 0.008) #Collision Properties
 mc.setAttr('nClothShape1.selfCollideWidthScale', 2.5)
 mc.setAttr('nClothShape1.friction', 1.0)
@@ -168,10 +152,9 @@ mc.setAttr('nClothShape1.drag', 0.05)
 mc.setAttr('nClothShape1.tangentialDrag', 0.2)
 mc.setAttr('nClothShape1.damp', 4.0)		#Quality Properties
 mc.setAttr('nClothShape1.maxSelfCollisionIterations', 12)
-mc.setAttr('nClothShape1.trappedCheck', 1)
+#mc.setAttr('nClothShape1.trappedCheck', 1)
 mc.setAttr('nClothShape1.pushOut', 0.025)
 
-#### Establish Dynamic Constraints ####
 # Neckline Constraints
 mc.select(clear=True)
 tunic_neckline_verts = [ '[411]', '[414]', '[415]', '[629]', '[630]', '[631]', '[632]', '[633]', '[654]', '[1513]', '[1516]',  '[1517]', '[1722]', '[1723]', '[1724]', '[1725]', '[1745]' ]

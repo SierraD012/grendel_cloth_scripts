@@ -20,7 +20,7 @@ prefix0 = 'viking_rig_main_Viking'
 prefix1 = 'viking_with_facial_rig_main_Viking'
 prefix2 = 'viking_with_facial_rig_main_mb29866846:Viking'
 
-rigPrefix = prefix2
+rigPrefix = prefix1
 
 
 ############################
@@ -337,4 +337,5 @@ mc.setKeyframe(rigPrefix + '_COG_cc_01', at='rotateZ')
 #Export Alembic (Requires User Input - Select Viking's Rig)
 mc.playbackOptions(animationStartTime=STARTPRE_0)
 import alembic_exporter
-alembic_exporter.go()
+reload(alembic_exporter)
+alembic_exporter.go(cfx=True)
