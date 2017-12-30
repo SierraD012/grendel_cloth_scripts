@@ -18,11 +18,11 @@ vikingBodyGeo = vikingBodyGeo1
 
 vikingRigName0 = "viking_rig_main_Viking_primary_global_cc_01"
 vikingRigName1 = "viking_with_facial_rig_main_mb29866846:Viking_primary_global_cc_01"
-vikingRigName = vikingRigName1
+vikingRigName = vikingRigName0
 
 cache_name0 = "viking_with_facial_rig_main"
 cache_name1 = "viking_with_facial_rig_main4"
-cache_name = cache_name1 # look in shots anim/main/cache
+cache_name = cache_name0 # look in shots cfx/main/cache
 
 #########################
 ## ESTABLISH CFX SCENE ##
@@ -54,7 +54,7 @@ src_dir = os.path.dirname(src)
 checkout_element = project.get_checkout_element(src_dir)
 checkout_body_name = checkout_element.get_parent()
 body = project.get_body(checkout_body_name)
-element = body.get_element(Department.ANIM)
+element = body.get_element(Department.CFX)
 cache_file = os.path.join(element.get_dir(), "cache", cache_name + ".abc")
 print("Expecting mesh alembic with name " + cache_name)
 # we could make a while loop to check if an alembic with this name exists already, if it does increment a suffix number on the filename
