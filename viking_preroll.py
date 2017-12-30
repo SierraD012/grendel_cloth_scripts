@@ -301,7 +301,7 @@ startY = mc.getAttr(rigPrefix + '_primary_global_cc_01.translateY')
 startZ = mc.getAttr(rigPrefix + '_primary_global_cc_01.translateZ')
 
 #Clear any unnecessary animation (Be Careful!)
-clearKeys(fullRig, STARTPRE_0, STARTANIM - 1)
+#clearKeys(fullRig, STARTPRE_0, STARTANIM - 1)
 
 #Keyframe Initial Frame
 mc.currentTime(STARTANIM)
