@@ -77,11 +77,7 @@ def clearScale(list):
 	    print ('************ Skipping ' + str(i) + '.scaleX')
 
 	if mc.getAttr(i + '.scaleY', settable=True):
-            mc.setAttr(i + '.scaleY', 1)
-        else:
-	    print ('************ Skipping ' + str(i) + '.scaleY')
-
-	if mc.getAttr(i + '.scaleZ', settable=True):
+            mc.setAttr(i + '.scaleY',reload(alembic_exporter)able=True):
 
             mc.setAttr(i + '.scaleZ', 1)
         else:
@@ -261,7 +257,7 @@ def keyArmFK():
 
     rightArmFK = rigPrefix + 'Beowulf_RGT_arm_settings_cc_01.FK_IK'
 
-    mc.setAttr(rigPrefix+'Beowulf_RGT_arm_settings_cc_01.FK_IK', 0)
+    mc.setAttr(rightArmFK, 0)
 
     if (mc.getAttr(rightArmFK, keyable=True) or (mc.getAttr(rightArmFK, channelBox=True))):
         mc.setKeyframe(rightArmFK);
@@ -391,6 +387,10 @@ mc.currentTime(STARTANIM)
 fullRig = selectRig()
 setRigKey(fullRig)
 
+#KEY ARM FK.IK here so it will be at STARTANIM in the mode it's supposed to be - this may not be necessary very often
+#mc.setKeyframe(rigPrefix + '_LFT_arm_settings_cc_01.FK_IK');
+#mc.setKeyframe(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK');
+
 #Set T-Pose (Clear Transformations)
 mc.currentTime(STARTPRE)
 mc.playbackOptions(minTime=STARTPRE)
@@ -426,7 +426,7 @@ import alembic_tagger;
 alembic_tagger.go()
 #Export alembic of just Beowulf's geo
 import alembic_exporter
-alembic_exporter.go()
+alembic_exporter.go() #cfx=true  - puts abc in the cfx file instead
 
 #Export alembic of just the cape chain - might need do this manually because the ABC Exporter doesn't know how to find the tag on this one since it's not a reference
 #AbcExport -j "-frameRange -30 120 -step 0.25 -dataFormat ogawa -root |beowulf_cape_model_main_beowulf_capeChain_combined -file /groups/grendel/production/shots/b023/anim/main/cache/beowulf_capeChain.abc";
