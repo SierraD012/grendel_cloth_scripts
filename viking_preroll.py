@@ -152,13 +152,19 @@ def selectRig():
     rigPrefix + '_LFT_FK_wrist_cc_01',
     rigPrefix + '_LFT_FK_lower_arm_cc_01',
     rigPrefix + '_LFT_FK_upper_arm_cc_01',
+    rigPrefix + '_LFT_upper_arm_bendy_cc_01',          #NEW
+    rigPrefix + '_LFT_elbow_bendy_cc_01',              #NEW
+    rigPrefix + '_LFT_lower_arm_bendy_cc_01',          #NEW
     rigPrefix + '_RGT_arm_settings_cc_01',	#Right
     rigPrefix + '_RGT_IK_arm_cc_01',
     rigPrefix + '_RGT_arm_pole_vector_cc_01',
     rigPrefix + '_RGT_clavicle_cc_01',
     rigPrefix + '_RGT_FK_wrist_cc_01',
     rigPrefix + '_RGT_FK_lower_arm_cc_01',
-    rigPrefix + '_RGT_FK_upper_arm_cc_01']
+    rigPrefix + '_RGT_FK_upper_arm_cc_01',
+    rigPrefix + '_RGT_upper_arm_bendy_cc_01',          #NEW
+    rigPrefix + '_RGT_elbow_bendy_cc_01',              #NEW
+    rigPrefix + '_RGT_lower_arm_bendy_cc_01']
 
     viking_hands = [
     #Note: Viking has no ring finger
@@ -216,10 +222,11 @@ def selectRig():
     rigPrefix + '_RGT_big_toe_primary_cc_01',
     rigPrefix + '_RGT_foot_ball_cc_01']
 
-    fullRig = viking_main + viking_head + viking_mouth + viking_neck + viking_torso + viking_arms + viking_hands + viking_hips + viking_legs_feet
+    #viking_main +
+    fullRig = viking_head + viking_mouth + viking_neck + viking_torso + viking_arms + viking_hands + viking_hips + viking_legs_feet
 
     #Create Selection from 'fullRig'
-    mc.select(viking_hands, replace=True)
+    mc.select(fullRig, replace=True)
     return fullRig
 
 
@@ -305,6 +312,10 @@ startZ = mc.getAttr(rigPrefix + '_primary_global_cc_01.translateZ')
 
 #Keyframe Initial Frame
 mc.currentTime(STARTANIM)
+#KEY ARM FK.IK here so it will be at STARTANIM in the mode it's supposed to be (NEW)
+mc.setKeyframe(rigPrefix + '_LFT_arm_settings_cc_01.FK_IK');
+mc.setKeyframe(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK');
+
 setRigKey(fullRig)
 
 #Get some frames at start pose
@@ -314,7 +325,7 @@ setRigKey(fullRig)
 #Clear Transformations
 mc.currentTime(STARTPRE_0)
 selectRig()
-keyArmFK()
+keyArmFK() #this forces it to be in FK mode - could cause an issue if it wasn't originally in that mode
 
 clearRotate(fullRig)
 clearTranslate(fullRig)
