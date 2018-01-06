@@ -31,7 +31,7 @@ rigPrefix = prefix1
 
 #Clears Rotation on a List of Objects
 def clearRotate(list):
-    print '>>ClearRotate() starting'
+    print ('>>ClearRotate() starting')
     for i in list:
         if mc.getAttr(i + '.rotateX', settable=True):
             mc.setAttr(i + '.rotateX', 0)
@@ -50,7 +50,7 @@ def clearRotate(list):
 
 #Clears Translation on a List of Objects
 def clearTranslate(list):
-    print ">>ClearTranslate() starting"
+    print (">>ClearTranslate() starting")
     for i in list:
         if mc.getAttr(i + '.translateX', settable=True):
             mc.setAttr(i + '.translateX', 0)
@@ -69,7 +69,7 @@ def clearTranslate(list):
 
 #Clears Scale on a List of Objects
 def clearScale(list):
-    print ">>ClearScale() starting"
+    print (">>ClearScale() starting")
     for i in list:
         if mc.getAttr(i + '.scaleX', settable=True):
             mc.setAttr(i + '.scaleX', 1)
@@ -91,7 +91,7 @@ def clearScale(list):
 
 #Selects/Returns Full Rig
 def selectRig():
-    print ">>SelectRig() starting"
+    print (">>SelectRig() starting")
 
     viking_main = [
     rigPrefix + '_main_cc_01',
@@ -152,19 +152,28 @@ def selectRig():
     rigPrefix + '_LFT_FK_wrist_cc_01',
     rigPrefix + '_LFT_FK_lower_arm_cc_01',
     rigPrefix + '_LFT_FK_upper_arm_cc_01',
-    rigPrefix + '_LFT_upper_arm_bendy_cc_01',          #NEW
-    rigPrefix + '_LFT_elbow_bendy_cc_01',              #NEW
-    rigPrefix + '_LFT_lower_arm_bendy_cc_01',          #NEW
     rigPrefix + '_RGT_arm_settings_cc_01',	#Right
     rigPrefix + '_RGT_IK_arm_cc_01',
     rigPrefix + '_RGT_arm_pole_vector_cc_01',
     rigPrefix + '_RGT_clavicle_cc_01',
     rigPrefix + '_RGT_FK_wrist_cc_01',
     rigPrefix + '_RGT_FK_lower_arm_cc_01',
-    rigPrefix + '_RGT_FK_upper_arm_cc_01',
-    rigPrefix + '_RGT_upper_arm_bendy_cc_01',          #NEW
-    rigPrefix + '_RGT_elbow_bendy_cc_01',              #NEW
-    rigPrefix + '_RGT_lower_arm_bendy_cc_01']
+    rigPrefix + '_RGT_FK_upper_arm_cc_01']
+
+    #TEST
+    viking_arm_bendy = [
+    rigPrefix + '_LFT_upper_arm_bendy_cc_01',
+    rigPrefix + '_LFT_elbow_bendy_cc_01',
+    rigPrefix + '_LFT_lower_arm_bendy_cc_01',
+    rigPrefix + '_LFT_wrist_bendy_cc_01',
+    rigPrefix + '_LFT_shoulder_bendy_cc_01',
+    rigPrefix + '_LFT_shoulder_bendy_low_tangent_cc_01',
+    rigPrefix + '_RGT_upper_arm_bendy_cc_01',
+    rigPrefix + '_RGT_elbow_bendy_cc_01',
+    rigPrefix + '_RGT_lower_arm_bendy_cc_01',
+    rigPrefix + '_RGT_wrist_bendy_cc_01',
+    rigPrefix + '_RGT_shoulder_bendy_cc_01',
+    rigPrefix + '_RGT_shoulder_bendy_low_tangent_cc_01']
 
     viking_hands = [
     #Note: Viking has no ring finger
@@ -223,7 +232,7 @@ def selectRig():
     rigPrefix + '_RGT_foot_ball_cc_01']
 
     #viking_main +
-    fullRig = viking_head + viking_mouth + viking_neck + viking_torso + viking_arms + viking_hands + viking_hips + viking_legs_feet
+    fullRig = viking_head + viking_mouth + viking_neck + viking_torso + viking_arms + viking_arm_bendy + viking_hands + viking_hips + viking_legs_feet
 
     #Create Selection from 'fullRig'
     mc.select(fullRig, replace=True)
@@ -231,7 +240,7 @@ def selectRig():
 
 
 def keyArmFK():
-    print ">>KeyArmFK() starting"
+    print (">>KeyArmFK() starting")
     #mc.setAttr('ten_rig_main_l_arm_switch_CTL.IKFK_Switch', 1)
     mc.setAttr(rigPrefix + '_LFT_arm_settings_cc_01.FK_IK', 0)  #FK mode
 
@@ -258,25 +267,25 @@ def fingerNames():
 ]
 
 def scaleFingers():
-    print ">>ScaleFingers() starting"
+    print (">>ScaleFingers() starting")
     for i in fingerNames():
         mc.setAttr(i + '.scaleX', 1)
         mc.setKeyframe(i, at='scaleX')
 
 def keyFingers():
-    print ">>KeyFingers() starting"
+    print (">>KeyFingers() starting")
     for i in fingerNames():
 	mc.setKeyframe(i, at='scaleX')
 
 
 def APose():
-    print ">>APose() starting"
+    print (">>APose() starting")
     mc.rotate(0, 0, -45, rigPrefix + '_LFT_FK_upper_arm_cc_01')
     mc.rotate(0, 0, -45, rigPrefix + '_RGT_FK_upper_arm_cc_01')
 
 
 def setRigKey(fullRig):
-    print ">>SetRigKey() starting"
+    print (">>SetRigKey() starting")
     #Key Translation
     mc.setKeyframe(fullRig, at='translateX')
     mc.setKeyframe(fullRig, at='translateY')
