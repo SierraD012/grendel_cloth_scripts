@@ -12,92 +12,6 @@ from byuam.environment import Department, Environment
 STARTANIM = -0
 STARTPRE = -50
 
-#########################
-## ESTABLISH CFX SCENE ##
-#########################
-
-def generateScene():
-    project = Project()
-    environment = Environment()
-
-    # Create a global position locator for Beowulf's Starting Location
-    mc.currentTime(STARTPRE)
-    globalPos = mc.spaceLocator(p=[0,0,0])
-    globPos = mc.rename(globalPos, "beowulfGlobalPos")
-    mc.select(rigPrefix+"Beowulf_primary_global_cc_01")
-    mc.select(globPos, add=True)
-    mc.pointConstraint(offset=[0,0,0], weight=1) #constrains the globPos position to where Beowulf's rig_main is
-    mc.orientConstraint(offset=[0,0,0], weight=1) #orients the globPos to match Beowulf's rig_main (I think it just does the rotation)
-
-    # Get transformation variables from globPos locator
-    tx = mc.getAttr(globPos+".translateX")
-    ty = mc.getAttr(globPos+".translateY")
-    tz = mc.getAttr(globPos+".translateZ")
-    rx = mc.getAttr(globPos+".rotateX")
-    ry = mc.getAttr(globPos+".rotateY")
-    rz = mc.getAttr(globPos+".rotateZ")
-
-    # get alembic filepath for scene's animation (requires prior export)
-    src = mc.file(q=True, sceneName=True)
-    src_dir = os.path.dirname(src)
-    checkout_element = project.get_checkout_element(src_dir)
-    checkout_body_name = checkout_element.get_parent()
-    body = project.get_body(checkout_body_name)
-    element = body.get_element(Department.ANIM)
-    #cache_name = "beowulf_"+checkout_body_name+"_anim_main" # this is me doing it arbitrarily but I think the preroll script picks its own name
-    cache_name = "beowulf_rig_main"
-    #I'm prettty sure cache_name should always be "beowulf_rig_main" - or whatever the ABCExporter created at the end of the preroll script
-    cache_file = os.path.join(element.get_dir(), "cache", cache_name + ".abc")
-    print("Expecting mesh alembic with name " + cache_name)
-    #we could make a while loop to check if an alembic with this name exists already, if it does increment a suffix number on the filename
-
-    # checkout cfx scene for corresponding shot number
-    current_user = environment.get_current_username()
-    element = body.get_element(Department.CFX)
-    cfx_filepath = element.checkout(current_user)
-    print(">GenScene(): cfx_filepath= " + cfx_filepath) # see where it's expecting the file to be/what it's called
-    print(">GenScene(): cache_file= " + cache_file) # this is where ABCimporter expects the character geo abc to be
-
-
-    #open cfx file
-    if cfx_filepath is not None:
-        if not mc.file(q=True, sceneName=True) == '': #I think this means if we already have the CFX scene open just save it...
-            mc.file(save=True, force=True) #save file
-
-        if not os.path.exists(cfx_filepath): #make a new CFX scene file
-            print(">GenScene(): CFX scene doesn't exist yet. Creating a new one")
-            mc.file(new=True, force=True)
-            mc.file(rename=cfx_filepath)
-            mc.file(save=True, force=True)
-        else:
-            print(">GenScene(): found existing CFX scene. Opening")
-            mc.file(cfx_filepath, open=True, force=True)
-
-    mc.currentTime(STARTPRE)
-    # import alembic for Beowulf's mesh
-    command = "AbcImport -mode import \"" + cache_file + "\""
-    maya.mel.eval(command)
-
-    #### PULL IN REFERENCE OBJECTS ####
-    getReferenceObjects()
-
-    # Set full cape group transforms to match Beowulf's alembic
-    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateX", tx)
-    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateY", ty)
-    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateZ", tz)
-    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.rotateX", rx)
-    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.rotateY", ry)
-    mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.rotateZ", rz)
-
-    #Set collisionMesh transforms to match Beowulf's alembic
-    mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.translateX", tx)
-    mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.translateY", ty)
-    mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.translateZ", tz)
-    mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.rotateX", rx)
-    mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.rotateY", ry)
-    mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.rotateZ", rz)
-
-
 def getReferenceObjects():
     #Reference Beowulf's CollisionMesh
     body = project.get_body("beowulf_collision_mesh_cloth")
@@ -116,6 +30,91 @@ def getReferenceObjects():
     command = "AbcImport -mode import \"" + beowulf_capeChain_abc + "\""
     maya.mel.eval(command)
 
+#########################
+## ESTABLISH CFX SCENE ##
+#########################
+
+#def generateScene():
+project = Project()
+environment = Environment()
+
+# Create a global position locator for Beowulf's Starting Location
+mc.currentTime(STARTPRE)
+globalPos = mc.spaceLocator(p=[0,0,0])
+globPos = mc.rename(globalPos, "beowulfGlobalPos")
+mc.select(rigPrefix+"Beowulf_primary_global_cc_01")
+mc.select(globPos, add=True)
+mc.pointConstraint(offset=[0,0,0], weight=1) #constrains the globPos position to where Beowulf's rig_main is
+mc.orientConstraint(offset=[0,0,0], weight=1) #orients the globPos to match Beowulf's rig_main (I think it just does the rotation)
+
+# Get transformation variables from globPos locator
+tx = mc.getAttr(globPos+".translateX")
+ty = mc.getAttr(globPos+".translateY")
+tz = mc.getAttr(globPos+".translateZ")
+rx = mc.getAttr(globPos+".rotateX")
+ry = mc.getAttr(globPos+".rotateY")
+rz = mc.getAttr(globPos+".rotateZ")
+
+# get alembic filepath for scene's animation (requires prior export)
+src = mc.file(q=True, sceneName=True)
+src_dir = os.path.dirname(src)
+checkout_element = project.get_checkout_element(src_dir)
+checkout_body_name = checkout_element.get_parent()
+body = project.get_body(checkout_body_name)
+element = body.get_element(Department.ANIM)
+#cache_name = "beowulf_"+checkout_body_name+"_anim_main" # this is me doing it arbitrarily but I think the preroll script picks its own name
+cache_name = "beowulf_rig_main"
+#I'm prettty sure cache_name should always be "beowulf_rig_main" - or whatever the ABCExporter created at the end of the preroll script
+cache_file = os.path.join(element.get_dir(), "cache", cache_name + ".abc")
+print("Expecting mesh alembic with name: " + cache_name)
+#we could make a while loop to check if an alembic with this name exists already, if it does increment a suffix number on the filename
+
+# checkout cfx scene for corresponding shot number
+current_user = environment.get_current_username()
+element = body.get_element(Department.CFX)
+cfx_filepath = element.checkout(current_user)
+print(">GenScene(): cfx_filepath= " + cfx_filepath) # see where it's expecting the file to be/what it's called
+print(">GenScene(): cache_file= " + cache_file) # this is where ABCimporter expects the character geo abc to be
+
+
+#open cfx file
+if cfx_filepath is not None:
+    if not mc.file(q=True, sceneName=True) == '': #I think this means if we already have the CFX scene open just save it...
+        mc.file(save=True, force=True) #save file
+
+    if not os.path.exists(cfx_filepath): #make a new CFX scene file
+        print(">GenScene(): CFX scene doesn't exist yet. Creating a new one")
+        mc.file(new=True, force=True)
+        mc.file(rename=cfx_filepath)
+        mc.file(save=True, force=True)
+    else:
+        print(">GenScene(): found existing CFX scene. Opening")
+        mc.file(cfx_filepath, open=True, force=True)
+
+mc.currentTime(STARTPRE)
+# import alembic for Beowulf's mesh
+command = "AbcImport -mode import \"" + cache_file + "\""
+maya.mel.eval(command)
+
+#### PULL IN REFERENCE OBJECTS ####
+getReferenceObjects()
+
+# Set full cape group transforms to match Beowulf's alembic
+mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateX", tx)
+mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateY", ty)
+mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.translateZ", tz)
+mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.rotateX", rx)
+mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.rotateY", ry)
+mc.setAttr("beowulf_cape_model_main_Beowulf_Cape.rotateZ", rz)
+
+#Set collisionMesh transforms to match Beowulf's alembic
+mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.translateX", tx)
+mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.translateY", ty)
+mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.translateZ", tz)
+mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.rotateX", rx)
+mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.rotateY", ry)
+mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.rotateZ", rz)
+
 
 #######################
 ##       MAIN        ##
@@ -124,7 +123,7 @@ def getReferenceObjects():
 global rigPrefix
 rigPrefix = "beowulf_rig_main_"  #concatenate this with every other control name
 
-generateScene()
+#generateScene()
 
 #######################
 ## Set Up Simulation ##
@@ -182,7 +181,7 @@ for i in cape_front_verts:
     mc.select('beowulf_cape_model_main_beowulf_cape_simMesh.vtx' + i, add=True)
 mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth', add=True)
 mel.eval('createNConstraint pointToSurface 0;')
-mel.eval('setAttr "dynamicConstraintShape2.strengthDropoff[1].strengthDropoff_Position" 1;')
+mel.eval('setAttr "dynamicConstraintShape2.strengthDropoff[1].strengthDropoff_Position" 1;') #TODO: Try making dropoff smaller to see if that reduces how it sticks up
 mel.eval('setAttr "dynamicConstraintShape2.strengthDropoff[1].strengthDropoff_FloatValue" 0;')
 
 
@@ -221,7 +220,8 @@ mc.select('beowulf_cape_model_main_beowulf_cape_beautyMesh', replace=True)
 mc.select('beowulf_cape_model_main_beowulf_cape_simMesh', add=True)
 mc.CreateWrap()
 
-
+#######################
+#TODO: put this part in a fn called "cleanup"
 #Rename/Group Simulation Objects
 mc.rename('nucleus1', 'nucleus_beowulf')
 mc.rename('nRigid1', 'nRigid_beowulf_body')
@@ -238,6 +238,14 @@ mc.hide('beowulf_cape_model_main_beowulf_cape_simMesh')
 mc.hide('beowulf_cape_model_main_beowulf_cape_clasps') #the chain/clasps are taken care of in the other script
 mc.hide('beowulf_cape_model_main_beowulf_cape_clasp_chain')
 mc.hide('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth')
+
+#Put stuff in layers:
+# select -r beowulf_rig_main_Beowulf_geo_GRP_01 ;
+# select -a beowulf_cape_model_main_beowulf_capeChain_combined ;
+# createDisplayLayer -name "Beowulf_geo" -number 1 -nr;
+# select -add beowulf_cape_model_main_Beowulf_Cape ;
+# createDisplayLayer -name "Beowulf_cape_sim" -number 1 -nr;
+#######################
 
 #Tag cape object for export
 mc.select("beowulf_cape_model_main_beowulf_cape_beautyMesh", replace = True)

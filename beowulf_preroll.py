@@ -54,17 +54,17 @@ def clearTranslate(list):
         if mc.getAttr(i + '.translateX', settable=True):
             mc.setAttr(i + '.translateX', 0)
         else:
-	    print ('************ Skipping ' + str(i) + '.translateX')
+            print ('************ Skipping ' + str(i) + '.translateX')
 
-	if mc.getAttr(i + '.translateY', settable=True):
+        if mc.getAttr(i + '.translateY', settable=True):
             mc.setAttr(i + '.translateY', 0)
         else:
-	    print ('************ Skipping ' + str(i) + '.translateY')
+            print ('************ Skipping ' + str(i) + '.translateY')
 
-	if mc.getAttr(i + '.translateZ', settable=True):
+        if mc.getAttr(i + '.translateZ', settable=True):
             mc.setAttr(i + '.translateZ', 0)
         else:
-	    print ('************ Skipping ' + str(i) + '.translateZ')
+	       print ('************ Skipping ' + str(i) + '.translateZ')
 
 #Clears Scale on a List of Objects
 def clearScale(list):
@@ -72,16 +72,18 @@ def clearScale(list):
     for i in list:
         if mc.getAttr(i + '.scaleX', settable=True):
             mc.setAttr(i + '.scaleX', 1)
-
         else:
-	    print ('************ Skipping ' + str(i) + '.scaleX')
+            print ('************ Skipping ' + str(i) + '.scaleX')
 
-	if mc.getAttr(i + '.scaleY', settable=True):
-            mc.setAttr(i + '.scaleY',reload(alembic_exporter)able=True):
+        if mc.getAttr(i + '.scaleY', settable=True):
+            mc.setAttr(i + '.scaleY', 1)
+        else:
+            print ('************ Skipping ' + str(i) + '.scaleY')
 
+        if mc.getAttr(i + '.scaleZ', settable=True):
             mc.setAttr(i + '.scaleZ', 1)
         else:
-	    print ('************ Skipping ' + str(i) + '.scaleZ')
+            print ('************ Skipping ' + str(i) + '.scaleZ')
 
 
 #Selects/Returns Full Rig
@@ -426,7 +428,7 @@ import alembic_tagger;
 alembic_tagger.go()
 #Export alembic of just Beowulf's geo
 import alembic_exporter
-alembic_exporter.go() #cfx=true  - puts abc in the cfx file instead
+alembic_exporter.go(cfx=True) # puts abc in the cfx file instead
 
 #Export alembic of just the cape chain - might need do this manually because the ABC Exporter doesn't know how to find the tag on this one since it's not a reference
 #AbcExport -j "-frameRange -30 120 -step 0.25 -dataFormat ogawa -root |beowulf_cape_model_main_beowulf_capeChain_combined -file /groups/grendel/production/shots/b023/anim/main/cache/beowulf_capeChain.abc";
