@@ -12,7 +12,7 @@ from byuam.project import Project
 from byuam.environment import Department, Environment
 
 STARTANIM = -5
-STARTPRE = -30
+STARTPRE = -50
 
 
 ############################
@@ -390,8 +390,8 @@ fullRig = selectRig()
 setRigKey(fullRig)
 
 #KEY ARM FK.IK here so it will be at STARTANIM in the mode it's supposed to be - this may not be necessary very often
-#mc.setKeyframe(rigPrefix + '_LFT_arm_settings_cc_01.FK_IK');
-#mc.setKeyframe(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK');
+mc.setKeyframe(rigPrefix + 'Beowulf_LFT_arm_settings_cc_01.FK_IK');
+mc.setKeyframe(rigPrefix + 'Beowulf_RGT_arm_settings_cc_01.FK_IK');
 
 #Set T-Pose (Clear Transformations)
 mc.currentTime(STARTPRE)
@@ -432,4 +432,5 @@ alembic_exporter.go(cfx=True) # puts abc in the cfx file instead
 
 #Export alembic of just the cape chain - might need do this manually because the ABC Exporter doesn't know how to find the tag on this one since it's not a reference
 #AbcExport -j "-frameRange -30 120 -step 0.25 -dataFormat ogawa -root |beowulf_cape_model_main_beowulf_capeChain_combined -file /groups/grendel/production/shots/b023/anim/main/cache/beowulf_capeChain.abc";
-#EXPORT IT WITH THIS NAME: beowulf_cape_chain_main.abc
+#EXPORT TO CFX FOLDER WITH THIS NAME: beowulf_cape_chain_main.abc
+#Now you should probably publish this shot too 

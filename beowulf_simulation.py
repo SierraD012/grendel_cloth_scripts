@@ -9,7 +9,7 @@ import maya.cmds as mc
 from byuam.project import Project
 from byuam.environment import Department, Environment
 
-STARTANIM = -0
+STARTANIM = -5
 STARTPRE = -50
 
 def getReferenceObjects():
@@ -29,6 +29,34 @@ def getReferenceObjects():
     beowulf_capeChain_abc = "beowulf_cape_chain_main.abc"
     command = "AbcImport -mode import \"" + beowulf_capeChain_abc + "\""
     maya.mel.eval(command)
+
+# Renames simulation objects and puts them in named layers for better organization
+def cleanupLayers():
+    #Rename/Group Simulation Objects
+    mc.rename('nucleus1', 'nucleus_beowulf')
+    mc.rename('nRigid1', 'nRigid_beowulf_body')
+    mc.rename('nCloth1', 'nCloth_beowulf_cape')
+
+    mc.rename('dynamicConstraint1','constraint_cape_neckline')
+    mc.rename('dynamicConstraint2','constraint_cape_front')
+    mc.group('constraint_cape_neckline', 'constraint_cape_front', name='beowulf_capeConstraints')
+
+    mc.group('nucleus_beowulf', 'nRigid_beowulf_body', 'nCloth_beowulf_cape', 'beowulf_capeConstraints', name='beowulf_cape_simulation')
+
+    #Hide Unnescessary Objects
+    mc.hide('beowulf_cape_model_main_beowulf_cape_simMesh')
+    mc.hide('beowulf_cape_model_main_beowulf_cape_clasps') #the chain/clasps are taken care of in the other script
+    mc.hide('beowulf_cape_model_main_beowulf_cape_clasp_chain')
+    mc.hide('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth')
+
+    #Put stuff in layers:
+    mc.select('beowulf_rig_main_Beowulf_geo_GRP_01', replace=True)
+    mc.select('beowulf_cape_model_main_beowulf_capeChain_combined', add=True)
+    mc.createDisplayLayer(name="Beowulf_geo") #TEST: this should create the layer using the stuff we just selected
+    mc.select('beowulf_cape_model_main_Beowulf_Cape', replace=True)
+    mc.select('beowulf_cape_simulation', add=True)
+    mc.createDisplayLayer(name="Beowulf_cape_sim") #TEST: this should create the layer using the stuff we just selected
+
 
 #########################
 ## ESTABLISH CFX SCENE ##
@@ -172,6 +200,7 @@ mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth'
 mel.eval('createNConstraint pointToSurface 0;')
 mel.eval('setAttr "dynamicConstraintShape1.strengthDropoff[1].strengthDropoff_Position" 1;')
 mel.eval('setAttr "dynamicConstraintShape1.strengthDropoff[1].strengthDropoff_FloatValue" 0;')
+mel.eval('setAttr "dynamicConstraintShape1.constraintMethod" 2;') #TEST: set constraint method to RubberBand - this might help with the stiffness
 
 #Front Constraints
 mc.select(clear=True)
@@ -181,8 +210,9 @@ for i in cape_front_verts:
     mc.select('beowulf_cape_model_main_beowulf_cape_simMesh.vtx' + i, add=True)
 mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth', add=True)
 mel.eval('createNConstraint pointToSurface 0;')
-mel.eval('setAttr "dynamicConstraintShape2.strengthDropoff[1].strengthDropoff_Position" 1;') #TODO: Try making dropoff smaller to see if that reduces how it sticks up
+mel.eval('setAttr "dynamicConstraintShape2.strengthDropoff[1].strengthDropoff_Position" 1;')
 mel.eval('setAttr "dynamicConstraintShape2.strengthDropoff[1].strengthDropoff_FloatValue" 0;')
+mel.eval('setAttr "dynamicConstraintShape2.constraintMethod" 2;') #TEST: set constraint method to RubberBand - this might help with the stiffness
 
 
 #Set Nucleus Parameters
@@ -220,34 +250,11 @@ mc.select('beowulf_cape_model_main_beowulf_cape_beautyMesh', replace=True)
 mc.select('beowulf_cape_model_main_beowulf_cape_simMesh', add=True)
 mc.CreateWrap()
 
-#######################
-#TODO: put this part in a fn called "cleanup"
-#Rename/Group Simulation Objects
-mc.rename('nucleus1', 'nucleus_beowulf')
-mc.rename('nRigid1', 'nRigid_beowulf_body')
-mc.rename('nCloth1', 'nCloth_beowulf_cape')
-
-mc.rename('dynamicConstraint1','constraint_cape_neckline')
-mc.rename('dynamicConstraint2','constraint_cape_front')
-mc.group('constraint_cape_neckline', 'constraint_cape_front', name='beowulf_capeConstraints')
-
-mc.group('nucleus_beowulf', 'nRigid_beowulf_body', 'nCloth_beowulf_cape', 'beowulf_capeConstraints', name='beowulf_cape_simulation')
-
-#Hide Unnescessary Objects
-mc.hide('beowulf_cape_model_main_beowulf_cape_simMesh')
-mc.hide('beowulf_cape_model_main_beowulf_cape_clasps') #the chain/clasps are taken care of in the other script
-mc.hide('beowulf_cape_model_main_beowulf_cape_clasp_chain')
-mc.hide('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth')
-
-#Put stuff in layers:
-# select -r beowulf_rig_main_Beowulf_geo_GRP_01 ;
-# select -a beowulf_cape_model_main_beowulf_capeChain_combined ;
-# createDisplayLayer -name "Beowulf_geo" -number 1 -nr;
-# select -add beowulf_cape_model_main_Beowulf_Cape ;
-# createDisplayLayer -name "Beowulf_cape_sim" -number 1 -nr;
-#######################
+cleanupLayers()
 
 #Tag cape object for export
 mc.select("beowulf_cape_model_main_beowulf_cape_beautyMesh", replace = True)
 import alembic_tagger;
 alembic_tagger.go()
+
+#NOTE: if you export the cape alembic manually, make sure you select the top level of the cape hierarchy (NOT just beautyMesh or something), or else the cape may not export in world space and will show up in the wrong spot when you import it to Houdini!
