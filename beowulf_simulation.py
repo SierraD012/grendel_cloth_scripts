@@ -25,7 +25,7 @@ def getReferenceObjects():
     cape_sim_file = element.get_app_filepath()
     mc.file(cape_sim_file, reference=True)
 
-    # also import the cape chain alembic too
+    # import the cape chain alembic too
     beowulf_capeChain_abc = "beowulf_cape_chain_main.abc"
     command = "AbcImport -mode import \"" + beowulf_capeChain_abc + "\""
     maya.mel.eval(command)
@@ -242,7 +242,6 @@ mc.CreateWrap()
 
 #From Brennan: Do your best to only have one thing wrapping per sim - they are slow to calculate
 # if you need to adjust the collision mesh for a weird cloth thing, you can duplicate the collisionmesh, adjust the shape/add more or whatever, then make it a blend shape to the original collision mesh. Blend shapes DO require the same exact # of polygons but they're also a lot faster than regular wraps.
-#mc.setAttr('wrap1.exclusiveBind', 0) #it looks like this is the default
 
 
 # Wrap Cape Beauty Mesh to Sim Mesh
@@ -250,7 +249,7 @@ mc.select('beowulf_cape_model_main_beowulf_cape_beautyMesh', replace=True)
 mc.select('beowulf_cape_model_main_beowulf_cape_simMesh', add=True)
 mc.CreateWrap()
 
-cleanupLayers()
+#cleanupLayers()  #this is causing problems with the wraps
 
 #Tag cape object for export
 mc.select("beowulf_cape_model_main_beowulf_cape_beautyMesh", replace = True)
@@ -258,3 +257,4 @@ import alembic_tagger;
 alembic_tagger.go()
 
 #NOTE: if you export the cape alembic manually, make sure you select the top level of the cape hierarchy (NOT just beautyMesh or something), or else the cape may not export in world space and will show up in the wrong spot when you import it to Houdini!
+# export cape beauty mesh as beowulf_cape_model_main.abc to the cfx folder

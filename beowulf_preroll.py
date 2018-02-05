@@ -1,6 +1,4 @@
 #Authors: Daniel Fuller, Brennan Mitchell,
-### contact this guy: Trevor Barrus
-# run this one BEFORE the sim script
 
 import os
 
@@ -433,4 +431,4 @@ alembic_exporter.go(cfx=True) # puts abc in the cfx file instead
 #Export alembic of just the cape chain - might need do this manually because the ABC Exporter doesn't know how to find the tag on this one since it's not a reference
 #AbcExport -j "-frameRange -30 120 -step 0.25 -dataFormat ogawa -root |beowulf_cape_model_main_beowulf_capeChain_combined -file /groups/grendel/production/shots/b023/anim/main/cache/beowulf_capeChain.abc";
 #EXPORT TO CFX FOLDER WITH THIS NAME: beowulf_cape_chain_main.abc
-#Now you should probably publish this shot too 
+#Now you should probably publish this shot too
