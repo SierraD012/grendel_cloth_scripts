@@ -14,11 +14,13 @@ STARTPRE = -50
 
 vikingBodyGeo0 = 'viking_rig_main_Viking_body_GEO_01'
 vikingBodyGeo1 = 'Viking_body_GEO_01'
-vikingBodyGeo = vikingBodyGeo1
+vikingBodyGeo2 = 'viking_with_facial_rig_main_Viking_body_GEO_01'
+vikingBodyGeo = vikingBodyGeo2
 
 vikingRigName0 = "viking_rig_main_Viking_primary_global_cc_01"
 vikingRigName1 = "viking_with_facial_rig_main_mb29866846:Viking_primary_global_cc_01"
-vikingRigName = vikingRigName0
+vikingRigName2 = "viking_with_facial_rig_main_Viking_primary_global_cc_01"
+vikingRigName = vikingRigName2
 
 cache_name0 = "viking_with_facial_rig_main"
 cache_name1 = "viking_with_facial_rig_main4"

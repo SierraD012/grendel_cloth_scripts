@@ -1,257 +1,361 @@
 # Authors: Brennan Mitchell, Sierra Davis, Ben Romney
+# contact this guy: Ben Romney
+# run this one BEFORE the sim script
+
 import os
 
 import maya
-import maya.mel as mel
-import pymel.core as pc
+import maya.mel as mel #Allows for evaluation of MEL
 import maya.cmds as mc
 
 from byuam.project import Project
 from byuam.environment import Department, Environment
 
 STARTANIM = 1
-STARTPRE = -50
+STARTPRE = -25
+STARTPRE_0 = -50
 
-vikingBodyGeo0 = 'viking_rig_main_Viking_body_GEO_01'
-vikingBodyGeo1 = 'Viking_body_GEO_01'
-vikingBodyGeo2 = 'viking_with_facial_rig_main_Viking_body_GEO_01'
-vikingBodyGeo = vikingBodyGeo2
+# Rig Pefix:
+prefix0 = 'viking_rig_main_Viking'
+prefix1 = 'viking_with_facial_rig_main_Viking'
+prefix2 = 'viking_with_facial_rig_main_mb29866846:Viking'
 
-vikingRigName0 = "viking_rig_main_Viking_primary_global_cc_01"
-vikingRigName1 = "viking_with_facial_rig_main_mb29866846:Viking_primary_global_cc_01"
-vikingRigName2 = "viking_with_facial_rig_main_Viking_primary_global_cc_01"
-vikingRigName = vikingRigName2
+rigPrefix = prefix1
 
-cache_name0 = "viking_with_facial_rig_main"
-cache_name1 = "viking_with_facial_rig_main4"
-cache_name = cache_name0 # look in shots cfx/main/cache
 
-#########################
-## ESTABLISH CFX SCENE ##
-#########################
+############################
+# PRE-ROLL VIKING ANIMATION
+# this version has each rig control name with the prefix "viking_rig_main_"
+# because the layout scenes have that (the rig file doesn't)
+############################
 
-project = Project()
-environment = Environment()
+#Clears Rotation on a List of Objects
+def clearRotate(list):
+    print ('>>ClearRotate() starting')
+    for i in list:
+        if mc.getAttr(i + '.rotateX', settable=True):
+            mc.setAttr(i + '.rotateX', 0)
+        else:
+            print '************ Skipping ' + str(i) + '.rotateX'
 
-# Create a global position locator for viking's starting location
+        if mc.getAttr(i + '.rotateY', settable=True):
+            mc.setAttr(i + '.rotateY', 0)
+        else:
+            print '************ Skipping ' + str(i) + '.rotateY'
+
+        if mc.getAttr(i + '.rotateZ', settable=True):
+            mc.setAttr(i + '.rotateZ', 0)
+        else:
+            print '************ Skipping ' + str(i) + '.rotateZ'
+
+#Clears Translation on a List of Objects
+def clearTranslate(list):
+    print (">>ClearTranslate() starting")
+    for i in list:
+        if mc.getAttr(i + '.translateX', settable=True):
+            mc.setAttr(i + '.translateX', 0)
+        else:
+	    print '************ Skipping ' + str(i) + '.translateX'
+
+	if mc.getAttr(i + '.translateY', settable=True):
+            mc.setAttr(i + '.translateY', 0)
+        else:
+	    print '************ Skipping ' + str(i) + '.translateY'
+
+	if mc.getAttr(i + '.translateZ', settable=True):
+            mc.setAttr(i + '.translateZ', 0)
+        else:
+	    print '************ Skipping ' + str(i) + '.translateZ'
+
+#Clears Scale on a List of Objects
+def clearScale(list):
+    print (">>ClearScale() starting")
+    for i in list:
+        if mc.getAttr(i + '.scaleX', settable=True):
+            mc.setAttr(i + '.scaleX', 1)
+
+        else:
+	    print '************ Skipping ' + str(i) + '.scaleX'
+
+	if mc.getAttr(i + '.scaleY', settable=True):
+            mc.setAttr(i + '.scaleY', 1)
+        else:
+	    print '************ Skipping ' + str(i) + '.scaleY'
+
+	if mc.getAttr(i + '.scaleZ', settable=True):
+
+            mc.setAttr(i + '.scaleZ', 1)
+        else:
+	    print '************ Skipping ' + str(i) + '.scaleZ'
+
+
+#Selects/Returns Full Rig
+def selectRig():
+    print (">>SelectRig() starting")
+
+    viking_main = [
+    rigPrefix + '_main_cc_01',
+    rigPrefix + '_secondary_global_cc_01',
+    rigPrefix + '_primary_global_cc_01']
+
+    viking_head = [
+    rigPrefix + '_head_cc_01',
+    rigPrefix + '_jaw_cc_01',
+    rigPrefix + '_head_settings_cc_01']
+
+    viking_eyes = [
+    rigPrefix + '_LFT_eye_rotate_cc_01', 	#Left
+    rigPrefix + '_LFT_LOW_eyelid_cc_01',
+    rigPrefix + '_LFT_UPP_eyelid_cc_01',
+    rigPrefix + '_LFT_OUT_eyebrow_cc_01',
+    rigPrefix + '_LFT_MID_eyebrow_cc_01',
+    rigPrefix + '_LFT_INN_eyebrow_cc_01',
+    rigPrefix + '_LFT_MAIN_eyebrow_cc_01',
+    rigPrefix + '_RGT_eye_rotate_cc_01',		#Right
+    rigPrefix + '_RGT_LOW_eyelid_cc_01',
+    rigPrefix + '_RGT_UPP_eyelid_cc_01',
+    rigPrefix + '_RGT_OUT_eyebrow_cc_01',
+    rigPrefix + '_RGT_MID_eyebrow_cc_01',
+    rigPrefix + '_RGT_INN_eyebrow_cc_01',
+    rigPrefix + '_RGT_MAIN_eyebrow_cc_01',
+    rigPrefix + '_LFT_eye_aim_cc_01',
+    rigPrefix + '_RGT_eye_aim_cc_01',
+    rigPrefix + '_both_eyes_aim_cc_01']
+
+    viking_mouth = [
+    rigPrefix + '_tongue_tip_cc_01',
+    rigPrefix + '_tongue_middle_cc_01',
+    rigPrefix + '_tongue_root_cc_01',
+    rigPrefix + '_LOW_teeth_cc_01',
+    rigPrefix + '_UPP_teeth_cc_01']
+
+    viking_neck = [
+    rigPrefix + '_UPP_neck_cc_01',
+    rigPrefix + '_MID_neck_cc_01',
+    rigPrefix + '_LOW_neck_cc_01',
+    rigPrefix + '_neck_base_cc_01',
+    rigPrefix + '_neck_settings_cc_01']
+
+    viking_torso = [
+    rigPrefix + '_spine_settings_cc_01',
+    rigPrefix + '_chest_cc_01',
+    rigPrefix + '_UPP_belly_cc_01',
+    rigPrefix + '_MID_belly_cc_01',
+    rigPrefix + '_LOW_belly_cc_01',
+    rigPrefix + '_COG_cc_01']
+
+    viking_arms = [
+    rigPrefix + '_LFT_arm_settings_cc_01',	#Left
+    rigPrefix + '_LFT_IK_arm_cc_01',
+    rigPrefix + '_LFT_arm_pole_vector_cc_01',
+    rigPrefix + '_LFT_clavicle_cc_01',
+    rigPrefix + '_LFT_FK_wrist_cc_01',
+    rigPrefix + '_LFT_FK_lower_arm_cc_01',
+    rigPrefix + '_LFT_FK_upper_arm_cc_01',
+    rigPrefix + '_RGT_arm_settings_cc_01',	#Right
+    rigPrefix + '_RGT_IK_arm_cc_01',
+    rigPrefix + '_RGT_arm_pole_vector_cc_01',
+    rigPrefix + '_RGT_clavicle_cc_01',
+    rigPrefix + '_RGT_FK_wrist_cc_01',
+    rigPrefix + '_RGT_FK_lower_arm_cc_01',
+    rigPrefix + '_RGT_FK_upper_arm_cc_01']
+
+    #TEST
+    viking_arm_bendy = [
+    rigPrefix + '_LFT_upper_arm_bendy_cc_01',
+    rigPrefix + '_LFT_elbow_bendy_cc_01',
+    rigPrefix + '_LFT_lower_arm_bendy_cc_01',
+    rigPrefix + '_LFT_wrist_bendy_cc_01',
+    rigPrefix + '_LFT_shoulder_bendy_cc_01',
+    rigPrefix + '_LFT_shoulder_bendy_low_tangent_cc_01',
+    rigPrefix + '_RGT_upper_arm_bendy_cc_01',
+    rigPrefix + '_RGT_elbow_bendy_cc_01',
+    rigPrefix + '_RGT_lower_arm_bendy_cc_01',
+    rigPrefix + '_RGT_wrist_bendy_cc_01',
+    rigPrefix + '_RGT_shoulder_bendy_cc_01',
+    rigPrefix + '_RGT_shoulder_bendy_low_tangent_cc_01']
+
+    viking_hands = [
+    #Note: Viking has no ring finger
+    rigPrefix + '_LFT_hand_cupping_splaying_cc_01',     #Left
+    rigPrefix + '_LFT_thumb_primary_cc_01',
+    rigPrefix + '_LFT_thumb_DIS_secondary_cc_01',
+    rigPrefix + '_LFT_index_finger_primary_cc_01',
+    rigPrefix + '_LFT_index_finger_DIS_secondary_cc_01',
+    rigPrefix + '_LFT_index_metacarpal_secondary_cc_01',
+    rigPrefix + '_LFT_middle_finger_DIS_secondary_cc_01',
+    rigPrefix + '_LFT_middle_finger_primary_cc_01',
+    rigPrefix + '_LFT_middle_metacarpal_secondary_cc_01',
+    rigPrefix + '_LFT_pinky_finger_DIS_secondary_cc_01',
+    rigPrefix + '_LFT_pinky_finger_primary_cc_01',
+    rigPrefix + '_LFT_pinky_metacarpal_secondary_cc_01',
+    rigPrefix + '_RGT_hand_cupping_splaying_cc_01',	#Right
+    rigPrefix + '_RGT_thumb_primary_cc_01',
+    rigPrefix + '_RGT_thumb_DIS_secondary_cc_01',
+    rigPrefix + '_RGT_index_finger_primary_cc_01',
+    rigPrefix + '_RGT_index_finger_DIS_secondary_cc_01',
+    rigPrefix + '_RGT_index_metacarpal_secondary_cc_01',
+    rigPrefix + '_RGT_middle_finger_DIS_secondary_cc_01',
+    rigPrefix + '_RGT_middle_finger_primary_cc_01',
+    rigPrefix + '_RGT_middle_metacarpal_secondary_cc_01',
+    rigPrefix + '_RGT_pinky_finger_DIS_secondary_cc_01',
+    rigPrefix + '_RGT_pinky_finger_primary_cc_01',
+    rigPrefix + '_RGT_pinky_metacarpal_secondary_cc_01']
+
+    viking_hips = [
+    rigPrefix + '_hips_cc_01']
+
+    viking_legs_feet = [
+    rigPrefix + '_LFT_leg_settings_cc_01',	#Left
+    rigPrefix + '_LFT_FK_ankle_cc_01',
+    rigPrefix + '_LFT_FK_lower_leg_cc_01',
+    rigPrefix + '_LFT_FK_upper_leg_cc_01',
+    rigPrefix + '_LFT_leg_pole_vector_cc_01',
+    rigPrefix + '_LFT_IK_leg_cc_01',
+    rigPrefix + '_LFT_foot_splaying_cc_01',
+    rigPrefix + '_LFT_foot_ball_cc_01',
+    rigPrefix + '_LFT_big_toe_DIS_secondary_cc_01',
+    rigPrefix + '_LFT_big_toe_MED_secondary_cc_01',
+    rigPrefix + '_LFT_big_toe_primary_cc_01',
+    rigPrefix + '_LFT_foot_ball_cc_01',
+    rigPrefix + '_RGT_leg_settings_cc_01',	#Right
+    rigPrefix + '_RGT_FK_ankle_cc_01',
+    rigPrefix + '_RGT_FK_lower_leg_cc_01',
+    rigPrefix + '_RGT_FK_upper_leg_cc_01',
+    rigPrefix + '_RGT_leg_pole_vector_cc_01',
+    rigPrefix + '_RGT_IK_leg_cc_01',
+    rigPrefix + '_RGT_foot_splaying_cc_01',
+    rigPrefix + '_RGT_foot_ball_cc_01',
+    rigPrefix + '_RGT_big_toe_DIS_secondary_cc_01',
+    rigPrefix + '_RGT_big_toe_MED_secondary_cc_01',
+    rigPrefix + '_RGT_big_toe_primary_cc_01',
+    rigPrefix + '_RGT_foot_ball_cc_01']
+
+    #viking_main +
+    fullRig = viking_head + viking_mouth + viking_neck + viking_torso + viking_arms + viking_arm_bendy + viking_hands + viking_hips + viking_legs_feet
+
+    #Create Selection from 'fullRig'
+    mc.select(fullRig, replace=True)
+    return fullRig
+
+
+def keyArmFK():
+    print (">>KeyArmFK() starting")
+    #mc.setAttr('ten_rig_main_l_arm_switch_CTL.IKFK_Switch', 1)
+    mc.setAttr(rigPrefix + '_LFT_arm_settings_cc_01.FK_IK', 0)  #FK mode
+
+    if (mc.getAttr(rigPrefix + '_LFT_arm_settings_cc_01.FK_IK', keyable=True) or mc.getAttr(rigPrefix + '_LFT_arm_settings_cc_01.FK_IK', channelBox=True)):
+        mc.setKeyframe(rigPrefix + '_LFT_arm_settings_cc_01.FK_IK');
+
+    #mc.setAttr('ten_rig_main_r_arm_switch_CTL.IKFK_Switch', 1)
+    mc.setAttr(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK', 0)  #really not sure about this
+
+    if (mc.getAttr(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK', keyable=True) or mc.getAttr(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK', channelBox=True)):
+        mc.setKeyframe(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK');
+
+def fingerNames():
+    #Note: Viking has no ring finger
+    return [
+    rigPrefix + '_LFT_thumb_primary_cc_01',
+    rigPrefix + '_LFT_index_metacarpal_secondary_cc_01',
+    rigPrefix + '_LFT_middle_metacarpal_secondary_cc_01',
+    rigPrefix + '_LFT_pinky_metacarpal_secondary_cc_01',
+    rigPrefix + '_RGT_thumb_primary_cc_01',
+    rigPrefix + '_RGT_index_metacarpal_secondary_cc_01',
+    rigPrefix + '_RGT_middle_metacarpal_secondary_cc_01',
+    rigPrefix + '_RGT_pinky_metacarpal_secondary_cc_01'
+]
+
+def scaleFingers():
+    print (">>ScaleFingers() starting")
+    for i in fingerNames():
+        mc.setAttr(i + '.scaleX', 1)
+        mc.setKeyframe(i, at='scaleX')
+
+def keyFingers():
+    print (">>KeyFingers() starting")
+    for i in fingerNames():
+	mc.setKeyframe(i, at='scaleX')
+
+
+def APose():
+    print (">>APose() starting")
+    mc.rotate(0, 0, -45, rigPrefix + '_LFT_FK_upper_arm_cc_01')
+    mc.rotate(0, 0, -45, rigPrefix + '_RGT_FK_upper_arm_cc_01')
+
+
+def setRigKey(fullRig):
+    print (">>SetRigKey() starting")
+    #Key Translation
+    mc.setKeyframe(fullRig, at='translateX')
+    mc.setKeyframe(fullRig, at='translateY')
+    mc.setKeyframe(fullRig, at='translateZ')
+    #Key Rotation
+    mc.setKeyframe(fullRig, at='rotateX')
+    mc.setKeyframe(fullRig, at='rotateY')
+    mc.setKeyframe(fullRig, at='rotateZ')
+
+    keyFingers()
+
+def clearKeys(rig, startFrame, endFrame):
+    cmds.cutKey(rig, time=(startFrame, endFrame))
+
+def translateRig(x, y, z):
+    mc.setAttr(rigPrefix + '_primary_global_cc_01.translateX', x)
+    mc.setAttr(rigPrefix + '_primary_global_cc_01.translateY', y)
+    mc.setAttr(rigPrefix + '_primary_global_cc_01.translateZ', z)
+
+###########################################
+#### MAIN ####
+###########################################
+
+fullRig = selectRig()
+
+#Remember anim start position
+startX = mc.getAttr(rigPrefix + '_primary_global_cc_01.translateX')
+startY = mc.getAttr(rigPrefix + '_primary_global_cc_01.translateY')
+startZ = mc.getAttr(rigPrefix + '_primary_global_cc_01.translateZ')
+
+#Clear any unnecessary animation (Be Careful!)
+#clearKeys(fullRig, STARTPRE_0, STARTANIM - 1)
+
+#Keyframe Initial Frame
+mc.currentTime(STARTANIM)
+#KEY ARM FK.IK here so it will be at STARTANIM in the mode it's supposed to be (NEW)
+mc.setKeyframe(rigPrefix + '_LFT_arm_settings_cc_01.FK_IK');
+mc.setKeyframe(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK');
+
+setRigKey(fullRig)
+
+#Get some frames at start pose
 mc.currentTime(STARTPRE)
-globalPos = mc.spaceLocator(p=[0,0,0])
-globPos = mc.rename(globalPos, "vikingGlobalPos")
-mc.select(vikingRigName)
-mc.select(globPos, add=True)
-mc.pointConstraint(offset=[0,0,0], weight=1) #constrains the globPos position to where viking's rig_main is
-mc.orientConstraint(offset=[0,0,0], weight=1) #orients the globPos to match viking's rig_main (I think it just does the rotation)
+setRigKey(fullRig)
 
-# Get transformation variables from globPos locator
-tx = mc.getAttr(globPos+".translateX")
-ty = mc.getAttr(globPos+".translateY")
-tz = mc.getAttr(globPos+".translateZ")
-rx = mc.getAttr(globPos+".rotateX")
-ry = mc.getAttr(globPos+".rotateY")
-rz = mc.getAttr(globPos+".rotateZ")
+#Clear Transformations
+mc.currentTime(STARTPRE_0)
+selectRig()
+keyArmFK() #this forces it to be in FK mode - could cause an issue if it wasn't originally in that mode
 
-# get alembic filepath for scene's animation (requires prior export)
-src = mc.file(q=True, sceneName=True)
-src_dir = os.path.dirname(src)
-checkout_element = project.get_checkout_element(src_dir)
-checkout_body_name = checkout_element.get_parent()
-body = project.get_body(checkout_body_name)
-element = body.get_element(Department.ANIM)
-cache_file = os.path.join(element.get_dir(), "cache", cache_name + ".abc")
-print("Expecting mesh alembic with name " + cache_name)
-# we could make a while loop to check if an alembic with this name exists already, if it does increment a suffix number on the filename
+clearRotate(fullRig)
+clearTranslate(fullRig)
+clearScale(fullRig)
 
-# checkout cfx scene for corresponding shot number
-current_user = environment.get_current_username()
-element = body.get_element(Department.CFX)
-cfx_filepath = element.checkout(current_user)
-print(">GenScene(): cfx_filepath= " + cfx_filepath) # see where it's expecting the file to be/what it's called
-print(">GenScene(): cache_file= " + cache_file) # this is where ABCimporter expects the character geo abc to be
+#Move rig to anim start position position
+translateRig(startX, startY, startZ)
 
-# open cfx file
-if cfx_filepath is not None:
-    if not mc.file(q=True, sceneName=True) == '':
-        mc.file(save=True, force=True) #save file
+#APose() -- No need to call APose() because Viking was built in A-Pose
+setRigKey(fullRig)
 
-    if not os.path.exists(cfx_filepath): #make a new CFX scene file
-        print(">GenScene(): CFX scene doesn't exist yet. Creating a new one")
-        mc.file(new=True, force=True)
-        mc.file(rename=cfx_filepath)
-        mc.file(save=True, force=True)
-    else:
-         mc.file(cfx_filepath, open=True, force=True)
+mc.setKeyframe(rigPrefix + '_COG_cc_01', at='translateX')
+mc.setKeyframe(rigPrefix + '_COG_cc_01', at='translateY')
+mc.setKeyframe(rigPrefix + '_COG_cc_01', at='translateZ')
 
-# import alembic
-command = "AbcImport -mode import \"" + cache_file + "\""
+mc.setKeyframe(rigPrefix + '_COG_cc_01', at='rotateX')
+mc.setKeyframe(rigPrefix + '_COG_cc_01', at='rotateY')
+mc.setKeyframe(rigPrefix + '_COG_cc_01', at='rotateZ')
 
-maya.mel.eval(command)
-
-#### PULL IN REFERENCE OBJECTS ####
-#Reference viking's CollisionMesh
-body = project.get_body("viking_collision_mesh_cloth")
-element = body.get_element(Department.MODEL)
-collisionMesh_file = element.get_app_filepath()
-mc.file(collisionMesh_file, reference=True)
-
-# Reference viking's tunic - it comes with both sim and beauty meshes
-body = project.get_body("viking_tunic")
-element = body.get_element(Department.MODEL)
-tunic_sim_file = element.get_app_filepath()
-mc.file(tunic_sim_file, reference=True)
-
-# Set full tunic group transforms to match viking's alembic
-mc.setAttr("viking_tunic_model_main_tunic.translateX", tx)
-mc.setAttr("viking_tunic_model_main_tunic.translateY", ty)
-mc.setAttr("viking_tunic_model_main_tunic.translateZ", tz)
-mc.setAttr("viking_tunic_model_main_tunic.rotateX", rx)
-mc.setAttr("viking_tunic_model_main_tunic.rotateY", ry)
-mc.setAttr("viking_tunic_model_main_tunic.rotateZ", rz)
-
-#Set collisionMesh transforms to match viking's alembic
-mc.setAttr("viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth.translateX", tx)
-mc.setAttr("viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth.translateY", ty)
-mc.setAttr("viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth.translateZ", tz)
-mc.setAttr("viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth.rotateX", rx)
-mc.setAttr("viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth.rotateY", ry)
-mc.setAttr("viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth.rotateZ", rz)
-
-#######################
-## Set Up Simulation ##
-#######################
-
-mc.select('viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth', replace=True)
-mc.viewFit() #Snap View to Body Collider
-mc.playbackOptions(animationStartTime=STARTPRE)
-mc.playbackOptions(minTime=STARTPRE)
-mc.currentTime(STARTPRE)
-
-#### Establish collision body
-mc.select('viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth', replace=True) #Collider Body
-mel.eval('makeCollideNCloth;')
-mc.setAttr('nRigid1.thickness', 0.001)
-
-#### Create nCloth
-mc.select('viking_tunic_model_main_tunic_sim_mesh', replace=True) #nCloth: tunic
-mel.eval('createNCloth 0;')
-
-### Attract to target mesh
-#mc.select('viking_rig_main_viking_tunic_model_main_tunic', replace=True)
-mc.select('viking_with_facial_rig_main_viking_tunic_model_main_tunic', replace=True)
-mc.select('viking_tunic_model_main_tunic_sim_mesh', add=True)
-mel.eval('createNConstraint match 1;')
-
-#### Establish Dynamic Constraints ####
-mc.setAttr('nClothShape1.thickness', 0.008) #Collision Properties
-mc.setAttr('nClothShape1.selfCollideWidthScale', 2.5)
-mc.setAttr('nClothShape1.friction', 1.0)
-mc.setAttr('nClothShape1.stickiness', 0.4)
-mc.setAttr('nClothShape1.stretchResistance', 350.0) #Dynamic Properties
-mc.setAttr('nClothShape1.compressionResistance', 100.0)
-mc.setAttr('nClothShape1.bendResistance', 1.0)
-mc.setAttr('nClothShape1.pointMass', 3.0)
-mc.setAttr('nClothShape1.lift', 0.1)
-mc.setAttr('nClothShape1.drag', 0.05)
-mc.setAttr('nClothShape1.tangentialDrag', 0.2)
-mc.setAttr('nClothShape1.damp', 4.0)		#Quality Properties
-mc.setAttr('nClothShape1.maxSelfCollisionIterations', 12)
-#mc.setAttr('nClothShape1.trappedCheck', 1)
-mc.setAttr('nClothShape1.pushOut', 0.025)
-
-# Neckline Constraints
-mc.select(clear=True)
-tunic_neckline_verts = [ '[411]', '[414]', '[415]', '[629]', '[630]', '[631]', '[632]', '[633]', '[654]', '[1513]', '[1516]',  '[1517]', '[1722]', '[1723]', '[1724]', '[1725]', '[1745]' ]
-
-for i in tunic_neckline_verts:
-    mc.select('viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth.vtx' + i, add=True)
-mc.select('viking_tunic_model_main_tunic_sim_mesh', add=True)
-mel.eval('createNConstraint pointToSurface 0;')
-mel.eval('setAttr "dynamicConstraintShape1.strengthDropoff[1].strengthDropoff_Position" 1;')
-mel.eval('setAttr "dynamicConstraintShape1.strengthDropoff[1].strengthDropoff_FloatValue" 0;')
-
-# Front Constraints
-#mc.select(clear=True)
-#tunic_front_verts = []
-
-#for i in tunic_front_verts:
-#    mc.select('viking_tunic_model_main_tunic.vtx' + i, add=True)
-#mc.select('viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth', add=True)
-#mel.eval('createNConstraint pointToSurface 0;')
-#mel.eval('setAttr "dynamicConstraintShape2.strengthDropoff[1].strengthDropoff_Position" 1;')
-#mel.eval('setAttr "dynamicConstraintShape2.strengthDropoff[1].strengthDropoff_FloatValue" 0;')
-
-
-# Set Nucleus Parameters
-mc.setAttr('nucleus1.startFrame', STARTPRE)
-mc.setAttr('nucleus1.spaceScale', 1.0)
-mc.setAttr("nucleus1.usePlane", 1)
-mc.setAttr("nucleus1.planeOriginX", tx)
-mc.setAttr("nucleus1.planeOriginY", ty)
-mc.setAttr("nucleus1.planeOriginZ", tz)
-mc.setAttr("nucleus1.windDirectionX", 0.9)  # add in wind here if necessary
-mc.setAttr("nucleus1.windDirectionZ", 0.1)
-mc.setAttr("nucleus1.subSteps", 12)
-mc.setAttr("nucleus1.maxCollisionIterations", 24)
-mc.setAttr("nucleus1.timeScale", 1)
-# you can try messing with nucleus time scale to increase substeps
-
-# Load cloth preset
-#cmds.nodePreset( list='nClothShape1' )
-#cmds.nodePreset( save=("nClothShape1","tunic_1") )
-#cmds.nodePreset( load=('nClothShape1', 'tunic_1') )
-
-
-#########################
-## PREPARE HERO MESHES ##
-#########################
-
-# Wrap Colliders to viking's character alembic
-# NOTE: if the dynamic constraints freak out, try changing the order that you do (collisionMesh wrap to character mesh) and (create dynamicConstraint)
-mc.select('viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth', replace=True) #Wrap Body
-mc.select(vikingBodyGeo, add=True)  #wrap the collision mesh to viking skin
-mc.CreateWrap()
-
-# Wrap bracelets to viking's character alembic
-mc.select('viking_tunic_model_main_bracelets', replace=True) #Wrap bracelets
-mc.select(vikingBodyGeo, add=True)  #wrap the bracelets to viking skin
-mc.CreateWrap()
-
-# Wrap Tunic Beauty Mesh to Sim Mesh
-mc.select('viking_tunic_model_main_tunic_beauty_mesh', replace=True)
-mc.select('viking_tunic_model_main_tunic_sim_mesh', add=True)
-mc.CreateWrap()
-
-# From Brennan: Do your best to only have one thing wrapping per sim - they are slow to calculate
-# if you need to adjust the collision mesh for a weird cloth thing, you can duplicate the collisionmesh,
-# adjust the shape/add more or whatever, then make it a blend shape to the original collision mesh.
-# Blend shapes DO require the same exact # of polygons but they're also a lot faster than regular wraps.
-#mc.setAttr('wrap1.exclusiveBind', 0) #it looks like this is the default
-
-# Rename/Group Simulation Objects
-mc.rename('nucleus1', 'nucleus_viking')
-mc.rename('nRigid1', 'nRigid_viking_body')
-mc.rename('nCloth1', 'nCloth_viking_tunic')
-
-mc.rename('dynamicConstraint1','constraint_tunic_neckline')
-#mc.rename('dynamicConstraint2','constraint_tunic_front')
-mc.group('constraint_tunic_neckline', name='viking_tunicConstraints')
-
-mc.group('nucleus_viking', 'nRigid_viking_body', 'nCloth_viking_tunic', 'viking_tunicConstraints', name='viking_tunic_simulation')
-
-# Hide Unnescessary Objects
-mc.hide('viking_tunic_model_main_tunic_sim_mesh')
-#mc.hide('viking_tunic_model_main_tunic_bracelets') # should we handle the bracelets in the other script?
-mc.hide('viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth')
-
-# Set display smoothness
-#mc.select('viking_tunic_model_main_tunic_sim_mesh', replace=True)
-#mc.select('viking_tunic_model_main_tunic_beauty_mesh', add=True)
-#mc.select('viking_tunic_model_main_bracelets', add=True)
-#cmds.displaySmoothness(du=3, dv=3, pw=16, ps=4, polygonObject=3)
-
-### Export tunic and braceletes as an alembic to shot cfx/main/cache, named tunic_sim.abc !!!!
-
-# Tag beauty mesh and bracelets for export
-#mc.select("viking_tunic_model_main_tunic_beauty_mesh", replace=True)
-#mc.select('viking_tunic_model_main_bracelets', add=True)
-#import alembic_tagger;
-#alembic_tagger.go()
+#Export Alembic (Requires User Input - Select Viking's Rig)
+mc.playbackOptions(animationStartTime=STARTPRE_0)
+import alembic_exporter
+reload(alembic_exporter)
+alembic_exporter.go(dept=Department.CFX)
