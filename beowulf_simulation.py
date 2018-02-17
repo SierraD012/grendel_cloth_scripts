@@ -38,8 +38,8 @@ def cleanupLayers():
     mc.rename('nCloth1', 'nCloth_beowulf_cape')
 
     mc.rename('dynamicConstraint1','constraint_cape_neckline')
-    mc.rename('dynamicConstraint2','constraint_cape_front')
-    mc.group('constraint_cape_neckline', 'constraint_cape_front', name='beowulf_capeConstraints')
+    #mc.rename('dynamicConstraint2','constraint_cape_front') #for some reason it doesn't like it when you rename DC2
+    mc.group('constraint_cape_neckline', 'dynamicConstraint2', name='beowulf_capeConstraints')
 
     mc.group('nucleus_beowulf', 'nRigid_beowulf_body', 'nCloth_beowulf_cape', 'beowulf_capeConstraints', name='beowulf_cape_simulation')
 
@@ -48,6 +48,7 @@ def cleanupLayers():
     mc.hide('beowulf_cape_model_main_beowulf_cape_clasps') #the chain/clasps are taken care of in the other script
     mc.hide('beowulf_cape_model_main_beowulf_cape_clasp_chain')
     mc.hide('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth')
+    mc.showHidden('beowulf_cape_model_main_beowulf_cape_beautyMesh')
 
     #Put stuff in layers:
     mc.select('beowulf_rig_main_Beowulf_geo_GRP_01', replace=True)
@@ -95,7 +96,6 @@ cache_name = "beowulf_rig_main"
 #I'm prettty sure cache_name should always be "beowulf_rig_main" - or whatever the ABCExporter created at the end of the preroll script
 cache_file = os.path.join(element.get_dir(), "cache", cache_name + ".abc")
 print("Expecting mesh alembic with name: " + cache_name)
-#we could make a while loop to check if an alembic with this name exists already, if it does increment a suffix number on the filename
 
 # checkout cfx scene for corresponding shot number
 current_user = environment.get_current_username()

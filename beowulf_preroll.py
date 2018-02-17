@@ -362,6 +362,8 @@ def constrainCapeChain():
 
     #Create parent constraint: (targetObject, childObject)
     mc.parentConstraint(rigPrefix+"Beowulf_chest_cc_01", "beowulf_cape_model_main_beowulf_capeChain_combined", maintainOffset=1, weight=1.0)
+    mc.select("beowulf_cape_model_main_beowulf_capeChain_combined", replace=True)
+    mc.rotate(-7.8375, 0.4445, 6.725, 'beowulf_cape_model_main_beowulf_capeChain_combined', objectSpace=True)
 
     #Hide original chain/clasp because we don't need them for this part
     mc.hide('beowulf_cape_model_main_beowulf_cape_clasps')
@@ -426,7 +428,7 @@ import alembic_tagger;
 alembic_tagger.go()
 #Export alembic of just Beowulf's geo
 import alembic_exporter
-alembic_exporter.go(cfx=True) # puts abc in the cfx file instead
+alembic_exporter.go(dept=Department.CFX) # puts abc in the cfx file instead
 
 #Export alembic of just the cape chain - might need do this manually because the ABC Exporter doesn't know how to find the tag on this one since it's not a reference
 #AbcExport -j "-frameRange -30 120 -step 0.25 -dataFormat ogawa -root |beowulf_cape_model_main_beowulf_capeChain_combined -file /groups/grendel/production/shots/b023/anim/main/cache/beowulf_capeChain.abc";
