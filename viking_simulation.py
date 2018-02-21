@@ -1,5 +1,6 @@
 # Authors: Brennan Mitchell, Sierra Davis, Ben Romney
 import os
+import re
 
 import maya
 import maya.mel as mel
@@ -12,19 +13,14 @@ from byuam.environment import Department, Environment
 STARTANIM = 1
 STARTPRE = -50
 
-vikingBodyGeo0 = 'viking_rig_main_Viking_body_GEO_01'
-vikingBodyGeo1 = 'Viking_body_GEO_01'
-vikingBodyGeo2 = 'viking_with_facial_rig_main_Viking_body_GEO_01'
-vikingBodyGeo = vikingBodyGeo2
+selection = mc.ls(selection=True)[0]
+rigPrefix = re.search( r'\w*main_\w*:?Viking', selection, re.I).group()
+rigPrefix = "viking_with_facial_rig_main" #until I can figure out that regex lol
 
-vikingRigName0 = "viking_rig_main_Viking_primary_global_cc_01"
-vikingRigName1 = "viking_with_facial_rig_main_mb29866846:Viking_primary_global_cc_01"
-vikingRigName2 = "viking_with_facial_rig_main_Viking_primary_global_cc_01"
-vikingRigName = vikingRigName2
+vikingBodyGeo = rigPrefix + '_body_GEO_01'
+vikingRigName = rigPrefix + '_primary_global_cc_01'
 
-cache_name0 = "viking_with_facial_rig_main"
-cache_name1 = "viking_with_facial_rig_main4"
-cache_name = cache_name0 # look in shots cfx/main/cache
+cache_name = rigPrefix # look in shots cfx/main/cache
 
 #########################
 ## ESTABLISH CFX SCENE ##
@@ -58,8 +54,7 @@ checkout_body_name = checkout_element.get_parent()
 body = project.get_body(checkout_body_name)
 element = body.get_element(Department.CFX)
 cache_file = os.path.join(element.get_dir(), "cache", cache_name + ".abc")
-print("Expecting mesh alembic with name " + cache_name)
-# we could make a while loop to check if an alembic with this name exists already, if it does increment a suffix number on the filename
+print("Expecting mesh alembic with name: " + cache_name)
 
 # checkout cfx scene for corresponding shot number
 current_user = environment.get_current_username()
@@ -83,7 +78,6 @@ if cfx_filepath is not None:
 
 # import alembic
 command = "AbcImport -mode import \"" + cache_file + "\""
-
 maya.mel.eval(command)
 
 #### PULL IN REFERENCE OBJECTS ####
@@ -239,6 +233,7 @@ mc.group('nucleus_viking', 'nRigid_viking_body', 'nCloth_viking_tunic', 'viking_
 
 # Hide Unnescessary Objects
 mc.hide('viking_tunic_model_main_tunic_sim_mesh')
+mc.hide('viking_with_facial_rig_main_Viking_tunic_geo')
 #mc.hide('viking_tunic_model_main_tunic_bracelets') # should we handle the bracelets in the other script?
 mc.hide('viking_collision_mesh_cloth_model_main_viking_collision_mesh_cloth')
 

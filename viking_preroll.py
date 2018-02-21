@@ -3,6 +3,7 @@
 # run this one BEFORE the sim script
 
 import os
+import re
 
 import maya
 import maya.mel as mel #Allows for evaluation of MEL
@@ -16,11 +17,10 @@ STARTPRE = -25
 STARTPRE_0 = -50
 
 # Rig Pefix:
-prefix0 = 'viking_rig_main_Viking'
-prefix1 = 'viking_with_facial_rig_main_Viking'
-prefix2 = 'viking_with_facial_rig_main_mb29866846:Viking'
-
-rigPrefix = prefix1
+#you have to have the viking group selected before running this part
+selection = mc.ls(selection=True)[0]
+rigPrefix = re.search( r'\w*main_\w*:?Viking', selection, re.I).group()
+print(">Viking rigPrefix = "+rigPrefix)
 
 
 ############################
@@ -31,7 +31,7 @@ rigPrefix = prefix1
 
 #Clears Rotation on a List of Objects
 def clearRotate(list):
-    print ('>>ClearRotate() starting')
+    print '>>ClearRotate() starting'
     for i in list:
         if mc.getAttr(i + '.rotateX', settable=True):
             mc.setAttr(i + '.rotateX', 0)
@@ -50,7 +50,7 @@ def clearRotate(list):
 
 #Clears Translation on a List of Objects
 def clearTranslate(list):
-    print (">>ClearTranslate() starting")
+    print ">>ClearTranslate() starting"
     for i in list:
         if mc.getAttr(i + '.translateX', settable=True):
             mc.setAttr(i + '.translateX', 0)
@@ -69,7 +69,7 @@ def clearTranslate(list):
 
 #Clears Scale on a List of Objects
 def clearScale(list):
-    print (">>ClearScale() starting")
+    print ">>ClearScale() starting"
     for i in list:
         if mc.getAttr(i + '.scaleX', settable=True):
             mc.setAttr(i + '.scaleX', 1)
@@ -91,12 +91,13 @@ def clearScale(list):
 
 #Selects/Returns Full Rig
 def selectRig():
-    print (">>SelectRig() starting")
+    print ">>SelectRig() starting"
 
     viking_main = [
     rigPrefix + '_main_cc_01',
-    rigPrefix + '_secondary_global_cc_01',
-    rigPrefix + '_primary_global_cc_01']
+    rigPrefix + '_secondary_global_cc_01']#,
+    #rigPrefix + '_primary_global_cc_01'] #don't change the pos of primary_global,
+            #that's what we use to determine where the collisionmesh should be placed
 
     viking_head = [
     rigPrefix + '_head_cc_01',
@@ -160,21 +161,6 @@ def selectRig():
     rigPrefix + '_RGT_FK_lower_arm_cc_01',
     rigPrefix + '_RGT_FK_upper_arm_cc_01']
 
-    #TEST
-    viking_arm_bendy = [
-    rigPrefix + '_LFT_upper_arm_bendy_cc_01',
-    rigPrefix + '_LFT_elbow_bendy_cc_01',
-    rigPrefix + '_LFT_lower_arm_bendy_cc_01',
-    rigPrefix + '_LFT_wrist_bendy_cc_01',
-    rigPrefix + '_LFT_shoulder_bendy_cc_01',
-    rigPrefix + '_LFT_shoulder_bendy_low_tangent_cc_01',
-    rigPrefix + '_RGT_upper_arm_bendy_cc_01',
-    rigPrefix + '_RGT_elbow_bendy_cc_01',
-    rigPrefix + '_RGT_lower_arm_bendy_cc_01',
-    rigPrefix + '_RGT_wrist_bendy_cc_01',
-    rigPrefix + '_RGT_shoulder_bendy_cc_01',
-    rigPrefix + '_RGT_shoulder_bendy_low_tangent_cc_01']
-
     viking_hands = [
     #Note: Viking has no ring finger
     rigPrefix + '_LFT_hand_cupping_splaying_cc_01',     #Left
@@ -231,8 +217,7 @@ def selectRig():
     rigPrefix + '_RGT_big_toe_primary_cc_01',
     rigPrefix + '_RGT_foot_ball_cc_01']
 
-    #viking_main +
-    fullRig = viking_head + viking_mouth + viking_neck + viking_torso + viking_arms + viking_arm_bendy + viking_hands + viking_hips + viking_legs_feet
+    fullRig = viking_main + viking_head + viking_mouth + viking_neck + viking_torso + viking_arms + viking_hands + viking_hips + viking_legs_feet
 
     #Create Selection from 'fullRig'
     mc.select(fullRig, replace=True)
@@ -240,7 +225,7 @@ def selectRig():
 
 
 def keyArmFK():
-    print (">>KeyArmFK() starting")
+    print ">>KeyArmFK() starting"
     #mc.setAttr('ten_rig_main_l_arm_switch_CTL.IKFK_Switch', 1)
     mc.setAttr(rigPrefix + '_LFT_arm_settings_cc_01.FK_IK', 0)  #FK mode
 
@@ -248,7 +233,7 @@ def keyArmFK():
         mc.setKeyframe(rigPrefix + '_LFT_arm_settings_cc_01.FK_IK');
 
     #mc.setAttr('ten_rig_main_r_arm_switch_CTL.IKFK_Switch', 1)
-    mc.setAttr(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK', 0)  #really not sure about this
+    mc.setAttr(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK', 0)
 
     if (mc.getAttr(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK', keyable=True) or mc.getAttr(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK', channelBox=True)):
         mc.setKeyframe(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK');
@@ -267,25 +252,18 @@ def fingerNames():
 ]
 
 def scaleFingers():
-    print (">>ScaleFingers() starting")
+    print ">>ScaleFingers() starting"
     for i in fingerNames():
         mc.setAttr(i + '.scaleX', 1)
         mc.setKeyframe(i, at='scaleX')
 
 def keyFingers():
-    print (">>KeyFingers() starting")
+    print ">>KeyFingers() starting"
     for i in fingerNames():
 	mc.setKeyframe(i, at='scaleX')
 
-
-def APose():
-    print (">>APose() starting")
-    mc.rotate(0, 0, -45, rigPrefix + '_LFT_FK_upper_arm_cc_01')
-    mc.rotate(0, 0, -45, rigPrefix + '_RGT_FK_upper_arm_cc_01')
-
-
 def setRigKey(fullRig):
-    print (">>SetRigKey() starting")
+    print ">>SetRigKey() starting"
     #Key Translation
     mc.setKeyframe(fullRig, at='translateX')
     mc.setKeyframe(fullRig, at='translateY')
@@ -296,6 +274,11 @@ def setRigKey(fullRig):
     mc.setKeyframe(fullRig, at='rotateZ')
 
     keyFingers()
+
+def APose():
+    print ">>APose() starting"
+    mc.rotate(0, 0, -45, rigPrefix + '_LFT_FK_upper_arm_cc_01')
+    mc.rotate(0, 0, -45, rigPrefix + '_RGT_FK_upper_arm_cc_01')
 
 def clearKeys(rig, startFrame, endFrame):
     cmds.cutKey(rig, time=(startFrame, endFrame))
@@ -317,15 +300,17 @@ startY = mc.getAttr(rigPrefix + '_primary_global_cc_01.translateY')
 startZ = mc.getAttr(rigPrefix + '_primary_global_cc_01.translateZ')
 
 #Clear any unnecessary animation (Be Careful!)
+# looks like sometimes the viking is animated to start at origin around frame -30 and then move to starting position
+# clearKeys doesn't seem to do the trick, I just went to the graph editor and deleted the keyframe bunch before 0
 #clearKeys(fullRig, STARTPRE_0, STARTANIM - 1)
 
 #Keyframe Initial Frame
 mc.currentTime(STARTANIM)
-#KEY ARM FK.IK here so it will be at STARTANIM in the mode it's supposed to be (NEW)
+setRigKey(fullRig)
+
+#KEY ARM FK.IK here so it will be at frame 0 in the mode the animators intended - this may not be necessary every time
 mc.setKeyframe(rigPrefix + '_LFT_arm_settings_cc_01.FK_IK');
 mc.setKeyframe(rigPrefix + '_RGT_arm_settings_cc_01.FK_IK');
-
-setRigKey(fullRig)
 
 #Get some frames at start pose
 mc.currentTime(STARTPRE)
@@ -334,14 +319,16 @@ setRigKey(fullRig)
 #Clear Transformations
 mc.currentTime(STARTPRE_0)
 selectRig()
-keyArmFK() #this forces it to be in FK mode - could cause an issue if it wasn't originally in that mode
+keyArmFK()
 
 clearRotate(fullRig)
 clearTranslate(fullRig)
 clearScale(fullRig)
 
-#Move rig to anim start position position
-translateRig(startX, startY, startZ)
+#Move rig to anim start position posOk no prob, we mainly use it just to make sure we all have the most recent versions. what's your email?
+ition
+#this shouldn't be necessary if we didn't clear translation from primary_global
+#translateRig(startX, startY, startZ)
 
 #APose() -- No need to call APose() because Viking was built in A-Pose
 setRigKey(fullRig)
@@ -356,6 +343,8 @@ mc.setKeyframe(rigPrefix + '_COG_cc_01', at='rotateZ')
 
 #Export Alembic (Requires User Input - Select Viking's Rig)
 mc.playbackOptions(animationStartTime=STARTPRE_0)
+import alembic_tagger;
+alembic_tagger.go()
 import alembic_exporter
-reload(alembic_exporter)
-alembic_exporter.go(dept=Department.CFX)
+#reload(alembic_exporter)
+alembic_exporter.go(dept=Department.CFX) # puts abc in the cfx file instead

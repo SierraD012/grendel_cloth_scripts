@@ -389,7 +389,7 @@ mc.currentTime(STARTANIM)
 fullRig = selectRig()
 setRigKey(fullRig)
 
-#KEY ARM FK.IK here so it will be at STARTANIM in the mode it's supposed to be - this may not be necessary very often
+#KEY ARM FK.IK here so it will be at frame 0 in the mode the animators intended - this may not be necessary every time
 mc.setKeyframe(rigPrefix + 'Beowulf_LFT_arm_settings_cc_01.FK_IK');
 mc.setKeyframe(rigPrefix + 'Beowulf_RGT_arm_settings_cc_01.FK_IK');
 
