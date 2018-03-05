@@ -62,7 +62,7 @@ def clearTranslate(list):
         if mc.getAttr(i + '.translateZ', settable=True):
             mc.setAttr(i + '.translateZ', 0)
         else:
-	       print ('************ Skipping ' + str(i) + '.translateZ')
+	        print ('************ Skipping ' + str(i) + '.translateZ')
 
 #Clears Scale on a List of Objects
 def clearScale(list):
@@ -292,7 +292,7 @@ def scaleFingers():
 def keyFingers():
     print (">>KeyFingers(): starting")
     for i in fingerNames():
-	mc.setKeyframe(i, at='scaleX')
+	    mc.setKeyframe(i, at='scaleX')
 
 
 def APose():

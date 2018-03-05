@@ -59,6 +59,17 @@ def cleanupLayers():
     mc.createDisplayLayer(name="Beowulf_cape_sim") #TEST: this should create the layer using the stuff we just selected
 
 
+
+#######################
+##       MAIN        ##
+#######################
+
+global rigPrefix
+rigPrefix = "beowulf_rig_main_"  #concatenate this with every other control name
+
+#generateScene()
+
+
 #########################
 ## ESTABLISH CFX SCENE ##
 #########################
@@ -90,7 +101,7 @@ src_dir = os.path.dirname(src)
 checkout_element = project.get_checkout_element(src_dir)
 checkout_body_name = checkout_element.get_parent()
 body = project.get_body(checkout_body_name)
-element = body.get_element(Department.ANIM)
+element = body.get_element(Department.CFX)
 #cache_name = "beowulf_"+checkout_body_name+"_anim_main" # this is me doing it arbitrarily but I think the preroll script picks its own name
 cache_name = "beowulf_rig_main"
 #I'm prettty sure cache_name should always be "beowulf_rig_main" - or whatever the ABCExporter created at the end of the preroll script
@@ -144,14 +155,6 @@ mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth
 mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.rotateZ", rz)
 
 
-#######################
-##       MAIN        ##
-#######################
-
-global rigPrefix
-rigPrefix = "beowulf_rig_main_"  #concatenate this with every other control name
-
-#generateScene()
 
 #######################
 ## Set Up Simulation ##
@@ -237,7 +240,7 @@ mc.setAttr("nucleus1.timeScale", 2)
 #Wrap Colliders to Beowulf's character alembic
 #NOTE: if the dynamic constraints freak out, try changing the order that you do (collisionMesh wrap to character mesh) and (create dynamicConstraint)
 mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth', replace=True) #Wrap Body
-mc.select('beowulf_rig_main_Beowulf_body_GEO_01', add=True)  #wrap the collision mesh to Beowulf skin
+mc.select(rigPrefix+'Beowulf_body_GEO_01', add=True)  #wrap the collision mesh to Beowulf skin
 mc.CreateWrap()
 
 #From Brennan: Do your best to only have one thing wrapping per sim - they are slow to calculate
