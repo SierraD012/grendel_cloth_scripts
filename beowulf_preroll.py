@@ -9,7 +9,7 @@ import maya.cmds as mc
 from byuam.project import Project
 from byuam.environment import Department, Environment
 
-STARTANIM = -5
+STARTANIM = -5 
 STARTPRE = -50
 
 

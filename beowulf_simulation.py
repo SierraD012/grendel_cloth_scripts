@@ -37,13 +37,13 @@ def cleanupLayers():
     mc.rename('nRigid1', 'nRigid_beowulf_body')
     mc.rename('nCloth1', 'nCloth_beowulf_cape')
 
-    mc.rename('dynamicConstraint1','constraint_cape_neckline')
+    #mc.rename('dynamicConstraint1','constraint_cape_neckline')
     #mc.rename('dynamicConstraint2','constraint_cape_front') #for some reason it doesn't like it when you rename DC2
-    mc.group('constraint_cape_neckline', 'dynamicConstraint2', name='beowulf_capeConstraints')
+    mc.group('dynamicConstraint1', 'dynamicConstraint2', name='beowulf_capeConstraints')
 
     mc.group('nucleus_beowulf', 'nRigid_beowulf_body', 'nCloth_beowulf_cape', 'beowulf_capeConstraints', name='beowulf_cape_simulation')
 
-    #Hide Unnescessary Objects
+    #Hide Unnecessary Objects
     mc.hide('beowulf_cape_model_main_beowulf_cape_simMesh')
     mc.hide('beowulf_cape_model_main_beowulf_cape_clasps') #the chain/clasps are taken care of in the other script
     mc.hide('beowulf_cape_model_main_beowulf_cape_clasp_chain')
@@ -227,10 +227,9 @@ mc.setAttr("nucleus1.usePlane", 1)
 mc.setAttr("nucleus1.planeOriginX", tx)
 mc.setAttr("nucleus1.planeOriginY", ty)
 mc.setAttr("nucleus1.planeOriginZ", tz)
-mc.setAttr("nucleus1.windDirectionX", 0.9)  # add in wind here if necessary
-mc.setAttr("nucleus1.windDirectionZ", 0.1)
+#mc.setAttr("nucleus1.windDirectionX", 0.9)  # add in wind here if necessary
+#mc.setAttr("nucleus1.windDirectionZ", 0.1)
 mc.setAttr("nucleus1.timeScale", 2)
-# you can try messing with nucleus time scale to increase substeps
 
 
 #########################
@@ -238,7 +237,6 @@ mc.setAttr("nucleus1.timeScale", 2)
 #########################
 
 #Wrap Colliders to Beowulf's character alembic
-#NOTE: if the dynamic constraints freak out, try changing the order that you do (collisionMesh wrap to character mesh) and (create dynamicConstraint)
 mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth', replace=True) #Wrap Body
 mc.select(rigPrefix+'Beowulf_body_GEO_01', add=True)  #wrap the collision mesh to Beowulf skin
 mc.CreateWrap()
@@ -246,13 +244,12 @@ mc.CreateWrap()
 #From Brennan: Do your best to only have one thing wrapping per sim - they are slow to calculate
 # if you need to adjust the collision mesh for a weird cloth thing, you can duplicate the collisionmesh, adjust the shape/add more or whatever, then make it a blend shape to the original collision mesh. Blend shapes DO require the same exact # of polygons but they're also a lot faster than regular wraps.
 
-
 # Wrap Cape Beauty Mesh to Sim Mesh
 mc.select('beowulf_cape_model_main_beowulf_cape_beautyMesh', replace=True)
 mc.select('beowulf_cape_model_main_beowulf_cape_simMesh', add=True)
 mc.CreateWrap()
 
-#cleanupLayers()  #this is causing problems with the wraps
+cleanupLayers()
 
 #Tag cape object for export
 mc.select("beowulf_cape_model_main_beowulf_cape_beautyMesh", replace = True)
