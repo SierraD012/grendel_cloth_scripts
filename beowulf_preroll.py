@@ -262,6 +262,9 @@ def keyArmFK():
     if (mc.getAttr(rightArmFK, keyable=True) or (mc.getAttr(rightArmFK, channelBox=True))):
         mc.setKeyframe(rightArmFK);
 
+def fingerNames():
+    baseFingerNames = [
+    'Beowulf_LFT_thumb_primary_cc_01',
     'Beowulf_LFT_index_metacarpal_secondary_cc_01',
     'Beowulf_LFT_middle_metacarpal_secondary_cc_01',
     'Beowulf_LFT_ring_metacarpal_secondary_cc_01',
