@@ -12,6 +12,9 @@ from byuam.environment import Department, Environment
 STARTANIM = -5
 STARTPRE = -50
 
+global rigPrefix
+rigPrefix = "beowulf_rig_main_"  #concatenate this with every other control name
+
 def getReferenceObjects():
     #Reference Beowulf's CollisionMesh
     body = project.get_body("beowulf_collision_mesh_cloth")
@@ -51,7 +54,7 @@ def cleanupLayers():
     mc.showHidden('beowulf_cape_model_main_beowulf_cape_beautyMesh')
 
     #Put stuff in layers:
-    mc.select('beowulf_rig_main_Beowulf_geo_GRP_01', replace=True)
+    mc.select(rigPrefix+'Beowulf_geo_GRP_01', replace=True)
     mc.select('beowulf_cape_model_main_beowulf_capeChain_combined', add=True)
     mc.createDisplayLayer(name="Beowulf_geo") #TEST: this should create the layer using the stuff we just selected
     mc.select('beowulf_cape_model_main_Beowulf_Cape', replace=True)
@@ -64,21 +67,13 @@ def cleanupLayers():
 ##       MAIN        ##
 #######################
 
-global rigPrefix
-rigPrefix = "beowulf_rig_main_"  #concatenate this with every other control name
-
-#generateScene()
-
-
-#########################
-## ESTABLISH CFX SCENE ##
-#########################
-
 #def generateScene():
 project = Project()
 environment = Environment()
 
-# Create a global position locator for Beowulf's Starting Location
+# Create a global position locator for Beowulf's Starting Location\
+# We should already have this data from the preroll script
+'''
 mc.currentTime(STARTPRE)
 globalPos = mc.spaceLocator(p=[0,0,0])
 globPos = mc.rename(globalPos, "beowulfGlobalPos")
@@ -94,6 +89,7 @@ tz = mc.getAttr(globPos+".translateZ")
 rx = mc.getAttr(globPos+".rotateX")
 ry = mc.getAttr(globPos+".rotateY")
 rz = mc.getAttr(globPos+".rotateZ")
+'''
 
 # get alembic filepath for scene's animation (requires prior export)
 src = mc.file(q=True, sceneName=True)
@@ -116,7 +112,10 @@ print(">GenScene(): cfx_filepath= " + cfx_filepath) # see where it's expecting t
 print(">GenScene(): cache_file= " + cache_file) # this is where ABCimporter expects the character geo abc to be
 
 
-#open cfx file
+#########################
+## ESTABLISH CFX SCENE ##
+#########################
+
 if cfx_filepath is not None:
     if not mc.file(q=True, sceneName=True) == '': #I think this means if we already have the CFX scene open just save it...
         mc.file(save=True, force=True) #save file

@@ -9,7 +9,7 @@ import maya.cmds as mc
 from byuam.project import Project
 from byuam.environment import Department, Environment
 
-STARTANIM = -5 
+STARTANIM = -5
 STARTPRE = -50
 
 
@@ -262,9 +262,6 @@ def keyArmFK():
     if (mc.getAttr(rightArmFK, keyable=True) or (mc.getAttr(rightArmFK, channelBox=True))):
         mc.setKeyframe(rightArmFK);
 
-def fingerNames():
-    baseFingerNames = [
-    'Beowulf_LFT_thumb_primary_cc_01',
     'Beowulf_LFT_index_metacarpal_secondary_cc_01',
     'Beowulf_LFT_middle_metacarpal_secondary_cc_01',
     'Beowulf_LFT_ring_metacarpal_secondary_cc_01',
@@ -361,9 +358,9 @@ def constrainCapeChain():
     mc.select("beowulf_cape_model_main_beowulf_capeChain_combined", add=True)
 
     #Create parent constraint: (targetObject, childObject)
+    mc.rotate(0, 0, 11.292982, 'beowulf_cape_model_main_beowulf_capeChain_combined', objectSpace=True)
     mc.parentConstraint(rigPrefix+"Beowulf_chest_cc_01", "beowulf_cape_model_main_beowulf_capeChain_combined", maintainOffset=1, weight=1.0)
-    mc.select("beowulf_cape_model_main_beowulf_capeChain_combined", replace=True)
-    mc.rotate(-7.8375, 0.4445, 6.725, 'beowulf_cape_model_main_beowulf_capeChain_combined', objectSpace=True)
+
 
     #Hide original chain/clasp because we don't need them for this part
     mc.hide('beowulf_cape_model_main_beowulf_cape_clasps')
