@@ -1,30 +1,12 @@
-#Authors: Daniel Fuller, Brennan Mitchell,
-
 import os
-
 import maya
-import maya.mel as mel #Allows for evaluation of MEL
+import maya.mel as mel
 import maya.cmds as mc
-
 from byuam.project import Project
 from byuam.environment import Department, Environment
 
 STARTANIM = -5
 STARTPRE = -50
-
-
-############################
-## PRE-ROLL BEOWULF ANIMATION ##
-# this version (2) has each rig control name with the prefix "_"
-# because the layout scenes have that (the rig file doesn't)
-############################
-
-# If you come across a shot where the rig's primary control is far away from the actual mesh for some reason
-# you can go far back in the preroll and set a keyframe on the primary control at a position really close to
-# where the mesh will start at frame 0, so then when you run this script the character mesh will be at A-pose
-# really close to where it should be at frame 0. This makes it so you don't have to deal with the mesh
-# flying 500 units over to its start point during preroll.
-
 
 #Clears Rotation on a List of Objects
 def clearRotate(list):
@@ -85,15 +67,8 @@ def clearScale(list):
 
 
 #Selects/Returns Full Rig
-# update: it looks like all the accessories + beard go with the transformation, so that's cool
 def selectRig():
     print (">>SelectRig() starting")
-
-    #these are what moves the entire rig group - if we skip these the rig will move from A-pose to scene start pose without flying back from origin
-    #beowulf_main = [
-    #'Beowulf_main_cc_01',
-    #'Beowulf_secondary_global_cc_01',
-    #'Beowulf_primary_global_cc_01']
 
     beowulf_head = [
     'Beowulf_head_cc_01',
@@ -248,17 +223,12 @@ def selectRig():
 def keyArmFK():
     print (">>KeyArmFK() starting")
     leftArmFK = rigPrefix + 'Beowulf_LFT_arm_settings_cc_01.FK_IK'
-
     mc.setAttr(leftArmFK, 0)  #FK mode
-
     if (mc.getAttr(leftArmFK, keyable=True) or mc.getAttr(leftArmFK, channelBox=True)):
         mc.setKeyframe(leftArmFK);
 
-
     rightArmFK = rigPrefix + 'Beowulf_RGT_arm_settings_cc_01.FK_IK'
-
     mc.setAttr(rightArmFK, 0)
-
     if (mc.getAttr(rightArmFK, keyable=True) or (mc.getAttr(rightArmFK, channelBox=True))):
         mc.setKeyframe(rightArmFK);
 
@@ -294,12 +264,9 @@ def keyFingers():
     for i in fingerNames():
 	    mc.setKeyframe(i, at='scaleX')
 
-
 def APose():
     print (">>APose(): starting")
-    #Handle Right Arm
-    mc.rotate(0, 0, 0, rigPrefix + 'Beowulf_LFT_FK_upper_arm_cc_01') #so far, we don't seem to need to rotate the arms to get them to match the collision mesh arms
-    #Handle Left Arm
+    mc.rotate(0, 0, 0, rigPrefix + 'Beowulf_LFT_FK_upper_arm_cc_01')
     mc.rotate(0, 0, 0, rigPrefix + 'Beowulf_RGT_FK_upper_arm_cc_01')
     print (">>APose(): done")
 
@@ -315,11 +282,17 @@ def setRigKey(fullRig):
     mc.setKeyframe(fullRig, at='rotateY')
     mc.setKeyframe(fullRig, at='rotateZ')
 
+    mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='translateX')
+    mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='translateY')
+    mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='translateZ')
+    mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateX')
+    mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateY')
+    mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateZ')
+
     keyFingers()
     print (">>SetRigKey(): done")
 
 #Used to constrain the clasps/chain on the front of the cape to Beowulf's chest rig control
-#this is kind of a fake sim, we should probably just use it when the chain is not directly visible!
 def constrainCapeChain():
     # Create a global position locator for Beowulf's main rig control location
     globalPos = mc.spaceLocator(p=[0,0,0])
@@ -327,7 +300,7 @@ def constrainCapeChain():
     mc.select(rigPrefix+"Beowulf_primary_global_cc_01")
     mc.select(globPos, add=True)
     mc.pointConstraint(offset=[0,0,0], weight=1) #constrains the globPos position to where Beowulf's rig_main is
-    mc.orientConstraint(offset=[0,0,0], weight=1) #orients the globPos to match Beowulf's rig_main (I think it just does the rotation)
+    mc.orientConstraint(offset=[0,0,0], weight=1) #orients the globPos to match Beowulf's rig_main
 
     # Get transformation variables from globPos locator
     tx = mc.getAttr(globPos+".translateX")
@@ -349,11 +322,10 @@ def constrainCapeChain():
 
     #Select & combine the clasps & chain meshes
     mc.select("beowulf_cape_model_main_beowulf_cape_clasps", replace=True)
-    mc.select("beowulf_cape_model_main_beowulf_cape_clasp_chain", add=True) #not really necessary to select these two
+    mc.select("beowulf_cape_model_main_beowulf_cape_clasp_chain", add=True)
     mc.polyUnite("beowulf_cape_model_main_beowulf_cape_clasps", "beowulf_cape_model_main_beowulf_cape_clasp_chain", name="beowulf_cape_model_main_beowulf_capeChain_combined")
     #center the combined object's pivot so we can rotate it to look more normal
     mc.xform("beowulf_cape_model_main_beowulf_capeChain_combined", centerPivots=True)
-    #mc.setAttr("beowulf_cape_model_main_beowulf_capeChain_combined.rotateZ", -16.0) #probably need to tweak this every time
 
     #Select the rig control we want to parent the chain/clasp to
     mc.select(rigPrefix+"Beowulf_chest_cc_01", replace=True)
@@ -361,9 +333,7 @@ def constrainCapeChain():
     mc.select("beowulf_cape_model_main_beowulf_capeChain_combined", add=True)
 
     #Create parent constraint: (targetObject, childObject)
-    mc.rotate(0, 0, 11.292982, 'beowulf_cape_model_main_beowulf_capeChain_combined', objectSpace=True)
     mc.parentConstraint(rigPrefix+"Beowulf_chest_cc_01", "beowulf_cape_model_main_beowulf_capeChain_combined", maintainOffset=1, weight=1.0)
-
 
     #Hide original chain/clasp because we don't need them for this part
     mc.hide('beowulf_cape_model_main_beowulf_cape_clasps')
@@ -389,7 +359,7 @@ mc.currentTime(STARTANIM)
 fullRig = selectRig()
 setRigKey(fullRig)
 
-#KEY ARM FK.IK here so it will be at frame 0 in the mode the animators intended - this may not be necessary every time
+#KEY ARM FK.IK here so it will be at frame 0 in the mode the animators intended
 mc.setKeyframe(rigPrefix + 'Beowulf_LFT_arm_settings_cc_01.FK_IK');
 mc.setKeyframe(rigPrefix + 'Beowulf_RGT_arm_settings_cc_01.FK_IK');
 
@@ -399,25 +369,14 @@ mc.playbackOptions(minTime=STARTPRE)
 
 selectRig()
 keyArmFK()
-
 clearRotate(fullRig)
 clearTranslate(fullRig)
 clearScale(fullRig)
 
 #Key APose (Adjust Arms, Keyframe)
-APose() #this may not be necessary for Beowulf's model
+APose()
 setRigKey(fullRig)
-
-mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='translateX')
-mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='translateY')
-mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='translateZ')
-mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateX')
-mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateY')
-mc.setKeyframe(rigPrefix + 'Beowulf_COG_cc_01', at='rotateZ')
-
-
 #Since we have Beowulf's rig available right now, let's constrain the cape chain/clasps
-#to his rig right now and export an alembic of that (you probs need to do that manually since we can't ABC tag it)
 constrainCapeChain()
 
 #Export full mesh alembic - Just Beowulf's geo
@@ -429,8 +388,3 @@ alembic_tagger.go()
 #Export alembic of just Beowulf's geo
 import alembic_exporter
 alembic_exporter.go(dept=Department.CFX) # puts abc in the cfx file instead
-
-#Export alembic of just the cape chain - might need do this manually because the ABC Exporter doesn't know how to find the tag on this one since it's not a reference
-#AbcExport -j "-frameRange -30 120 -step 0.25 -dataFormat ogawa -root |beowulf_cape_model_main_beowulf_capeChain_combined -file /groups/grendel/production/shots/b023/anim/main/cache/beowulf_capeChain.abc";
-#EXPORT TO CFX FOLDER WITH THIS NAME: beowulf_cape_chain_main.abc
-#Now you should probably publish this shot too

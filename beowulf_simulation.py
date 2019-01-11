@@ -1,11 +1,8 @@
-#Authors: Daniel Fuller, Trevor Barrus, Brennan Mitchell
 import os
-
 import maya
 import maya.mel as mel #Allows for evaluation of MEL
 import pymel.core as pc #Allows for evaluation of MEL (NECESSARY?)
 import maya.cmds as mc
-
 from byuam.project import Project
 from byuam.environment import Department, Environment
 
@@ -39,11 +36,7 @@ def cleanupLayers():
     mc.rename('nucleus1', 'nucleus_beowulf')
     mc.rename('nRigid1', 'nRigid_beowulf_body')
     mc.rename('nCloth1', 'nCloth_beowulf_cape')
-
-    #mc.rename('dynamicConstraint1','constraint_cape_neckline')
-    #mc.rename('dynamicConstraint2','constraint_cape_front') #for some reason it doesn't like it when you rename DC2
     mc.group('dynamicConstraint1', 'dynamicConstraint2', name='beowulf_capeConstraints')
-
     mc.group('nucleus_beowulf', 'nRigid_beowulf_body', 'nCloth_beowulf_cape', 'beowulf_capeConstraints', name='beowulf_cape_simulation')
 
     #Hide Unnecessary Objects
@@ -55,41 +48,27 @@ def cleanupLayers():
 
     #Put stuff in layers:
     mc.select(rigPrefix+'Beowulf_geo_GRP_01', replace=True)
-    mc.select('beowulf_cape_model_main_beowulf_capeChain_combined', add=True)
-    mc.createDisplayLayer(name="Beowulf_geo") #TEST: this should create the layer using the stuff we just selected
+    mc.select(rigPrefix+'beowulf_capeChain_combined', add=True)
+    mc.createDisplayLayer(name="Beowulf_geo")
     mc.select('beowulf_cape_model_main_Beowulf_Cape', replace=True)
     mc.select('beowulf_cape_simulation', add=True)
-    mc.createDisplayLayer(name="Beowulf_cape_sim") #TEST: this should create the layer using the stuff we just selected
-
+    mc.createDisplayLayer(name="Beowulf_cape_sim")
 
 
 #######################
 ##       MAIN        ##
 #######################
 
-#def generateScene():
 project = Project()
 environment = Environment()
 
-# Create a global position locator for Beowulf's Starting Location\
-# We should already have this data from the preroll script
-'''
-mc.currentTime(STARTPRE)
-globalPos = mc.spaceLocator(p=[0,0,0])
-globPos = mc.rename(globalPos, "beowulfGlobalPos")
-mc.select(rigPrefix+"Beowulf_primary_global_cc_01")
-mc.select(globPos, add=True)
-mc.pointConstraint(offset=[0,0,0], weight=1) #constrains the globPos position to where Beowulf's rig_main is
-mc.orientConstraint(offset=[0,0,0], weight=1) #orients the globPos to match Beowulf's rig_main (I think it just does the rotation)
-
-# Get transformation variables from globPos locator
-tx = mc.getAttr(globPos+".translateX")
-ty = mc.getAttr(globPos+".translateY")
-tz = mc.getAttr(globPos+".translateZ")
-rx = mc.getAttr(globPos+".rotateX")
-ry = mc.getAttr(globPos+".rotateY")
-rz = mc.getAttr(globPos+".rotateZ")
-'''
+# dont make a new one just reset their vars for this script
+tx = mc.getAttr("beowulfGlobalPos.translateX")
+ty = mc.getAttr("beowulfGlobalPos.translateY")
+tz = mc.getAttr("beowulfGlobalPos.translateZ")
+rx = mc.getAttr("beowulfGlobalPos.rotateX")
+ry = mc.getAttr("beowulfGlobalPos.rotateY")
+rz = mc.getAttr("beowulfGlobalPos.rotateZ")
 
 # get alembic filepath for scene's animation (requires prior export)
 src = mc.file(q=True, sceneName=True)
@@ -98,9 +77,7 @@ checkout_element = project.get_checkout_element(src_dir)
 checkout_body_name = checkout_element.get_parent()
 body = project.get_body(checkout_body_name)
 element = body.get_element(Department.CFX)
-#cache_name = "beowulf_"+checkout_body_name+"_anim_main" # this is me doing it arbitrarily but I think the preroll script picks its own name
 cache_name = "beowulf_rig_main"
-#I'm prettty sure cache_name should always be "beowulf_rig_main" - or whatever the ABCExporter created at the end of the preroll script
 cache_file = os.path.join(element.get_dir(), "cache", cache_name + ".abc")
 print("Expecting mesh alembic with name: " + cache_name)
 
@@ -108,16 +85,12 @@ print("Expecting mesh alembic with name: " + cache_name)
 current_user = environment.get_current_username()
 element = body.get_element(Department.CFX)
 cfx_filepath = element.checkout(current_user)
-print(">GenScene(): cfx_filepath= " + cfx_filepath) # see where it's expecting the file to be/what it's called
-print(">GenScene(): cache_file= " + cache_file) # this is where ABCimporter expects the character geo abc to be
-
 
 #########################
 ## ESTABLISH CFX SCENE ##
 #########################
-
 if cfx_filepath is not None:
-    if not mc.file(q=True, sceneName=True) == '': #I think this means if we already have the CFX scene open just save it...
+    if not mc.file(q=True, sceneName=True) == '':
         mc.file(save=True, force=True) #save file
 
     if not os.path.exists(cfx_filepath): #make a new CFX scene file
@@ -133,8 +106,6 @@ mc.currentTime(STARTPRE)
 # import alembic for Beowulf's mesh
 command = "AbcImport -mode import \"" + cache_file + "\""
 maya.mel.eval(command)
-
-#### PULL IN REFERENCE OBJECTS ####
 getReferenceObjects()
 
 # Set full cape group transforms to match Beowulf's alembic
@@ -154,7 +125,6 @@ mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth
 mc.setAttr("beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth.rotateZ", rz)
 
 
-
 #######################
 ## Set Up Simulation ##
 #######################
@@ -170,11 +140,9 @@ mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth'
 mel.eval('makeCollideNCloth;')
 mc.setAttr('nRigid1.thickness', 0.001)
 
-
 #### Establish nCloth Objects ####
 mc.select('beowulf_cape_model_main_beowulf_cape_simMesh', replace=True) #nCloth: Robe
 mel.eval('createNCloth 0;')
-
 mc.setAttr('nClothShape1.thickness', 0.008) #Collision Properties
 mc.setAttr('nClothShape1.selfCollideWidthScale', 2.5)
 mc.setAttr('nClothShape1.friction', 1.0)
@@ -202,7 +170,7 @@ mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth'
 mel.eval('createNConstraint pointToSurface 0;')
 mel.eval('setAttr "dynamicConstraintShape1.strengthDropoff[1].strengthDropoff_Position" 1;')
 mel.eval('setAttr "dynamicConstraintShape1.strengthDropoff[1].strengthDropoff_FloatValue" 0;')
-mel.eval('setAttr "dynamicConstraintShape1.constraintMethod" 2;') #TEST: set constraint method to RubberBand - this might help with the stiffness
+mel.eval('setAttr "dynamicConstraintShape1.constraintMethod" 2;')
 
 #Front Constraints
 mc.select(clear=True)
@@ -214,7 +182,7 @@ mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth'
 mel.eval('createNConstraint pointToSurface 0;')
 mel.eval('setAttr "dynamicConstraintShape2.strengthDropoff[1].strengthDropoff_Position" 1;')
 mel.eval('setAttr "dynamicConstraintShape2.strengthDropoff[1].strengthDropoff_FloatValue" 0;')
-mel.eval('setAttr "dynamicConstraintShape2.constraintMethod" 2;') #TEST: set constraint method to RubberBand - this might help with the stiffness
+mel.eval('setAttr "dynamicConstraintShape2.constraintMethod" 2;')
 
 
 #Set Nucleus Parameters
@@ -234,14 +202,10 @@ mc.setAttr("nucleus1.timeScale", 2)
 #########################
 ## PREPARE HERO MESHES ##
 #########################
-
 #Wrap Colliders to Beowulf's character alembic
 mc.select('beowulf_collision_mesh_cloth_model_main_beowulf_collision_mesh_cloth', replace=True) #Wrap Body
 mc.select(rigPrefix+'Beowulf_body_GEO_01', add=True)  #wrap the collision mesh to Beowulf skin
 mc.CreateWrap()
-
-#From Brennan: Do your best to only have one thing wrapping per sim - they are slow to calculate
-# if you need to adjust the collision mesh for a weird cloth thing, you can duplicate the collisionmesh, adjust the shape/add more or whatever, then make it a blend shape to the original collision mesh. Blend shapes DO require the same exact # of polygons but they're also a lot faster than regular wraps.
 
 # Wrap Cape Beauty Mesh to Sim Mesh
 mc.select('beowulf_cape_model_main_beowulf_cape_beautyMesh', replace=True)
@@ -249,11 +213,8 @@ mc.select('beowulf_cape_model_main_beowulf_cape_simMesh', add=True)
 mc.CreateWrap()
 
 cleanupLayers()
-
 #Tag cape object for export
 mc.select("beowulf_cape_model_main_beowulf_cape_beautyMesh", replace = True)
 import alembic_tagger;
 alembic_tagger.go()
-
-#NOTE: if you export the cape alembic manually, make sure you select the top level of the cape hierarchy (NOT just beautyMesh or something), or else the cape may not export in world space and will show up in the wrong spot when you import it to Houdini!
 # export cape beauty mesh as beowulf_cape_model_main.abc to the cfx folder
